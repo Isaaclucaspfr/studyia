@@ -49,48 +49,48 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 
 ### Global (`style.css` + `base.html`)
 - [x] Tokens semânticos + aliases das variáveis indefinidas (A1) — Fase 2, `static/css/tokens.css`
-- [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) (parcial: os genéricos saíram na Fase 2; os de tela entram na Fase 3)
-- [ ] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5)
-- [ ] Media queries mobile-first (`640`, `768`, `1024`, `1280`)
+- [x] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) — genéricos na Fase 2, de tela na Fase 3 (lista na D24)
+- [ ] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5) — falta o erro e o digitando do chat (A5, Fase 4)
+- [x] Media queries mobile-first (`640`, `768`, `1024`, `1280`); referência em `--bp-*` no `tokens.css`
 - [x] `<link>` do Google Fonts só com a fonte aprovada (A7; ver decisão D1 no [registro](#registro-de-decisões))
 - [x] Navbar: layout em 375 px; "⚙️" com `aria-hidden` e rótulo de texto (A6)
-- [ ] Modal: estilos via `.modal-title`, `.modal-text`, `.modal-actions`. **Mantenha** `#settingsModal`, `#closeSettingsBtn`, `type="button"` e `display:none` inicial
-- [ ] Flashes: manter `alert-{{ category }}`
-- [ ] Rodapé RNF06 com classe e sem inline (A1, A8)
+- [x] Modal: estilos via `.modal-title`, `.modal-text`, `.modal-actions`. **Mantenha** `#settingsModal`, `#closeSettingsBtn`, `type="button"` e `display:none` inicial
+- [x] Flashes: manter `alert-{{ category }}`
+- [x] Rodapé RNF06 com classe e sem inline (A1, A8)
 
 ### `login.html` e `register.html`
-- [ ] `.auth-card`, sem inline
-- [ ] Manter os `name`s (`login_input`, `password` · `name`, `username`, `email`, `password`, `confirm_password`)
+- [x] `.auth-card`, sem inline
+- [x] Manter os `name`s (`login_input`, `password` · `name`, `username`, `email`, `password`, `confirm_password`)
 
 ### `dashboard.html`
-- [ ] `.page-header` + `.demo-banner` (A8). Manter `#openSettingsBtn2` e o `onclick` (mudar é B11)
-- [ ] Estatísticas com `.stat` e ícones `aria-hidden`
-- [ ] Cards de fluxo: manter os `name`s, o `enctype` e o `accept`
-- [ ] Histórico com `.list-item` e `.empty-state`; botão 🗑️ com nome acessível (A6). Manter `method="POST"` e o `onsubmit` (mudar é B6)
-- [ ] Manter o texto **"Painel de Estudos"** (título e `<h1>`)
+- [x] `.page-header` + `.notice` (o `.demo-banner` do 06 virou `.notice`) (A8). Manter `#openSettingsBtn2` e o `onclick` (mudar é B11)
+- [x] Estatísticas com `.stat` e ícones `aria-hidden`
+- [x] Cards de fluxo: manter os `name`s, o `enctype` e o `accept`
+- [x] Histórico com `.list-item` e `.empty-state`; botão 🗑️ com nome acessível (A6). Manter `method="POST"` e o `onsubmit` (mudar é B6)
+- [x] Manter o texto **"Painel de Estudos"** (título e `<h1>`)
 
 ### `study_topic.html`
-- [ ] Grid responsivo (1 coluna < 1024 px), sem o inline da linha 54 (A4)
-- [ ] Altura do chat via classe (`min(620px, 70dvh)` ou similar). O `#chatMessages` continua rolável (A4)
-- [ ] Bolhas: só CSS. **Não** mudar a estrutura de `:67-81` (está duplicada no JS, B11)
+- [x] Grid responsivo (1 coluna < 1024 px), sem o inline da linha 54 (A4)
+- [x] Altura do chat via classe (`min(620px, 70dvh)`, mínimo de 22rem). O `#chatMessages` continua rolável (A4)
+- [x] Bolhas: só CSS. **Não** mudar a estrutura de `:67-81` (está duplicada no JS, B11)
 - [ ] `.chat-bubble.typing` e `.chat-bubble.error` estilizados (A5)
-- [ ] Coluna lateral: `.card-header`, `.list-item`, `.empty-state`
-- [ ] Forms "gerar seminário" continuam POST
+- [x] Coluna lateral: `.card-header`, `.list-item`, `.empty-state`
+- [x] Forms "gerar seminário" continuam POST
 
 ### `plan_create.html`
-- [ ] Cabeçalho e form com classes; `value`s numéricos dos `<select>` intactos
+- [x] Cabeçalho e form com classes; `value`s numéricos dos `<select>` intactos
 
 ### `plan_view.html`
-- [ ] Barra de progresso: manter `#planProgressBar` (com `style="width"`) e `#planProgressText`
-- [ ] `.task-item` com o estado de concluído via `:has(:checked)`. Manter `.plan-task-checkbox`, `data-*` e `#label_{{ task_key }}`; **não tocar** na fórmula da `task_key` nem no loop
-- [ ] Manter o texto **"Progresso Geral de Execução"**
-- [ ] Faixa de CTA com classe
+- [x] Barra de progresso: manter `#planProgressBar` (com `style="width"`) e `#planProgressText`
+- [x] `.task-item` com o estado de concluído via `:has(:checked)`. Manter `.plan-task-checkbox`, `data-*` e `#label_{{ task_key }}`; **não tocar** na fórmula da `task_key` nem no loop
+- [x] Manter o texto **"Progresso Geral de Execução"**
+- [x] Faixa de CTA com classe
 
 ### `seminar_view.html`
-- [ ] `.score-panel` com a escala única `.score--high/mid/low` (A3, valores aprovados pelo grupo)
-- [ ] `.choice` para as alternativas. Manter `name="q_{{ qid }}"` e `value="{{ opt }}"`
-- [ ] `.feedback--*` para o retorno por questão. Por causa do B1 (✅ confirmado em 17/11/2026), esse bloco **não aparece** hoje: estilize pelo markup, mas não vai dar para validar visualmente até o B1 ser resolvido
-- [ ] **Não** alterar o `{% set %}` / `{% for %}` das linhas 98-104 (é o B1)
+- [x] `.score-panel` com a escala única `.score--high/mid/low` (A3; valores aprovados pelo Renzo, pendentes do grupo — D2)
+- [x] `.choice` para as alternativas. Manter `name="q_{{ qid }}"` e `value="{{ opt }}"`
+- [x] `.feedback--*` para o retorno por questão. Por causa do B1 (✅ confirmado em 17/11/2026), esse bloco **não aparece** hoje: estilize pelo markup, mas não vai dar para validar visualmente até o B1 ser resolvido
+- [x] **Não** alterar o `{% set %}` / `{% for %}` das linhas 98-104 (é o B1)
 
 ## Riscos
 
@@ -117,10 +117,10 @@ A sprint roda em uma branch só, `feat/redesign-visual`, dividida em 4 fases. Ca
 |---|---|---|
 | 1 | Versão atual, auditoria e direção visual (sem código) | ✅ concluída em 17/11/2026 |
 | 2 | Fundação: tokens, fonte, componentes base, navbar, modal | ✅ concluída em 17/11/2026 |
-| 3 | Telas: migração do inline para classes, tela por tela (**começa pelo T1**) | ⏳ próxima |
-| 4 | Estados, microinterações, polish e PR | — |
+| 3 | Telas: migração do inline para classes, tela por tela (**começa pelo T1**) | ✅ concluída em 17/11/2026 |
+| 4 | Estados, microinterações, polish e PR | ⏳ próxima |
 
-Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat). Fase 2: `../studyia-screenshots/fase2/` (375 e 1440 px).
+Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat). Fase 2: `../studyia-screenshots/fase2/` (375 e 1440 px). Fase 3: `../studyia-screenshots/fase3/` (todas as telas em 375, 768 e 1440 px, mais o modal e os estados vazios; medições em `../studyia-screenshots/fase3-report.json`).
 
 ---
 
@@ -218,6 +218,47 @@ Onde estas decisões divergirem da proposta do [06-padroes-visuais.md](../06-pad
 
 **D20. Escopo da Fase 2.** Entraram a navbar numa linha em 375 px, os alvos de toque de 44 px e as grades `.grid-2`/`.grid-3` sem estouro (fazem parte do `base.html` ou dos componentes). No modal, só foram acrescentadas as classes e o `aria-describedby` do campo; o inline sai na Fase 3. O layout das telas não foi tocado.
 
+### 17/11/2026 — Fase 3 (aprovadas pelo Renzo)
+
+**D21. Comportamento no mobile, por tela.**
+
+| Tela | < 640 px | 640–1023 px | ≥ 1024 px |
+|---|---|---|---|
+| Navbar | só o ícone da engrenagem; nome cortado com "…" | rótulos visíveis | igual |
+| Login/cadastro | card com 24 px de padding; botão com largura total | 32 px de padding | igual |
+| Dashboard | aviso de demo abaixo do título; KPIs como lista (rótulo à esquerda, número à direita); cards de fluxo empilhados; item do histórico em 2 linhas, sem ícone, com as ações embaixo à direita | KPIs em 3 colunas | cabeçalho em linha com o aviso à direita; cards de fluxo lado a lado (a partir de 768) |
+| Tópico | "Gerar Plano" sozinho na 1ª linha; "Mini Seminário" + Exportar só com ícone na 2ª; chat com `min(620px, 70dvh)`; painéis empilhados embaixo | botões em linha; os 2 painéis lado a lado abaixo do chat (a partir de 768) | chat 2/3 + lateral 1/3 |
+| Criar plano | campos em 1 coluna; Cancelar e Gerar empilhados, nessa ordem (bate com a ordem do Tab) | botões lado a lado, à direita | igual |
+| Ver plano | "Reajustar" com largura total; CTA empilhado com botão de largura total | igual | CTA em linha (a partir de 768) |
+| Seminário | a nota vem antes do título (`order`; não há nada focável dentro); fortes e a revisar empilhados; enviar com largura total | igual | nota à direita; envio centralizado |
+
+**D22. Ações do tópico.** Ordem: Gerar Plano (primário) → Mini Seminário → Exportar, para o primário vir primeiro no celular e no Tab. Abaixo de 640 px, o "Exportar" fica só com o ícone (`.btn-collapse` + `.btn-label-collapse`; o nome acessível continua).
+
+**D23. Sem a classe `.eyebrow`.** A D4 e o craft-floor proíbem eyebrow. O que carrega dado virou `.meta-label`, em sentence case: "Questão N" fica na linha do badge de status; "Sessão N" desceu para baixo do título do dia, junto dos minutos (`.meta-line`). Os eyebrows decorativos foram removidos.
+
+**D24. Classes de padrão e de tela** (aditivas; só `.stat-box` e `.stat-icon`, provisórias da Fase 2, foram removidas):
+- **Página:** `.page-header`, `.page-heading`, `.page-title-row`, `.page-title`, `.page-subtitle`, `.page-meta`, `.page-actions`, `.back-link`, `.btn-collapse` + `.btn-label-collapse`, `.meta-label`, `.meta-line`, `.link-action`.
+- **Card e lista:** `.card-header` (+ `--divided`), `.card-title`, `.card-subtitle`, `.card-text`, `.list-item` (+ `-media`, `-body`, `-title`, `-link`, `-meta`, `-actions`, `--stack`), `.row-between`, `.item-title`, `.item-meta`, `.empty-state--compact`.
+- **Avisos, auth e forms:** `.notice` (+ `.notice-text`), `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer`, `.narrow-page`, `.form-actions`, `.form-submit`, `.site-footer`, `.brand-mark-glyph`.
+- **KPIs:** `.stats`, `.stat`, `.stat-label`, `.stat-value`, `.stat-empty`.
+- **Tópico e plano:** `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.chat-header`, `.chat-title`, `.chat-count`, `.progress-card`, `.progress-summary`, `.progress-label`, `.progress-value`, `.progress-lg`, `.progress-foot`, `.plan-days`, `.plan-day-header`, `.task-list`, `.cta-strip`.
+- **Seminário:** `.score-panel`, `.score-head`, `.score-title`, `.score-summary`, `.score-box`, `.score-value`, `.score-label`, `.score--high/mid/low`, `.score-insights`, `.insight` (+ `--positive`, `--review`), `.question-list`, `.question-head`, `.question-title`, `.choices`, `.choice`, `.choice-input`, `.choice-text`, `.feedback` (+ `--correct`, `--partial`, `--incorrect`).
+- **Estados:** `.is-done`, `.is-selected`, `.is-readonly`, `.is-editable`.
+
+**D25. Inline condicional vira classe, sem lógica nova.** `{% if is_checked %}` → `.is-done`; `{% if user_answers.get(qid) == opt %}` → `.is-selected` (os 2 `if`s idênticos, de borda e de fundo, viraram 1 emissão de classe); o `if` do cursor → `.is-readonly` / `.is-editable`. Os 3 `if`s da nota emitem `.score--*`.
+
+**D26. Painel da nota.** Borda inteira de 1 px na cor da faixa (saiu a faixa colorida de 5 px no topo), número colorido, título na cor da tinta. Fortes e a revisar com texto normal; a cor fica só no ícone e na borda (S2).
+
+**D27. Textos.** Novo: "Começar pelo primeiro assunto" (botão do estado vazio do histórico, leva ao `#title`). Sentence case aplicado só no seminário nesta fase (S4). **Aprovado estender o sentence case a todas as telas na Fase 4, exceto os textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy)**, que ficam exatamente como estão.
+
+**D28. Login e cadastro alinhados à esquerda** (antes, centralizados); título de `h2` para `h1` (L2).
+
+**D29. KPIs mantêm um ícone cinza de 16 px** ao lado do rótulo, sem fundo.
+
+**D30. Seminário continua como botão secundário** em todos os lugares, inclusive no CTA do plano (D3).
+
+**D31. Glifos viram ícones.** "←", "→" e "+" trocados por 3 SVGs novos no sprite (`arrow-left`, `arrow-right`, `plus`), com o mesmo traço da D11.
+
 ---
 
 ## Checklist por fase (auditoria da Fase 1)
@@ -243,76 +284,78 @@ IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboa
 - [x] Emojis que funcionam como ícone trocados por SVG com `aria-hidden` (navbar, botões, cards, stats, avisos, badges); o botão de excluir ganhou "Excluir estudo" em `.sr-only` (A6). Ficam os avatares do chat (B11) e os títulos da nota (D2, Fase 3)
 - [x] Cache-busting: `?v=redesign_v1` em `tokens.css` e `style.css`
 
-### Fase 3 — Telas
+### Fase 3 — Telas — ✅ concluída em 17/11/2026
 
-**⚠️ PRIMEIRO ITEM DA FASE (antes de qualquer outra tela)**
-- [ ] **T1: rolagem horizontal da tela do tópico em 375 px** (✅ confirmada pelo Renzo no navegador em 17/11/2026; na Fase 2 o Playwright mediu 149 px de estouro). Causa: grid inline `grid-template-columns: 2fr 1fr` em `study_topic.html:54` e `height: 620px` inline no `.chat-window`. Correção: grid em classe com 1 coluna abaixo de 1024 px; `.chat-window { height: min(620px, 70dvh) }`; o `#chatMessages` continua com altura limitada e `overflow-y:auto`. **Validar em 375, 768 e 1440 px** (sem rolagem horizontal e com o chat rolando e recebendo mensagens novas) antes de seguir para o resto da fase (T1 · **C**, A4)
+- [x] **T1: rolagem horizontal da tela do tópico em 375 px.** Grid em `.topic-layout` (1 coluna abaixo de 1024 px) e `.chat-window { height: min(620px, 70dvh) }`. Estouro medido: 0 px em 375, 768 e 1440 px, em todas as telas. O `#chatMessages` rola e recebe mensagens novas (Playwright: `overflow-y:auto`, rolado até o fim). ✅ confirmado também pelo Renzo no navegador (T1 · **C**, A4)
 
-**Restos de inline encontrados na Fase 2** (o inline ainda vence os componentes novos)
-- [ ] Eyebrows e labels dos stats em caixa alta (`text-transform: uppercase` inline): remover (D4, DB2, DB6)
-- [ ] Bordas coloridas de 4 px (laterais e superiores) nos stats, nos cards de fluxo, nos dias do plano e no painel da nota: remover (G5, V1, S1)
-- [ ] Quadradinhos coloridos atrás dos ícones (`background` inline em `.stat-icon` e nos cabeçalhos dos cards): ícone cinza, sem fundo colorido (D1)
-- [ ] Borda tracejada do CTA de seminário em `plan_view.html` (V5)
-- [ ] Checkbox do plano: o inline força 18 px (o componente tem 20 px) e o `<label>` ainda não usa `.task-item`/`.task-text` (V2, V3)
-- [ ] Badge "N registros" do histórico cortado em 375 px: o cabeçalho é um flex inline sem quebra (DB5)
-- [ ] Radios desabilitados do seminário com o visual nativo: aplicar `.choice` (S3)
-- [ ] "Processar e Estudar Arquivo": trocar `.btn-purple` por `.btn-primary` (D14, DB3)
-- [ ] Modal: remover o inline de `h3`, `p`, `small` e da linha de ações; as classes já estão aplicadas (M1, D20)
+**Restos de inline encontrados na Fase 2**
+- [x] Eyebrows e labels dos stats em caixa alta: removidos (D4, D23, DB2, DB6)
+- [x] Bordas coloridas de 4 px nos stats, nos cards de fluxo, nos dias do plano e no painel da nota: removidas (G5, V1, S1)
+- [x] Quadradinhos coloridos atrás dos ícones: ícone cinza, sem fundo (D1)
+- [x] Borda tracejada do CTA de seminário (V5)
+- [x] Checkbox do plano com 20 px e `<label class="task-item">` + `.task-text` (V2, V3)
+- [x] Badge "N registros" sem corte em 375 px: `.card-header` quebra linha (DB5)
+- [x] Radios do seminário com `.choice` (S3)
+- [x] "Processar e Estudar Arquivo" com `.btn-primary` (D14, DB3)
+- [x] Modal sem inline (M1, D20)
 
 **Global**
-- [ ] Flash: tinta clara, borda de 1 px e ícone SVG; manter `alert-{{ category }}` (G13 · B)
-- [ ] Rodapé RNF06 discreto (13 px), alinhado ao grid, sem inline (G14 · B, A1, A8)
-- [x] Emojis trocados por SVG com `aria-hidden` nos templates; o botão de excluir ganha nome acessível (G7, A6) — adiantado na Fase 2, exceto os títulos da nota (S1/D2) e os avatares (B11)
+- [x] Flash mantendo `alert-{{ category }}`; o container some quando não há mensagem (G13)
+- [x] Rodapé RNF06 em `.site-footer`, 13 px, alinhado ao grid (G14, A1, A8)
+- [x] 183 `style=""` → 2, as duas [exceções permitidas](../06-padroes-visuais.md#exceções-permitidas) (`width` das barras de progresso). Nenhuma cor hardcoded nos templates
+- [x] Cache-busting: `?v=redesign_v2`
 
 **Login e cadastro**
-- [ ] Remover a pílula "PROJETO A3 — IA PARA O COTIDIANO" (L1 · M, D4)
-- [ ] Título como `h1` de 24 px, sem quebrar em 375 px (L2 · M)
-- [ ] `.auth-card` com 24 px de padding no celular, sem sombra (L3 · B)
+- [x] Pílula "PROJETO A3 — IA PARA O COTIDIANO" removida (L1, D4)
+- [x] Título como `h1` de 24 px, sem quebrar em 375 px (L2)
+- [x] `.auth-card` com 24 px de padding no celular, sem sombra (L3)
 
 **Dashboard**
-- [ ] `.notice` único (âmbar AA) no banner de demo; manter `#openSettingsBtn2` e o `onclick` (DB1 · A, A8)
-- [ ] KPIs em uma faixa dividida por linhas, número de 24 px com algarismos tabulares, "—" em cinza (DB2 · M)
-- [ ] Cards de fluxo com o mesmo peso; diferença só por título e ícone; manter `name`s, `enctype` e `accept` (DB3 · M)
-- [ ] `::file-selector-button` estilizado (DB4 · M)
-- [ ] Histórico como lista com divisórias; `aria-label` no excluir; item em 2 linhas em 375 px; manter `method="POST"` e o `onsubmit` (DB5 · M)
-- [ ] Remover o eyebrow; manter "Painel de Estudos" no título e no `h1` (DB6 · B)
+- [x] `.notice` âmbar no banner de demo; `#openSettingsBtn2` e `onclick` intactos (DB1, A8)
+- [x] KPIs em faixa dividida, número de 24 px com algarismos tabulares, "—" em cinza (DB2)
+- [x] Cards de fluxo com o mesmo peso; `name`s, `enctype` e `accept` intactos (DB3)
+- [x] `::file-selector-button` estilizado (DB4)
+- [x] Histórico como lista com divisórias, item em 2 linhas em 375 px; `method="POST"` e `onsubmit` intactos (DB5)
+- [x] Eyebrow removido; "Painel de Estudos" mantido (DB6)
+- [x] Estado vazio do histórico com link-âncora para `#title` (DB7, adiantado da Fase 4)
 
 **Tópico e chat**
-- [ ] T1: ver o [primeiro item da fase](#fase-3--telas) (resolver antes de tudo)
-- [ ] Uma ação primária no cabeçalho; as outras secundárias; quebra correta em 375 px (T4 · M)
-- [ ] Bolha do usuário chapada; contador de mensagens como texto secundário; estrutura da bolha intacta (T5 · M)
-- [ ] Coluna lateral como painel com lista (sem cards aninhados); "+ Novo" e "+ Gerar" como `.btn-ghost` de 44 px; forms de seminário continuam POST (T6 · M)
-- [ ] Input e botão do chat com a mesma altura (44 px); botão sem quebrar linha (T7 · B)
-- [ ] Markdown da bolha com tipografia de leitura; `overflow-x:auto` em `pre` e `table` (T8 · B)
+- [x] Uma ação primária no cabeçalho; quebra correta em 375 px (T4, D22)
+- [x] Bolha do usuário chapada; contador como texto secundário; estrutura da bolha intacta (T5)
+- [x] Coluna lateral como painel com lista; "Novo" e "Gerar" como `.btn-ghost`; forms de seminário em POST (T6)
+- [x] Input e botão do chat com 44 px; botão sem quebra (T7)
+- [x] Markdown da bolha: `overflow-x:auto` em `pre` e `table` (T8)
+- [x] Estados vazios de planos e de seminários (`.empty-state--compact`)
 
 **Criar plano**
-- [ ] Remover o eyebrow e o "(F07)" (P1 · M, D4)
-- [ ] Select com seta SVG e 44 px; card padrão; `value`s numéricos intactos (P2 · B)
+- [x] Eyebrow e "(F07)" removidos (P1, D4)
+- [x] Select com seta SVG e 44 px; `value`s numéricos intactos (P2)
 
 **Ver plano**
-- [ ] Cada dia como seção, sem borda colorida; minutos como texto secundário (V1 · M)
-- [ ] Tarefa concluída com cor AA via `.task-item:has(:checked)` (vale no carregamento; depois do clique, a cor inline do JS vence; ver pendências) (V2 · M)
-- [ ] Linha da tarefa com foco visível (`:has(:focus-visible)`) e 44 px; manter `.plan-task-checkbox`, `data-*`, `#label_{{ task_key }}` e a fórmula da `task_key` (V3 · B)
-- [ ] Manter "Progresso Geral de Execução" no HTML; `#planProgressBar` e `#planProgressText` intactos
-- [ ] CTA de seminário como faixa simples com botão (V5 · B)
+- [x] Cada dia como card sem borda colorida; minutos como texto secundário (V1)
+- [x] Tarefa concluída via `:has(:checked)` e `.is-done` (vale no carregamento; depois do clique, o inline do JS vence — B11) (V2)
+- [x] Linha da tarefa com foco visível e 44 px; contratos e `task_key` intactos (V3)
+- [x] "Progresso Geral de Execução" mantido; `#planProgressBar` e `#planProgressText` intactos
+- [x] CTA de seminário como `.cta-strip` (V5)
 
 **Seminário**
-- [ ] Escala de nota da D2 em borda, número e título (S1 · A, A3)
-- [ ] Painéis "fortes" e "a revisar" com texto na cor normal e cor só no ícone e na borda (S2 · A)
-- [ ] `.choice` com `:has(:checked)` e `:has(:focus-visible)`; resposta marcada legível no resultado; manter `name="q_{{ qid }}"` e `value="{{ opt }}"` (S3 · M)
-- [ ] `.feedback--*` estilizado pelo markup (não validável por causa do B1)
-- [ ] Sentence case; sem emoji; botão de envio com largura total no celular (S4 · B)
-- [ ] **Não** alterar o `{% set %}` / `{% for %}` das linhas 98-104 (B1)
+- [x] Escala de nota da D2 na borda, no número e no título (S1, A3)
+- [x] Fortes e a revisar com texto na cor normal (S2)
+- [x] `.choice` com `:has(:checked)` e `:has(:focus-visible)`; resposta marcada legível no resultado (S3)
+- [x] `.feedback--*` estilizado pelo markup (⚠️ não validado visualmente por causa do B1)
+- [x] Sem emoji; sentence case no seminário; envio com largura total no celular (S4)
+- [x] `{% set %}` / `{% for %}` do B1 intocados
 
 ### Fase 4 — Estados e polish
 - [ ] `.chat-bubble.typing`: texto atenuado e 3 pontos animados em CSS; estático com reduced-motion (T2 · A, A5)
 - [ ] `.chat-bubble.error`: tinta de perigo, borda e ícone via `::before` (T3 · A, A5)
-- [ ] Estado vazio do histórico com link-âncora para o campo `#title` (DB7 · B)
+- [x] Estado vazio do histórico com link-âncora para o campo `#title` (DB7 · B) — adiantado na Fase 3
 - [ ] Barra de progresso: transição de 200 ms com ease-out (a largura continua pelo JS) (V4 · B)
 - [ ] Modal: entrada com `@starting-style` (M2 · B, D6)
 - [ ] Feedback ao pressionar botões (D6)
 - [ ] `::selection`, `accent-color` via token, scrollbar (G15 · B)
 - [ ] Favicon SVG em `static/` + `<link rel="icon">` no `base.html` (G15, D8)
+- [ ] **Sentence case em todas as telas** (D27): títulos, botões, rótulos e badges. **Exceção: os textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) não mudam** ("Painel de Estudos", "Progresso Geral de Execução" e os demais), nem os `value`s e `name`s. Rodar o `test_app.py` depois
 - [ ] Critérios de aceite completos (fluxo manual, 375/1440 px, `git diff --stat` fora do escopo vazio)
 - [ ] Descrição do PR destacando a D2 como **pendente de validação do grupo**
 
@@ -320,7 +363,7 @@ IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboa
 
 ## Pendências fora do escopo
 
-Encontradas ou decididas nas Fases 1 e 2. Nenhuma entra nesta sprint.
+Encontradas ou decididas nas Fases 1 a 3. Nenhuma entra nesta sprint.
 
 | Pendência | Por que fica de fora | Categoria |
 |---|---|---|
@@ -334,6 +377,8 @@ Encontradas ou decididas nas Fases 1 e 2. Nenhuma entra nesta sprint.
 | Feedback por questão do seminário não aparece | Escopo de variável no Jinja ([B1](../05-achados-frontend.md), ✅ confirmado) | B |
 | "Piso" de imagens e de animações do taste-skill | Vale para landing pages, não para telas de app | — |
 | Tema escuro | Fora do escopo da sprint | — |
+| "Dia N:" repetido no título do dia do plano, logo acima de "Sessão N" (D23) | Texto gerado pelo fallback do `ai_service.py:249`; ver [backend-pendencias §14](../handoff/backend-pendencias.md#14-dia-n-repetido-no-título-do-dia-do-plano) | C |
+| Emojis no conteúdo do chat (📚 🎯 🚀 🧭 💬 💡) | Texto gerado pelo `ai_service.py` (fallback e modelo do prompt); ver [backend-pendencias §15](../handoff/backend-pendencias.md#15-emojis-no-conteúdo-gerado) | C |
 | Script `unpkg.com/lucide@latest` no `base.html`: **carregado e não usado — remover junto com a revisão das CDNs** | Nenhum template usa `data-lucide` e os ícones agora são SVG inline (D11). Remover mexe em CDN | B (versões de CDN) |
 
 ---
@@ -342,12 +387,12 @@ Encontradas ou decididas nas Fases 1 e 2. Nenhuma entra nesta sprint.
 
 As regras da sprint (git, escopo, contratos, skills e protocolo de cada fase) estão no `CLAUDE.local.md`, carregado automaticamente. Este arquivo guarda o progresso e as decisões.
 
-**Próxima fase: Fase 3 — Telas.**
-1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões), D1–D20, e o [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1)) e os SKILL.md das skills da fase.
-2. Trabalhar em `feat/redesign-visual`. Arquivos da fase: `templates/*.html` (markup e classes) e `static/css/style.css`. Os tokens estão em `static/css/tokens.css`; componentes novos usam só os tokens semânticos (`--color-*`, `--space-*`, `--text-*`), nunca `--chakra-*`.
-3. **Primeiro passo, obrigatório: corrigir o T1** (rolagem horizontal da tela do tópico em 375 px) e validar em **375, 768 e 1440 px** antes de qualquer outra tela. Ver o primeiro item do checklist da Fase 3.
-4. Depois: a migração do inline para classes, tela por tela (login e cadastro primeiro), cumprindo o [checklist do 04](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme) em cada template. Incluir a lista "Restos de inline encontrados na Fase 2".
-5. Ícones: usar o sprite do `base.html` (`<use href="#i-nome">`, D11). Para um ícone novo, acrescentar um `<symbol>` no sprite, com o mesmo traço.
-6. Ao mudar o CSS, subir o cache-busting para `?v=redesign_v2`.
-7. A porta 5000 pode estar ocupada por uma instância antiga. Para testar sem tocar no `studyia.db`: `DATABASE_PATH=<arquivo temporário> .venv/bin/flask --app app run --port 5055`.
-8. Comparar com `../studyia-screenshots/fase2/` e salvar as novas em `../studyia-screenshots/fase3/`.
+**Próxima fase: Fase 4 — Estados, microinterações, polish e PR.**
+1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões), D1–D31, e o checklist da [Fase 4](#fase-4--estados-e-polish)) e os SKILL.md das skills da fase (emil kowalski para as microinterações, impeccable para estados e consistência).
+2. Trabalhar em `feat/redesign-visual`. Arquivos: `static/css/style.css` (estados e movimento), `templates/*.html` (só para o sentence case da D27 e o favicon da D8) e um SVG novo em `static/`.
+3. Itens da fase: `.chat-bubble.typing` com 3 pontos e `.chat-bubble.error` (A5); transição da barra de progresso; entrada do modal com `@starting-style`; feedback ao pressionar; `::selection`, `accent-color` e scrollbar; favicon; **sentence case em todas as telas, sem tocar nos textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy)**. Tudo desligado com `prefers-reduced-motion: reduce`.
+4. Os estados `typing` e `error` vêm do `app.js` (a classe já é aplicada; só falta o CSS). Para vê-los: o typing aparece enquanto a resposta não chega; o error aparece com o servidor fora do ar durante o envio.
+5. Classes da Fase 3 (D24) já cobrem as telas; para algo novo, preferir estender uma delas a criar outra. Componentes usam só tokens semânticos (`--color-*`, `--space-*`, `--text-*`).
+6. Ao mudar o CSS, subir o cache-busting para `?v=redesign_v3`.
+7. Testar sem tocar no `studyia.db`: `DATABASE_PATH=<arquivo temporário> .venv/bin/flask --app app run --port 5055` (a 5000 pode estar ocupada). Comparar com `../studyia-screenshots/fase3/` e salvar em `../studyia-screenshots/fase4/`.
+8. Fim da fase = fim da sprint: critérios de aceite completos (fluxo manual, 375/1440 px, `git diff --stat main` fora do escopo vazio) e a descrição do PR destacando a **D2 como pendente de validação do grupo**.
