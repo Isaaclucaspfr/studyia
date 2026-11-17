@@ -3,76 +3,52 @@
 {% block title %}Painel de Estudos — StudyIA{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 2.25rem;">
-    <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <div style="font-size: 0.8rem; font-weight: 700; color: var(--chakra-colors-teal-600); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.25rem;">
-                Espaço de Aprendizagem
-            </div>
-            <h1 style="font-size: 2rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
-                Painel de Estudos
-            </h1>
-            <p style="color: var(--chakra-colors-gray-600); font-size: 0.95rem; margin-top: 0.25rem;">
-                Pesquise qualquer assunto ou envie um arquivo para transformar seu conteúdo em aprendizagem estruturada.
-            </p>
-        </div>
-
-        {% if not has_custom_key %}
-        <div style="background: var(--chakra-colors-yellow-50); border: 1px solid var(--chakra-colors-yellow-100); border-radius: var(--chakra-radii-md); padding: 0.55rem 0.95rem; font-size: 0.8rem; color: var(--chakra-colors-orange-500); display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--chakra-shadows-xs);">
-            <span>⚡ Modo Demonstração Ativo</span>
-            <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar Chave Gemini</button>
-        </div>
-        {% endif %}
+<div class="page-header">
+    <div class="page-heading">
+        <h1 class="page-title">Painel de Estudos</h1>
+        <p class="page-subtitle">
+            Pesquise qualquer assunto ou envie um arquivo para transformar seu conteúdo em aprendizagem estruturada.
+        </p>
     </div>
+
+    {% if not has_custom_key %}
+    <div class="notice">
+        <span class="notice-text"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo demonstração ativo</span>
+        <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar chave Gemini</button>
+    </div>
+    {% endif %}
 </div>
 
-<!-- Métricas Chakra Stat -->
-<div class="grid-3" style="margin-bottom: 2.5rem;">
-    <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-teal-500);">
-        <div class="stat-icon" style="background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-600);">
-            📚
-        </div>
-        <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">{{ total_topics }}</div>
-            <div style="font-size: 0.8rem; color: var(--chakra-colors-gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">Tópicos de Estudo</div>
-        </div>
+<!-- Métricas -->
+<div class="stats">
+    <div class="stat">
+        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg> Tópicos de estudo</div>
+        <div class="stat-value">{{ total_topics }}</div>
     </div>
 
-    <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-purple-500);">
-        <div class="stat-icon" style="background: var(--chakra-colors-purple-50); color: var(--chakra-colors-purple-600);">
-            📅
-        </div>
-        <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">{{ total_plans }}</div>
-            <div style="font-size: 0.8rem; color: var(--chakra-colors-gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">Planos Gerados</div>
-        </div>
+    <div class="stat">
+        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos gerados</div>
+        <div class="stat-value">{{ total_plans }}</div>
     </div>
 
-    <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-green-500);">
-        <div class="stat-icon" style="background: var(--chakra-colors-green-50); color: var(--chakra-colors-green-600);">
-            🎯
-        </div>
-        <div>
-            <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">
-                {% if avg_score is not none %}{{ avg_score }}%{% else %}—{% endif %}
-            </div>
-            <div style="font-size: 0.8rem; color: var(--chakra-colors-gray-500); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.25rem;">Desempenho ({{ total_seminars }} concl.)</div>
+    <div class="stat">
+        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Desempenho ({{ total_seminars }} concl.)</div>
+        <div class="stat-value">
+            {% if avg_score is not none %}{{ avg_score }}%{% else %}<span class="stat-empty">—</span>{% endif %}
         </div>
     </div>
 </div>
 
 <!-- Dois Fluxos Principais (F02 e F05) -->
-<div class="grid-2" style="margin-bottom: 2.5rem;">
+<div class="grid-2 flows">
     <!-- Fluxo 1: Pesquisar Assunto Geral -->
-    <div class="card" style="border-top: 4px solid var(--chakra-colors-teal-500);">
-        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem;">
-            <div style="background: var(--chakra-colors-teal-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;">🔍</div>
-            <div>
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900);">Pesquisar Assunto Geral</h2>
-                <span class="badge badge-subject" style="margin-top: 0.15rem;">Modo Aberto</span>
-            </div>
+    <div class="card flow-card">
+        <div class="flow-head">
+            <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
+            <h2>Pesquisar assunto geral</h2>
+            <span class="badge badge-subject">Modo aberto</span>
         </div>
-        <p style="font-size: 0.875rem; color: var(--chakra-colors-gray-600); margin-bottom: 1.5rem;">
+        <p class="card-text">
             Explore qualquer conceito ou tema. A IA preparará uma fundamentação conceitual detalhada e acompanhará suas dúvidas progressivas.
         </p>
 
@@ -83,42 +59,40 @@
             </div>
 
             <div class="form-group">
-                <label for="initial_question">Primeira dúvida ou objetivo (opcional):</label>
+                <label for="initial_question">Primeira dúvida ou objetivo (opcional)</label>
                 <input type="text" name="initial_question" id="initial_question" class="form-control" placeholder="ex: O que é normalização e por que usá-la?">
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem;">
-                Iniciar Estudo com IA
+            <button type="submit" class="btn btn-primary btn-block">
+                Iniciar estudo com IA
             </button>
         </form>
     </div>
 
     <!-- Fluxo 2: Estudar Arquivo Anexado -->
-    <div class="card" style="border-top: 4px solid var(--chakra-colors-purple-500);">
-        <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem;">
-            <div style="background: var(--chakra-colors-purple-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;">📄</div>
-            <div>
-                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900);">Estudo Exclusivo de Arquivo</h2>
-                <span class="badge badge-file" style="margin-top: 0.15rem;">Fidelidade Restrita</span>
-            </div>
+    <div class="card flow-card">
+        <div class="flow-head">
+            <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-file"></use></svg>
+            <h2>Estudo exclusivo de arquivo</h2>
+            <span class="badge badge-file">Fidelidade restrita</span>
         </div>
-        <p style="font-size: 0.875rem; color: var(--chakra-colors-gray-600); margin-bottom: 1.5rem;">
+        <p class="card-text">
             Envie sua apostila, artigo ou PDF. O StudyIA ancorará suas respostas <strong>exclusivamente</strong> no texto do documento, evitando alucinações.
         </p>
 
         <form action="{{ url_for('upload_file') }}" method="POST" enctype="multipart/form-data">
             <div class="form-group">
-                <label for="document">Selecione o arquivo (PDF, TXT ou MD — máx. 10MB):</label>
+                <label for="document">Selecione o arquivo (PDF, TXT ou MD — máx. 10MB)</label>
                 <input type="file" name="document" id="document" class="form-control" accept=".pdf,.txt,.md" required>
             </div>
 
             <div class="form-group">
-                <label for="custom_title">Título de referência (opcional):</label>
+                <label for="custom_title">Título de referência (opcional)</label>
                 <input type="text" name="custom_title" id="custom_title" class="form-control" placeholder="ex: Apostila de Banco de Dados — 1º Semestre">
             </div>
 
-            <button type="submit" class="btn btn-purple" style="width: 100%; padding: 0.75rem;">
-                Processar e Estudar Arquivo
+            <button type="submit" class="btn btn-primary btn-block">
+                Processar e estudar arquivo
             </button>
         </form>
     </div>
@@ -126,50 +100,48 @@
 
 <!-- Histórico Individual (F04) -->
 <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--chakra-colors-gray-200); padding-bottom: 1rem;">
+    <div class="card-header">
         <div>
-            <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900);">Seu Histórico de Estudos</h2>
-            <p style="font-size: 0.825rem; color: var(--chakra-colors-gray-500); margin-top: 0.15rem;">Todos os seus tópicos, perguntas, planos e notas gravados com segurança no banco de dados</p>
+            <h2 class="card-title">Seu histórico de estudos</h2>
+            <p class="card-subtitle">Todos os seus tópicos, perguntas, planos e notas gravados com segurança no banco de dados</p>
         </div>
-        <span class="badge" style="background: var(--chakra-colors-gray-100); color: var(--chakra-colors-gray-700);">
-            {{ topics|length }} registros
-        </span>
+        <span class="badge badge-neutral">{{ topics|length }} registros</span>
     </div>
 
     {% if topics %}
-    <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+    <div class="list">
         {% for t in topics %}
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-lg); background: #ffffff; flex-wrap: wrap; gap: 0.85rem; transition: all 0.15s ease;">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div style="width: 44px; height: 44px; border-radius: var(--chakra-radii-md); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: {% if t.topic_type == 'file' %}var(--chakra-colors-purple-50){% else %}var(--chakra-colors-teal-50){% endif %};">
-                    {% if t.topic_type == 'file' %}📄{% else %}💡{% endif %}
+        <div class="list-item">
+            <div class="list-item-media">
+                {% if t.topic_type == 'file' %}<svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-file"></use></svg>{% else %}<svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>{% endif %}
+            </div>
+            <div class="list-item-body">
+                <div class="list-item-title">
+                    <a href="{{ url_for('view_topic', topic_id=t.id) }}" class="list-item-link">
+                        {{ t.title }}
+                    </a>
+                    {% if t.topic_type == 'file' %}
+                    <span class="badge badge-file">{{ t.file_name }}</span>
+                    {% else %}
+                    <span class="badge badge-subject">Assunto geral</span>
+                    {% endif %}
                 </div>
-                <div>
-                    <div style="display: flex; align-items: center; gap: 0.65rem;">
-                        <a href="{{ url_for('view_topic', topic_id=t.id) }}" style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900); text-decoration: none;">
-                            {{ t.title }}
-                        </a>
-                        {% if t.topic_type == 'file' %}
-                        <span class="badge badge-file">{{ t.file_name }}</span>
-                        {% else %}
-                        <span class="badge badge-subject">Assunto Geral</span>
-                        {% endif %}
-                    </div>
-                    <div style="font-size: 0.8rem; color: var(--chakra-colors-gray-500); margin-top: 0.25rem;">
-                        Iniciado em {{ t.created_at[:10] }} • 
-                        <strong>{{ t.plans_count }}</strong> plano(s) • 
-                        <strong>{{ t.seminars_count }}</strong> mini seminário(s)
-                    </div>
+                <div class="list-item-meta">
+                    Iniciado em {{ t.created_at[:10] }} •
+                    <strong>{{ t.plans_count }}</strong> plano(s) •
+                    <strong>{{ t.seminars_count }}</strong> mini seminário(s)
                 </div>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 0.65rem;">
+            <div class="list-item-actions">
                 <a href="{{ url_for('view_topic', topic_id=t.id) }}" class="btn btn-outline btn-sm">
-                    Abrir Estudo →
+                    Abrir estudo
+                    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
                 </a>
-                <form action="{{ url_for('delete_topic', topic_id=t.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta pesquisa e todas as atividades vinculadas?');" style="margin: 0;">
-                    <button type="submit" class="btn btn-danger-outline btn-sm" title="Excluir">
-                        🗑️
+                <form action="{{ url_for('delete_topic', topic_id=t.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta pesquisa e todas as atividades vinculadas?');">
+                    <button type="submit" class="btn btn-danger-outline btn-sm btn-icon" title="Excluir">
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-trash"></use></svg>
+                        <span class="sr-only">Excluir estudo</span>
                     </button>
                 </form>
             </div>
@@ -177,9 +149,11 @@
         {% endfor %}
     </div>
     {% else %}
-    <div style="text-align: center; padding: 3rem 1rem; color: var(--chakra-colors-gray-500);">
-        <p style="font-size: 1.15rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--chakra-colors-gray-700);">Nenhum estudo iniciado ainda.</p>
-        <p style="font-size: 0.875rem;">Utilize os cartões acima para pesquisar um tema ou anexar seu primeiro documento!</p>
+    <div class="empty-state">
+        <svg class="icon empty-state-icon" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg>
+        <p class="empty-state-title">Nenhum estudo iniciado ainda.</p>
+        <p class="empty-state-text">Utilize os cartões acima para pesquisar um tema ou anexar seu primeiro documento!</p>
+        <a href="#title" class="btn btn-secondary">Começar pelo primeiro assunto</a>
     </div>
     {% endif %}
 </div>

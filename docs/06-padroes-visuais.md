@@ -1,149 +1,162 @@
 # 06 — Padrões visuais
 
-> **Status: PROPOSTA — aguardando aprovação do grupo.** Nada aqui está implementado. Depois de aprovado, este arquivo vira a referência do redesign.
+> **Status: aguardando aprovação do grupo.** Implementado na [sprint 01](sprints/sprint-01-redesign-visual.md) (branch `feat/redesign-visual`, 17/11/2026). Depois do merge do PR, este arquivo vira a referência visual do StudyIA. As decisões que levaram a cada valor (D1–D40) estão no [registro da sprint](sprints/sprint-01-redesign-visual.md#registro-de-decisões).
 
 ## Princípios
 
-- **Mesmo stack:** HTML + Jinja + CSS puro + o `app.js` existente. **Sem React, sem Tailwind, sem build step, sem npm.**
-- **Tudo no `static/css/style.css`.** Se o arquivo crescer demais, ele pode ser dividido em mais arquivos `.css` carregados pelo `base.html`, ainda sem build.
-- **Nenhum contrato de [04-contratos-frontend.md](04-contratos-frontend.md) é quebrado.** As classes atuais usadas pelo JS ou geradas pelo backend continuam existindo.
+- **Mesmo stack:** HTML + Jinja + CSS puro + o `app.js` existente. **Sem React, sem Tailwind, sem build step, sem npm.** Ícones em SVG inline (sprite no `base.html`), sem biblioteca.
+- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `redesign_v3`).
+- **Nenhum contrato de [04-contratos-frontend.md](04-contratos-frontend.md) é quebrado.** As classes usadas pelo JS ou geradas pelo backend continuam existindo.
 - **Inspiração:** a anatomia de componentes do shadcn/ui (estrutura simples, variantes por modificador, estados explícitos), feita **em CSS puro**.
+- **Direção "Caderno quieto" (D1):** app de estudos calmo e legível. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro. Superfícies com borda de 1 px e sem sombra em repouso; sombra só no modal. Sem gradiente, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone.
+- **Componentes usam só tokens semânticos** (`--color-*`, `--space-*`, `--text-*`, `--radius-*`, `--duration-*`). Nenhuma cor literal em template.
 
-## 1. Tokens
+## 1. Tokens (`static/css/tokens.css`)
 
-### Estratégia de compatibilidade
+### Cor
 
-1. Criar **tokens semânticos** novos (`--color-*`, `--space-*`, `--radius-*` etc.).
-2. **Manter** os `--chakra-*` atuais durante a transição, porque os 183 estilos inline ainda dependem deles. Os novos tokens apontam para a paleta existente, sem mudar as cores de partida.
-3. **Definir os tokens que hoje faltam** (`--gray-*`, `--chakra-colors-red-200`, `--chakra-colors-purple-300`) como aliases, o que corrige o achado [A1](05-achados-frontend.md) sem tocar no markup.
-4. À medida que cada tela sai do estilo inline, ela passa a usar só tokens semânticos. Quando nenhum template usar mais `--chakra-*`, os aliases podem ser removidos num PR separado.
+Primitivos em escalas (`--neutral-*`, `--accent-*`, `--success-*`, `--warning-*`, `--danger-*`); os componentes usam os semânticos abaixo. Contrastes WCAG medidos.
 
-```css
-:root {
-  /* Cores semânticas (inicialmente = paleta atual) */
-  --color-bg:           var(--chakra-colors-gray-50);
-  --color-surface:      #fff;
-  --color-surface-muted:var(--chakra-colors-gray-50);
-  --color-border:       var(--chakra-colors-gray-200);
-  --color-text:         var(--chakra-colors-gray-800);
-  --color-text-strong:  var(--chakra-colors-gray-900);
-  --color-text-muted:   var(--chakra-colors-gray-500);
-  --color-primary:      var(--chakra-colors-teal-500);
-  --color-primary-hover:var(--chakra-colors-teal-600);
-  --color-primary-soft: var(--chakra-colors-teal-50);
-  --color-accent:       var(--chakra-colors-purple-500);   /* modo arquivo / seminário */
-  --color-accent-soft:  var(--chakra-colors-purple-50);
-  --color-success:      var(--chakra-colors-green-500);
-  --color-warning:      var(--chakra-colors-orange-500);
-  --color-danger:       var(--chakra-colors-red-500);
-  --color-focus-ring:   rgba(49, 151, 149, 0.4);
+| Token | Valor | Uso | Contraste |
+|---|---|---|---|
+| `--color-bg` | `#F5F6F4` | fundo da página, área do chat | — |
+| `--color-surface` | `#FFFFFF` | cards, campos, bolha da IA | — |
+| `--color-surface-muted` | `#EDEFEC` | badges neutros, aviso de transparência, desabilitado | — |
+| `--color-border` | `#E2E5E1` | bordas de card e divisórias | — |
+| `--color-border-strong` | `#C5CBC6` | botão secundário, alternativa | — |
+| `--color-border-input` | `#868F89` | borda de campo, checkbox, radio | 3,3:1 no branco (não-texto) |
+| `--color-text` | `#17201C` | tinta | 16,7 (branco) · 15,4 (fundo) |
+| `--color-text-secondary` | `#55605A` | texto de apoio | 6,6 · 6,0 |
+| `--color-text-subtle` | `#646E68` | placeholder, hora, desabilitado | 5,3 · 4,9 · 4,6 (muted) |
+| `--color-accent` | `#1E6B5C` | botão primário, progresso, links, foco | branco por cima 6,3 |
+| `--color-accent-hover` / `-active` | `#18584B` / `#124538` | hover / pressionado | 8,3 / — |
+| `--color-accent-soft` | `#EAF3F0` | alternativa marcada, fundo de hover | — |
+| `--color-success` / `-text` / `-soft` / `-border` | `#237A4B` / `#1A5E39` / `#EBF5EF` / `#A8D1B8` | concluído, nota alta | texto/soft 7,0 |
+| `--color-warning` / `-text` / `-soft` / `-border` | `#B57A10` / `#8A5A00` / `#FFF6DB` / `#EBD38A` | pendente, nota média, aviso de demo | texto/soft 5,5; `warning` só gráfico (3,7) |
+| `--color-danger` / `-text` / `-soft` / `-border` | `#B42318` / `#912018` / `#FDF0EE` / `#EDABA2` | "Sair", excluir, erro, nota baixa | 6,6 · texto/soft 7,8 |
+| `--color-selection` | `#D3E6E0` | `::selection` | tinta por cima 12,8 |
+| `--color-scrollbar` | `#C5CBC6` | polegar das barras de rolagem | — |
+| `--color-overlay` | `rgb(23 32 28 / .5)` | fundo do modal | — |
+| `--color-code-bg` / `-text` | `#17201C` / `#F5F6F4` | bloco de código no chat | — |
 
-  /* Espaço (escala de 4px) */
-  --space-1: .25rem; --space-2: .5rem; --space-3: .75rem; --space-4: 1rem;
-  --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+Os aliases `--chakra-*` e `--gray-*` continuam no fim do `tokens.css` por compatibilidade, apontando para a paleta nova. **Nenhum template os usa mais**; podem sair num PR separado.
 
-  /* Tipografia */
-  --font-sans: var(--chakra-fonts-body);
-  --text-xs: .75rem; --text-sm: .875rem; --text-base: 1rem;
-  --text-lg: 1.125rem; --text-xl: 1.25rem; --text-2xl: 1.5rem; --text-3xl: 1.875rem;
+### Tipografia
 
-  /* Raio, sombra, movimento */
-  --radius-sm: var(--chakra-radii-md); --radius-md: var(--chakra-radii-lg); --radius-lg: var(--chakra-radii-xl);
-  --shadow-sm: var(--chakra-shadows-sm); --shadow-md: var(--chakra-shadows-md);
-  --duration-fast: 120ms; --duration-base: 180ms;
-  --ease-out: cubic-bezier(.2, .8, .2, 1);
+- **Família:** Atkinson Hyperlegible Next (Google Fonts, 400/600/700) com fallback `system-ui`. Algarismos proporcionais por padrão; números que alinham usam `font-variant-numeric: tabular-nums`.
+- **Escala:** `--text-xs` 12 (badge) · `--text-sm` 13 (metadados, botão pequeno, dica) · `--text-ui` 14 (interface) · `--text-base` 16 (leitura, campos, h3) · `--text-lg` 20 (h2, título do modal) · `--text-xl` 24 (h1, KPI) · `--text-2xl` 36 (nota).
+- **Altura de linha:** 1,2 títulos · 1,35 rótulos · 1,5 interface · 1,6 leitura. Títulos com `-0.015em` e `text-wrap: balance`.
+- **Caixa:** sentence case em tudo (títulos, botões, rótulos, badges), exceto os textos da [tabela 7.5](04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) e nomes próprios.
 
-  /* Aliases para variáveis hoje indefinidas (achado A1) */
-  --gray-200: var(--chakra-colors-gray-200);
-  --gray-500: var(--chakra-colors-gray-500);
-  --gray-600: var(--chakra-colors-gray-600);
-  --gray-900: var(--chakra-colors-gray-900);
-  --chakra-colors-red-200: #feb2b2;
-  --chakra-colors-purple-300: #b794f4;
-}
-```
+### Espaço, raio, sombra, controles
 
-**Escala de nota única** (achado A3; os valores precisam ser aprovados pelo grupo): `≥ 70` sucesso (verde), `50–69` atenção (laranja), `< 50` revisar (vermelho). Título, borda e número passam a usar a mesma escala, via classes `.score--high`, `.score--mid` e `.score--low` calculadas uma única vez no template.
+- **Espaço** (base 4 px): `--space-0-5` 2 · `-1` 4 · `-1-5` 6 · `-2` 8 · `-3` 12 · `-4` 16 · `-5` 20 · `-6` 24 · `-8` 32 · `-10` 40 · `-12` 48 · `-16` 64.
+- **Raio:** `--radius-xs` 4 (checkbox) · `-sm` 6 (botão, campo) · `-md` 8 (card, alerta) · `-lg` 12 (modal) · `-full` (badges, barra).
+- **Sombra:** só `--shadow-overlay` (modal). Nada em repouso.
+- **Layout:** `--container-max` 1200 px; `--gutter` 16 px (24 px a partir de 640); `--nav-height` 56 px.
+- **Controles:** campos sempre com 44 px e fonte de 16 px (sem zoom no iOS). Botões com `--touch-min` 44 px abaixo de 768 px e `--control-h` 40 px (36 px no `.btn-sm`) a partir daí.
+- **Ícones:** `--icon-sm` 16 · `--icon-md` 18 · `--icon-lg` 24, traço de 1,5 px na tela.
 
-## 2. Componentes base
+### Movimento
 
-Nomenclatura **plana, igual à atual** (`.btn`, `.card`), com variantes por classe adicional. As classes existentes são mantidas. As novas são aditivas.
+- `--duration-instant` 100 ms (pressionar) · `--duration-fast` 150 ms (cor, borda, ponto do radio) · `--duration-base` 200 ms (modal, barra, entrada de mensagem) · `--duration-slow` 300 ms (painel da nota).
+- `--ease-out` `cubic-bezier(.23, 1, .32, 1)` para tudo que é interação; `--ease-in-out` `cubic-bezier(.77, 0, .175, 1)` reservado para movimento na tela.
 
-| Componente | Classes | Substitui (achado A2) |
-|---|---|---|
-| Botão | `.btn` + `.btn-primary` / `.btn-accent` (alias de `.btn-purple`) / `.btn-secondary` / `.btn-outline` / `.btn-danger-outline` / `.btn-ghost` + `.btn-sm` / `.btn-block` | `style="width:100%; padding..."` nos botões |
-| Card | `.card`, `.card-header`, `.card-title`, `.card-body` | cabeçalhos de card inline |
-| Cabeçalho de página | `.page-header`, `.page-title`, `.page-subtitle`, `.page-actions` | blocos `display:flex; justify-content:space-between` |
-| Link de voltar | `.back-link` | 4 links "← Voltar" inline |
-| Eyebrow | `.eyebrow` (+ `.eyebrow-accent`) | rótulos em caixa alta inline |
-| Badge | `.badge` + variantes atuais + `.badge-neutral`, `.badge-danger` | badges com `style` |
-| Campo | `.form-group`, `.form-label`, `.form-control`, `.form-hint`, `.form-error` | `<small style=...>` |
-| Alerta / aviso | `.alert-*` (atuais), `.ai-notice`, `.demo-banner` | banner de demo inline |
-| Lista | `.list`, `.list-item`, `.list-item-media`, `.list-item-actions` | itens do histórico, planos e seminários |
-| Estado vazio | `.empty-state`, `.empty-state-title` | 3 estados vazios inline |
-| Estatística | `.stat`, `.stat-value`, `.stat-label` (+ `.stat-box` atual) | números do dashboard |
-| Progresso | `.progress-bar-container`, `.progress-bar-fill` (atuais) | — |
-| Tarefa | `.task-item` (o `<label>`), `.task-text` | `plan_view.html:70-85` |
-| Opção de resposta | `.choice`, `.choice-input`, `.choice-text` | `seminar_view.html:132-142` |
-| Painel de nota | `.score-panel`, `.score-value`, `.score--high/mid/low` | `seminar_view.html:40-89` |
-| Feedback | `.feedback`, `.feedback--correct/partial/incorrect` | `seminar_view.html:161` |
-| Auth | `.auth-card` | `login.html` e `register.html` |
-| Modal | `.modal-overlay`, `.modal-content` (atuais) + `.modal-title`, `.modal-text`, `.modal-actions` | inline em `base.html:41-53` |
-| Ícone decorativo | `.icon` + `aria-hidden="true"`; texto alternativo em `.sr-only` | emojis sem rótulo (A6) |
-
-## 3. Estados visuais
-
-Todo componente interativo precisa definir estes estados:
-
-| Estado | Regra |
-|---|---|
-| **Hover** | só em `@media (hover: hover)`, para não "grudar" no toque; muda fundo ou borda, nunca o tamanho do elemento |
-| **Focus** | `:focus-visible` com anel `0 0 0 3px var(--color-focus-ring)`. **Nunca** `outline: none` sem substituto (hoje `.btn` tem `outline:none` em `style.css:207`) |
-| **Disabled** | `:disabled, [aria-disabled="true"]`: opacidade .55, `cursor: not-allowed`, sem hover |
-| **Loading** | `.is-loading` / `[aria-busy="true"]`: spinner via `::after` e texto mantido; largura estável. ⚠️ O CSS pode ficar pronto (A), mas **quem aplica a classe é o JS**, que é escopo [B4](05-achados-frontend.md) e depende do grupo |
-| **Vazio** | `.empty-state`: ícone, título, uma frase e uma ação |
-| **Erro** | `.form-error`, `.alert-danger`, `.chat-bubble.error` (achado A5) |
-| **Digitando** | `.chat-bubble.typing` com aparência de "rascunho" (texto atenuado, 3 pontos animados) (A5) |
-| **Concluído (tarefa)** | `.task-item:has(.plan-task-checkbox:checked) .task-text { text-decoration: line-through; color: var(--color-text-muted); }`. Funciona sem alterar o JS, mas ver a [exceção](#exceções-permitidas) |
-
-## 4. Breakpoints (mobile-first)
-
-O CSS atual é *desktop-first* (`max-width: 768px`). A proposta é escrever a base para celular e ampliar com `min-width`:
+### Breakpoints (mobile-first, sempre `min-width`)
 
 | Nome | Media query | Uso |
 |---|---|---|
-| base | — | 1 coluna, gutters de 16 px, navbar compacta |
-| `sm` | `@media (min-width: 640px)` | formulários em 2 colunas (`.grid-2`) |
-| `md` | `@media (min-width: 768px)` | navbar em linha; 3 estatísticas lado a lado |
-| `lg` | `@media (min-width: 1024px)` | tela de estudo em 2 colunas (chat + lateral) |
-| `xl` | `@media (min-width: 1280px)` | `.container` com largura máxima de 1200 px |
+| base | — | 1 coluna, gutter de 16 px, navbar só com ícones |
+| `sm` | `640px` | KPIs em 3 colunas, rótulos de botão visíveis, gutter de 24 px |
+| `md` | `768px` | botões de 40/36 px, painéis do tópico lado a lado, CTA em linha, cards de fluxo lado a lado |
+| `lg` | `1024px` | tópico em 2 colunas (chat 2/3 + lateral 1/3), cabeçalho de página em linha |
+| `xl` | `1280px` | container no máximo (1200 px) |
 
-Validar sempre em **375 px** e **1440 px** (critério da [sprint 01](sprints/sprint-01-redesign-visual.md)).
+Validar sempre em **375 px** e **1440 px** (e 768 px). O comportamento por tela está na [D21](sprints/sprint-01-redesign-visual.md#17112026--fase-3-aprovadas-pelo-renzo).
 
-**Chat responsivo** (achado A4): a altura sai do inline e vai para uma classe, por exemplo `.chat-window { height: min(620px, 70dvh); }`. Isso mantém a altura limitada que o `#chatMessages` exige.
+## 2. Componentes
 
-## 5. Movimento
+Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por classe adicional. Nenhuma classe antiga foi renomeada.
 
-- Animar só `transform` e `opacity`. Duração entre 120 e 200 ms, com `--ease-out`.
-- Nada de animação em elementos que se repetem muito (mensagens do histórico, itens de lista no carregamento).
-- Toda animação dentro de:
-  ```css
-  @media (prefers-reduced-motion: no-preference) { /* animações aqui */ }
-  ```
-  ou, no mínimo, com um bloco `@media (prefers-reduced-motion: reduce)` que zere `animation` e `transition`.
-- O `.btn:active { transform: scale(0.98) }` atual pode continuar (é sutil), dentro da mesma regra.
+| Componente | Classes |
+|---|---|
+| Botão | `.btn` + `.btn-primary` · `.btn-secondary` · `.btn-purple` (= secundário, D3) · `.btn-outline` · `.btn-danger-outline` · `.btn-ghost` + `.btn-sm` · `.btn-block` · `.btn-icon` · `.btn-collapse` (+ `.btn-label-collapse`) |
+| Campo | `.form-group`, `.form-control` (input, select com seta SVG, textarea, file com `::file-selector-button`), `.form-hint`, `.form-error`, `.form-actions`, `.form-submit` |
+| Card | `.card`, `.card-header` (+ `--divided`), `.card-title`, `.card-subtitle`, `.card-text` |
+| Página | `.page-header`, `.page-heading`, `.page-title-row`, `.page-title`, `.page-subtitle`, `.page-meta`, `.page-actions`, `.back-link`, `.narrow-page`, `.meta-label`, `.meta-line`, `.link-action` |
+| Lista | `.list-item` (+ `-media`, `-body`, `-title`, `-link`, `-meta`, `-actions`, `--stack`), `.row-between`, `.item-title`, `.item-meta` |
+| Badge | `.badge` + `.badge-subject` · `.badge-file` · `.badge-neutral` (neutros) · `.badge-completed` · `.badge-pending` · `.badge-danger` |
+| Alerta (flash) | `.alert` + `.alert-success` · `-danger` · `-warning` · `-info` (contrato do backend); ícone por máscara SVG no `::before` |
+| Avisos | `.notice` + `.notice-text` (modo demo, âmbar) · `.ai-notice` (transparência, cinza) |
+| Estado vazio | `.empty-state` (+ `-icon`, `-title`, `-text`, `--compact`) |
+| KPIs | `.stats`, `.stat`, `.stat-label`, `.stat-value`, `.stat-empty` |
+| Progresso | `.progress-bar-container` (+ `.progress-lg`), `.progress-bar-fill`, `.progress-card`, `.progress-summary`, `.progress-label`, `.progress-value`, `.progress-foot` |
+| Tarefa | `.task-list`, `.task-item` (o `<label>`), `.plan-task-checkbox` (contrato), `.task-text` (+ `.is-done`), `.plan-days`, `.plan-day-header`, `.cta-strip` |
+| Chat | `.chat-window`, `.chat-header`, `.chat-title`, `.chat-count`, `.chat-messages`, `.message-row`, `.avatar-circle`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble.user/.assistant/.typing/.error`, `.chat-input-area` (estrutura da bolha é contrato) |
+| Seminário | `.score-panel` + `.score--high/mid/low` (≥ 70 / 50–69 / < 50, D2), `.score-head`, `.score-title`, `.score-summary`, `.score-box`, `.score-value`, `.score-label`, `.score-insights`, `.insight` (+ `--positive`, `--review`), `.question-list`, `.question-head`, `.question-title`, `.choices`, `.choice` (+ `.is-selected`, `.is-readonly`, `.is-editable`), `.choice-input`, `.choice-text`, `.feedback` (+ `--correct`, `--partial`, `--incorrect`) |
+| Modal | `.modal-overlay` (`#settingsModal`, `display:none` no CSS), `.modal-content`, `.modal-title`, `.modal-text`, `.modal-actions` |
+| Auth | `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer` |
+| Telas | `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.site-footer` |
+| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-user`, `.nav-settings-btn`, `.nav-btn-label`, `.user-badge`, `.user-name` |
+| Grade | `.container`, `.grid-2`, `.grid-3` |
+| Ícone e acessibilidade | `.icon` (+ `-sm`, `-lg`), `.icon-sprite`, `.sr-only` |
 
-## 6. Regra: nada de `style=""` inline
+## 3. Estados
 
-Novos estilos vão **sempre** para classes no CSS. Em templates tocados pelo redesign, o `style=""` existente é migrado para classes.
+| Estado | Regra |
+|---|---|
+| **Hover** | só em `@media (hover: hover)`; muda fundo ou borda, nunca o tamanho. Cards não clicáveis **não** têm hover (G5, D37) |
+| **Pressionado** | botões: escala .98 + tom mais escuro; checkbox e radio (ou a linha deles): caixa a .9; linha da tarefa um tom mais escura |
+| **Foco** | `:focus-visible` global: anel de 2 px no acento com 2 px de afastamento (5,9–6,3:1 em todos os fundos). Tarefa e alternativa: o anel envolve a linha inteira (`:has(:focus-visible)`). `#chatMessages`: anel para dentro. Bolha do usuário: anel na cor do texto. Campos: borda + anel também no clique (`:focus`) |
+| **Desabilitado** | `:disabled, [aria-disabled="true"]`: texto sutil sobre `--color-surface-muted` (4,6:1), borda neutra, `cursor: not-allowed`, sem hover nem pressão. Sem opacidade (D34). `textarea` desabilitada sem alça |
+| **Carregando** | ⚠️ não existe ainda: quem aplica o estado é o JS ([B4](05-achados-frontend.md)). Até lá, usar o desabilitado |
+| **Vazio** | `.empty-state`: ícone, título, uma frase e uma ação |
+| **Erro** | `.form-error`, `.alert-danger`, `.chat-bubble.error` (tinta, fundo e borda de perigo + ícone de alerta) |
+| **Digitando** | `.chat-bubble.typing`: quadro da bolha da IA, texto secundário em 14 px e 3 pontos em onda; parados com movimento reduzido |
+| **Concluído (tarefa)** | `.task-item:has(:checked) .task-text` e `.task-text.is-done`: cor sutil + riscado. Depois do clique, o inline do `app.js` vence (ver exceções) |
+| **Selecionado (alternativa)** | `.choice:has(:checked)` / `.is-selected`: borda e ponto no acento, fundo `--color-accent-soft`. Com o retorno da questão: verde (correta), âmbar (parcial), vermelho (incorreta), por `.card:has(> .feedback--*)` (D35; ⚠️ depende do B1) |
+| **Superfícies do navegador** | `::selection`, `caret-color`, `accent-color` e barras de rolagem (finas no chat e no modal) com a paleta |
+
+## 4. Movimento
+
+- Só CSS. Animar `transform` e `opacity`; a exceção é a `width` da barra de progresso, que o contrato manda controlar por `style.width`.
+- Nada anima no histórico nem em listas no carregamento. As mensagens novas do chat animam porque não têm `.markdown-content` (só o `app.js` as cria).
+- Saídas são instantâneas (modal fecha na hora).
+- **Movimento reduzido:** `@media (prefers-reduced-motion: reduce)` zera duração de transições e animações, para os 3 pontos e remove as escalas de pressão. Tudo desligado (D6).
+
+| O quê | Duração / easing |
+|---|---|
+| Pressionar botão (escala .98) | 100 ms, ease-out |
+| Pressionar checkbox/radio ou a linha deles (caixa a .9) | 100 ms, ease-out |
+| Marcar alternativa: ponto de opacidade 0 e escala .5 para 1 | 150 ms, ease-out |
+| Cor e borda (hover, texto da tarefa) | 150 ms, ease-out |
+| Entrada das mensagens novas: opacidade + 6 px | 200 ms, ease-out |
+| "Digitando": 3 pontos em onda | 1 s, linear, infinito |
+| Barra de progresso | 200 ms, ease-out |
+| Modal: fade do overlay + card de .97 a 1 (`@starting-style`) | 200 ms, ease-out |
+| Painel da nota: opacidade + 8 px, uma vez | 300 ms, ease-out |
+
+## 5. Regra: nada de `style=""` inline
+
+Novos estilos vão **sempre** para classes no CSS. Os 183 `style=""` originais viraram classes; restam só as exceções abaixo.
 
 ### Exceções permitidas
 
 | Caso | Por quê |
 |---|---|
-| `style="width: {{ p.progress_percent }}%"` em `.progress-bar-fill` (`plan_view.html:39`, `study_topic.html:115`) | valor dinâmico vindo do banco. O `#planProgressBar` ainda é **atualizado pelo JS via `style.width`** (contrato) |
+| `style="width: {{ … }}%"` em `.progress-bar-fill` (`plan_view.html`, `study_topic.html`) | valor dinâmico vindo do banco. O `#planProgressBar` ainda é **atualizado pelo JS via `style.width`** (contrato) |
 | `style.display` no `#settingsModal` | escrito pelo JS (contrato); o CSS só define o estado inicial `display:none` |
-| `style.textDecoration` / `style.color` em `#label_<task_key>` | escrito pelo JS (`app.js:167-175`). Estilo inline vence a classe, então, **depois do primeiro clique**, a cor do JS (`#94a3b8` / `inherit`) prevalece sobre o CSS. Alinhar isso exige mudar o JS (B11) |
-| HTML com `style` gerado no JS (`app.js:118`) | só muda junto com o JS (B) |
+| `style.textDecoration` / `style.color` em `#label_<task_key>` | escrito pelo JS (`app.js:167-175`). O inline vence a classe, então, **depois do primeiro clique**, a cor do JS (`#94a3b8`, 2,45:1) prevalece sobre o CSS. Alinhar exige mudar o JS (B11) |
+| HTML com `style` gerado no JS (`app.js:118`, nota de demo no chat) | só muda junto com o JS (B11) |
 
-Para valores dinâmicos novos, prefira uma **CSS custom property** no elemento (`style="--progress: 40%"`) consumida pela classe. Mas não troque o mecanismo das exceções acima sem alinhar com o JS.
+Para valores dinâmicos novos, prefira uma **CSS custom property** no elemento (`style="--progress: 40%"`) consumida pela classe, sem trocar o mecanismo das exceções acima sem alinhar com o JS.
+
+## 6. Ícones
+
+SVG inline num sprite no topo do `base.html`, traço de 1,5 px na tela, sempre `aria-hidden="true" focusable="false"`:
+
+```html
+<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>
+```
+
+Ícones: `settings`, `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`. Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).

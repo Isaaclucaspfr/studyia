@@ -4,7 +4,7 @@
 >
 > Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depende de rodar o app ou de testar com a API).
 
-Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada)
+Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado)
 
 ---
 
@@ -91,6 +91,18 @@
 - **O que acontece:** ✅ cada instalação pode trazer uma versão diferente (o README cita Flask 3.1, mas o arquivo pede `>=3.0.0`). Nada declara que o Python precisa ser ≥ 3.12 (`ai_service.py:51`, `:195`, `:278` não rodam em versões anteriores).
 - **Impacto na tela:** "funciona na minha máquina". Uma atualização do `google-genai` ou do `pypdf` pode quebrar a geração ou o upload perto da apresentação.
 - **Sugestão (opcional):** fixar versões (`==`) e declarar a versão do Python (`.python-version` ou `runtime.txt`, conforme o deploy do `Procfile`).
+
+### 14. "Dia N:" repetido no título do dia do plano
+- **Onde:** `ai_service.py:249` (fallback do plano: `"topic": f"Dia {i+1}: {stage_title} em {topic_title}"`); o exemplo de JSON do prompt, em `ai_service.py:206` (`"Tema do Dia 1"`), pode induzir o mesmo padrão na IA real
+- **O que acontece:** ✅ no fallback, o campo `topic` de cada dia já começa com "Dia N:". ⚠️ não confirmado com uma chave real se o Gemini repete o padrão.
+- **Impacto na tela:** desde a Fase 3 da sprint 01, o `plan_view.html` mostra o número da sessão ("Sessão 1") logo abaixo do título do dia. O resultado fica redundante: "Dia 1: Fundamentos e Introdução em Fotossíntese" / "Sessão 1".
+- **Sugestão (opcional):** gerar o `topic` sem o prefixo (`f"{stage_title} em {topic_title}"`) e, no prompt, pedir só o tema do dia. O número já vem em `day_number`.
+
+### 15. Emojis no conteúdo gerado
+- **Onde:** `ai_service.py:70-84` (visão geral de demonstração: 📚 🎯 🚀 🧭 💬) e `:165` (resposta de demonstração sobre arquivo: 💡); o prompt da visão geral em `ai_service.py:37-51` pede os mesmos emojis nos títulos das seções
+- **O que acontece:** ✅ o texto de demonstração traz emojis nos títulos e nas chamadas. ⚠️ não confirmado com uma chave real, mas, como o prompt pede os emojis, a IA real provavelmente os repete.
+- **Impacto na tela:** a sprint 01 trocou todos os emojis da interface por ícones SVG com `aria-hidden` (achado A6, decisão D11). Os emojis no conteúdo do chat destoam do resto e são lidos em voz alta pelos leitores de tela ("foguete", "bússola").
+- **Sugestão (opcional):** remover os emojis do fallback e do modelo de seções do prompt, e pedir ao Gemini que não use emojis.
 
 ---
 

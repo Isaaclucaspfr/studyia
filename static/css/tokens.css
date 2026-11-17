@@ -1,0 +1,293 @@
+/* ==========================================================================
+   StudyIA — Design tokens ("Caderno quieto", Sprint 01 · D1)
+   Carregado ANTES do style.css (base.html). Ordem do arquivo:
+     1. Primitivos (escalas de cor)
+     2. Tokens semânticos (o que os componentes usam)
+     3. Tipografia, espaço, raio, sombra, layout, movimento
+     4. Aliases de compatibilidade (--chakra-* e --gray-*)
+   Componentes novos usam SÓ os tokens semânticos (seção 2 em diante).
+   Contrastes WCAG medidos estão no doc da sprint (Fase 2).
+   ========================================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- 1. Primitivos ---------- */
+
+  /* Neutros levemente esverdeados (tinta #17201C, fundo #F5F6F4) */
+  --neutral-0:   #FFFFFF;
+  --neutral-50:  #F5F6F4;
+  --neutral-100: #EDEFEC;
+  --neutral-200: #E2E5E1;
+  --neutral-300: #C5CBC6;
+  --neutral-400: #868F89;  /* borda de campo: 3,3:1 sobre branco (não-texto) */
+  --neutral-500: #646E68;  /* texto sutil: 4,9:1 no fundo, 5,3:1 no branco */
+  --neutral-600: #55605A;  /* texto secundário: 6,0:1 no fundo, 6,6:1 no branco */
+  --neutral-700: #3A443F;
+  --neutral-800: #252E2A;
+  --neutral-900: #17201C;  /* tinta */
+
+  /* Acento único: verde-petróleo */
+  --accent-50:  #EAF3F0;
+  --accent-100: #D3E6E0;
+  --accent-200: #A9CFC3;
+  --accent-300: #6FA99A;
+  --accent-500: #1E6B5C;   /* branco sobre ele: 6,3:1 */
+  --accent-600: #18584B;   /* hover */
+  --accent-700: #124538;   /* pressionado / texto sobre acento-50 (9,6:1) */
+  --accent-800: #0D3329;
+
+  /* Sucesso */
+  --success-50:  #EBF5EF;
+  --success-100: #CFE6D8;
+  --success-200: #A8D1B8;
+  --success-500: #237A4B;  /* 5,3:1 sobre branco */
+  --success-700: #1A5E39;  /* texto sobre sucesso-50: 7,0:1 */
+
+  /* Atenção */
+  --warning-50:  #FFF6DB;
+  --warning-100: #F6E7B4;
+  --warning-200: #EBD38A;
+  --warning-500: #B57A10;  /* só gráfico (borda, ícone): 3,7:1 */
+  --warning-700: #8A5A00;  /* texto: 5,5:1 sobre atenção-50 */
+
+  /* Perigo */
+  --danger-50:  #FDF0EE;
+  --danger-100: #F8D7D2;
+  --danger-200: #EDABA2;
+  --danger-500: #B42318;   /* 6,6:1 sobre branco */
+  --danger-700: #912018;   /* texto sobre perigo-50: 7,8:1 */
+
+  /* ---------- 2. Tokens semânticos ---------- */
+
+  --color-bg:             var(--neutral-50);
+  --color-surface:        var(--neutral-0);
+  --color-surface-muted:  var(--neutral-100);
+  --color-border:         var(--neutral-200);
+  --color-border-strong:  var(--neutral-300);
+  --color-border-input:   var(--neutral-400);
+
+  --color-text:           var(--neutral-900);
+  --color-text-secondary: var(--neutral-600);
+  --color-text-subtle:    var(--neutral-500);
+  --color-text-inverse:   var(--neutral-0);
+
+  --color-accent:             var(--accent-500);
+  --color-accent-hover:       var(--accent-600);
+  --color-accent-active:      var(--accent-700);
+  --color-accent-soft:        var(--accent-50);
+  --color-accent-soft-border: var(--accent-200);
+  --color-on-accent:          var(--neutral-0);
+  --color-link:               var(--accent-500);
+  --color-focus:              var(--accent-500);
+
+  --color-success:        var(--success-500);
+  --color-success-text:   var(--success-700);
+  --color-success-soft:   var(--success-50);
+  --color-success-border: var(--success-200);
+
+  --color-warning:        var(--warning-500);
+  --color-warning-text:   var(--warning-700);
+  --color-warning-soft:   var(--warning-50);
+  --color-warning-border: var(--warning-200);
+
+  --color-danger:         var(--danger-500);
+  --color-danger-text:    var(--danger-700);
+  --color-danger-soft:    var(--danger-50);
+  --color-danger-border:  var(--danger-200);
+
+  --color-selection:      var(--accent-100);   /* ::selection; tinta por cima: 12,8:1 */
+  --color-scrollbar:      var(--neutral-300);  /* polegar das barras de rolagem */
+
+  --color-overlay:        rgb(23 32 28 / 0.5);
+  --color-code-bg:        var(--neutral-900);
+  --color-code-text:      var(--neutral-50);
+
+  /* ---------- 3. Tipografia ---------- */
+
+  --font-sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
+               "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+
+  /* Escala: 12 · 13 · 14 · 16 · 20 · 24 · 36 */
+  --text-xs:   0.75rem;    /* 12 — badges */
+  --text-sm:   0.8125rem;  /* 13 — metadados, rodapé, botão pequeno, dicas */
+  --text-ui:   0.875rem;   /* 14 — interface (botões, labels, listas) */
+  --text-base: 1rem;       /* 16 — leitura, campos, bolhas do chat, h3 */
+  --text-lg:   1.25rem;    /* 20 — h2, título do modal */
+  --text-xl:   1.5rem;     /* 24 — h1, números dos KPIs */
+  --text-2xl:  2.25rem;    /* 36 — nota do seminário */
+
+  --weight-regular:  400;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+
+  --leading-tight:   1.2;   /* títulos */
+  --leading-snug:    1.35;  /* rótulos, botões de 2 linhas */
+  --leading-normal:  1.5;   /* interface */
+  --leading-relaxed: 1.6;   /* leitura (chat, plano) */
+
+  --tracking-tight:  -0.015em; /* h1/h2 */
+  --tracking-normal: 0;
+
+  --measure: 68ch; /* largura máxima de parágrafo de leitura */
+
+  /* ---------- Espaço (escala de 4 px) ---------- */
+
+  --space-0-5: 0.125rem;
+  --space-1:   0.25rem;
+  --space-1-5: 0.375rem;
+  --space-2:   0.5rem;
+  --space-3:   0.75rem;
+  --space-4:   1rem;
+  --space-5:   1.25rem;
+  --space-6:   1.5rem;
+  --space-8:   2rem;
+  --space-10:  2.5rem;
+  --space-12:  3rem;
+  --space-16:  4rem;
+
+  /* ---------- Raio ---------- */
+
+  --radius-xs:   4px;   /* checkbox */
+  --radius-sm:   6px;   /* controles: botão, campo */
+  --radius-md:   8px;   /* cards, alertas, avisos */
+  --radius-lg:   12px;  /* modal (superfície flutuante) */
+  --radius-full: 9999px;/* só badges */
+
+  /* ---------- Sombra (D1: nada em repouso) ---------- */
+
+  --shadow-none:    none;
+  --shadow-overlay: 0 16px 40px -12px rgb(23 32 28 / 0.28), 0 2px 6px rgb(23 32 28 / 0.08);
+
+  /* ---------- Layout e controles ---------- */
+
+  --container-max: 75rem; /* 1200 px */
+  --gutter:        1rem;  /* 16 px no celular; 24 px a partir de 640 px */
+  --nav-height:    3.5rem;/* 56 px */
+
+  --control-h-sm:  2.25rem; /* 36 px, só a partir de 768 px */
+  --control-h:     2.5rem;  /* 40 px, só a partir de 768 px */
+  --touch-min:     2.75rem; /* 44 px: alvo mínimo de toque */
+
+  --icon-sm: 1rem;     /* 16 */
+  --icon-md: 1.125rem; /* 18 */
+  --icon-lg: 1.5rem;   /* 24 */
+
+  /* Breakpoints (mobile-first, sempre min-width). CSS não aceita var() dentro
+     de @media: estes valores são a referência; as media queries do style.css
+     repetem os números literais.
+     sm 640: KPIs em 3 colunas, rótulos de botão visíveis, ações em tamanho natural
+     md 768: botões de 40 px, painéis laterais do tópico lado a lado, CTA em linha
+     lg 1024: tópico em 2 colunas (chat + lateral), cabeçalho de página em linha
+     xl 1280: container no máximo (1200 px)                                      */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
+  --z-nav:   50;
+  --z-modal: 100;
+
+  /* ---------- Movimento ---------- */
+
+  --duration-instant: 100ms; /* pressionar */
+  --duration-fast:    150ms; /* cor, borda */
+  --duration-base:    200ms; /* modal, barra de progresso */
+  --duration-slow:    300ms;
+
+  --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ---------- 4. Aliases de compatibilidade ----------
+     Os estilos inline dos templates ainda usam --chakra-* (Fase 3 migra).
+     Cada alias aponta para a paleta nova, então o inline já herda a D1.
+     Roxo e azul viram o acento único (D3). Sombras viram "none" (D1).
+     Cinzas 400/500 usados como texto foram escurecidos para AA.        */
+
+  --chakra-colors-transparent: transparent;
+  --chakra-colors-black: #000;
+  --chakra-colors-white: #fff;
+
+  --chakra-colors-gray-50:  var(--neutral-50);
+  --chakra-colors-gray-100: var(--neutral-100);
+  --chakra-colors-gray-200: var(--neutral-200);
+  --chakra-colors-gray-300: var(--neutral-300);
+  --chakra-colors-gray-400: var(--neutral-500); /* usado como texto (hora, tarefa concluída) */
+  --chakra-colors-gray-500: var(--neutral-500);
+  --chakra-colors-gray-600: var(--neutral-600);
+  --chakra-colors-gray-700: var(--neutral-700);
+  --chakra-colors-gray-800: var(--neutral-800);
+  --chakra-colors-gray-900: var(--neutral-900);
+
+  --chakra-colors-teal-50:  var(--accent-50);
+  --chakra-colors-teal-100: var(--accent-100);
+  --chakra-colors-teal-200: var(--accent-200);
+  --chakra-colors-teal-300: var(--accent-300);
+  --chakra-colors-teal-400: var(--accent-500); /* gradiente achatado */
+  --chakra-colors-teal-500: var(--accent-500);
+  --chakra-colors-teal-600: var(--accent-600);
+  --chakra-colors-teal-700: var(--accent-700);
+  --chakra-colors-teal-800: var(--accent-800);
+
+  --chakra-colors-purple-50:  var(--accent-50);
+  --chakra-colors-purple-100: var(--accent-100);
+  --chakra-colors-purple-200: var(--accent-200);
+  --chakra-colors-purple-300: var(--accent-300); /* era indefinida (A1) */
+  --chakra-colors-purple-500: var(--accent-500);
+  --chakra-colors-purple-600: var(--accent-600);
+  --chakra-colors-purple-700: var(--accent-700);
+
+  --chakra-colors-blue-50:  var(--accent-50);
+  --chakra-colors-blue-100: var(--accent-100);
+  --chakra-colors-blue-500: var(--accent-500);
+  --chakra-colors-blue-600: var(--accent-600);
+
+  --chakra-colors-green-50:  var(--success-50);
+  --chakra-colors-green-100: var(--success-100);
+  --chakra-colors-green-500: var(--success-500);
+  --chakra-colors-green-600: var(--success-700);
+
+  --chakra-colors-yellow-50:  var(--warning-50);
+  --chakra-colors-yellow-100: var(--warning-100);
+  --chakra-colors-yellow-500: var(--warning-500);
+  --chakra-colors-orange-50:  var(--warning-50);
+  --chakra-colors-orange-100: var(--warning-100);
+  --chakra-colors-orange-500: var(--warning-700); /* usado como texto */
+
+  --chakra-colors-red-50:  var(--danger-50);
+  --chakra-colors-red-100: var(--danger-100);
+  --chakra-colors-red-200: var(--danger-200); /* era indefinida (A1) */
+  --chakra-colors-red-500: var(--danger-500);
+  --chakra-colors-red-600: var(--danger-700);
+
+  --chakra-fonts-heading: var(--font-sans);
+  --chakra-fonts-body:    var(--font-sans);
+
+  --chakra-radii-none: 0;
+  --chakra-radii-sm:   0.125rem;
+  --chakra-radii-base: var(--radius-xs);
+  --chakra-radii-md:   var(--radius-sm);
+  --chakra-radii-lg:   var(--radius-md);
+  --chakra-radii-xl:   var(--radius-md);
+  --chakra-radii-2xl:  var(--radius-md);
+  --chakra-radii-3xl:  var(--radius-md);
+  --chakra-radii-full: var(--radius-full);
+
+  --chakra-shadows-xs:      none;
+  --chakra-shadows-sm:      none;
+  --chakra-shadows-base:    none;
+  --chakra-shadows-md:      none;
+  --chakra-shadows-lg:      none;
+  --chakra-shadows-outline: 0 0 0 2px var(--color-focus);
+
+  /* Variáveis usadas no base.html que nunca foram definidas (A1) */
+  --gray-200: var(--neutral-200);
+  --gray-500: var(--neutral-500);
+  --gray-600: var(--neutral-600);
+  --gray-900: var(--neutral-900);
+}
+
+@media (min-width: 640px) {
+  :root { --gutter: 1.5rem; }
+}
