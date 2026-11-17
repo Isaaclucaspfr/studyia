@@ -1,0 +1,640 @@
+# 01. IDENTIFICAÇÃO DO PROJETO
+
+Informações gerais de identificação do projeto StudyIA
+
+**Nome do projeto:** StudyIA — Assistente Inteligente de Estudos\
+**Nome da aplicação:** StudyIA\
+**Unidade Curricular:** Inteligência Artificial\
+**Projeto:** A3 — IA para o Cotidiano\
+**Curso:** Sistemas de Informação\
+**Turma:** Inteligência Artificial -419\
+**Professor(a):** Mario\
+**Integrantes:** \
+Patrick Stuart - 324116667                                Isaac Lucas - 324127235\
+Arthur Fernandes - 324116669                         Juan Eremita - 324120088
+
+Kauã Henrique - 326131242                              Luan Oliveira - 326215050
+
+Renzo Soares - 324120646                               Rafael Kayck - 324152307
+
+\
+**Data:** 09/09/2026\
+**Versão do documento:** 1.0
+
+
+# 02. PROBLEMA E CONTEXTO
+
+Descrição do problema cotidiano que motivou o desenvolvimento do StudyIA
+
+### Problema identificado
+
+Pessoas que desejam aprender sobre determinado assunto nem sempre conseguem transformar as informações encontradas em um processo de aprendizagem organizado. Além da dificuldade para pesquisar e compreender conteúdos, podem enfrentar obstáculos para definir por onde começar, elaborar um plano de estudo e verificar o que aprenderam.
+
+Essas dificuldades também ocorrem quando o conteúdo está em um arquivo, como uma apostila, um artigo ou um documento. Nesses casos, a pessoa pode precisar de apoio para estudar exclusivamente o material anexado e organizar os principais tópicos.
+
+### Onde o problema ocorre
+
+O problema ocorre em diferentes situações de aprendizagem, como estudos escolares e universitários, desenvolvimento profissional, busca por conhecimentos gerais e pesquisas motivadas por curiosidade pessoal. Pode surgir tanto na pesquisa de um novo assunto quanto no estudo de arquivos.
+
+### Por que o problema é relevante
+
+O acesso às informações, por si só, não garante a compreensão de um assunto. Sem uma organização adequada, a pessoa pode ter dificuldade para identificar os pontos principais, estabelecer uma sequência de estudo e avaliar o próprio conhecimento.
+
+Além disso, pesquisas e materiais dispersos dificultam a retomada dos conteúdos e a continuidade da aprendizagem.
+
+### Quem é afetado
+
+O problema afeta pessoas que desejam aprender sobre diferentes temas, incluindo estudantes, profissionais e usuários interessados em conhecimentos gerais. É especialmente relevante para quem possui pouco tempo disponível, precisa compreender um material específico ou tem dificuldade para organizar seus estudos de forma independente.
+
+### Frequência
+
+Essa dificuldade pode ocorrer sempre que a pessoa inicia uma pesquisa, busca compreender um novo assunto ou precisa estudar um arquivo. Pode se intensificar diante de conteúdos extensos, temas desconhecidos ou prazos para aplicar o conhecimento adquirido.
+
+### Consequências
+
+A falta de organização pode resultar em perda de tempo, pesquisas repetidas, compreensão superficial, dificuldade para dar continuidade aos estudos e incerteza sobre o que foi aprendido. Também pode causar desmotivação e dificultar o alcance dos objetivos pessoais, acadêmicos ou profissionais.
+
+### Como o problema é tratado atualmente
+
+Atualmente, as pessoas utilizam mecanismos de busca, vídeos, assistentes de inteligência artificial, agendas, aplicativos de tarefas e anotações para pesquisar e organizar seus estudos. Entretanto, o uso dessas ferramentas de forma separada pode exigir que o próprio usuário reúna as informações, elabore um plano e crie atividades para verificar sua compreensão.
+
+O StudyIA propõe reunir essas etapas em um aplicativo com acesso por login e senha. O usuário poderá pesquisar assuntos gerais, gerar planos de estudo e realizar mini seminários interativos com perguntas e respostas para verificar seu conhecimento. Também poderá anexar um arquivo e utilizar exclusivamente seu conteúdo como base para essas atividades. Cada assunto pesquisado ficará salvo no histórico individual, permitindo retomar os estudos posteriormente.
+
+
+# 03. USUÁRIOS E PÚBLICO-ALVO
+
+Identificação dos usuários, suas características, necessidades, dificuldades e expectativas.
+
+### Público-alvo
+
+O StudyIA é destinado a pessoas que desejam pesquisar, compreender e estudar diferentes assuntos, seja para escola, faculdade, desenvolvimento profissional, conhecimentos gerais ou curiosidade pessoal. A aplicação permitirá pesquisar temas, estudar arquivos anexados, gerar planos de estudo e verificar a compreensão por meio de mini seminários interativos.
+
+### Usuário principal
+
+O usuário principal é a pessoa que deseja aprender sobre um assunto ou compreender um arquivo específico e precisa de apoio para organizar o conteúdo e orientar seu estudo. Seu objetivo pode estar relacionado a uma necessidade acadêmica, profissional ou pessoal, sem exigir vínculo com uma instituição de ensino.
+
+### Usuários secundários
+
+Também poderão utilizar a aplicação estudantes que estejam se preparando para avaliações, vestibulares e concursos, profissionais que desejem atualizar seus conhecimentos e pessoas interessadas em explorar novos temas ou revisar conteúdos já estudados.
+
+### Características dos usuários
+
+Os usuários possuem diferentes níveis de conhecimento, objetivos de aprendizagem, disponibilidade de tempo e familiaridade com ferramentas digitais. Poderão acessar o aplicativo pelo celular ou computador e utilizar tanto a pesquisa por assunto quanto o estudo baseado exclusivamente em arquivos anexados.
+
+Cada usuário terá uma conta com login e senha e um histórico individual dos assuntos pesquisados, permitindo retomar conteúdos e dar continuidade aos estudos.
+
+### Necessidades
+
+Os usuários precisam encontrar explicações compreensíveis, organizar os principais tópicos de um assunto e gerar planos de estudo compatíveis com seus objetivos e tempo disponível.
+
+Também necessitam fazer perguntas sobre arquivos anexados, estudar exclusivamente esses materiais quando desejarem e verificar o que aprenderam por meio de perguntas e respostas. O histórico individual deverá facilitar a consulta às pesquisas anteriores e a retomada dos estudos.
+
+### Dificuldades
+
+Entre as principais dificuldades estão o excesso de informações dispersas, a identificação dos pontos mais relevantes, a compreensão de conteúdos desconhecidos e a definição de uma sequência de estudo.
+
+Outros obstáculos incluem a interpretação de arquivos extensos, a falta de tempo, a dificuldade para avaliar o próprio conhecimento e a perda de pesquisas anteriores, que pode levar à repetição de atividades.
+
+### Expectativas
+
+Os usuários esperam que o StudyIA seja simples, rápido e fácil de utilizar, apresente conteúdos organizados e gere planos de estudo adequados aos seus objetivos.
+
+Também esperam acessar seu histórico de pesquisas, estudar arquivos anexados e realizar mini seminários interativos com perguntas e retorno sobre suas respostas. No modo de estudo por arquivo, esperam que o aplicativo utilize somente o conteúdo do material enviado e informe quando uma resposta não estiver disponível no documento.
+
+
+# 04. PESQUISA E DIAGNÓSTICO
+
+Registro da pesquisa inicial, das evidências consultadas e das conclusões que fundamentam a proposta do StudyIA.
+
+### Método da pesquisa inicial
+
+Nesta primeira etapa, foi realizada uma pesquisa bibliográfica exploratória sobre organização dos estudos, administração do tempo e aprendizagem autorregulada. Também foram consideradas situações observadas na rotina acadêmica dos integrantes do grupo. Até o momento, não foram realizadas entrevistas ou aplicações de questionários.
+
+Com a ampliação da proposta do StudyIA para diferentes contextos de aprendizagem, será necessário complementar a pesquisa com pessoas que buscam conhecimentos para fins acadêmicos, profissionais ou pessoais.
+
+### Fontes pesquisadas
+
+A pesquisa de Wolters e Brady apresenta a administração do tempo como parte importante da aprendizagem autorregulada e discute sua relação com o envolvimento, a aprendizagem e o desempenho dos estudantes universitários.
+
+**Título:** *College Students’ Time Management: a Self-Regulated Learning Perspective.*
+
+A revisão publicada pela OCDE analisa o tempo dedicado à aprendizagem como um recurso educacional e destaca a relevância da maneira como esse tempo é utilizado.
+
+**Título:** *Student Learning Time: A Literature Review.*
+
+Essas fontes contribuem para fundamentar a organização dos estudos no aplicativo. Entretanto, seu foco educacional não permite concluir, isoladamente, quais são as necessidades de todos os públicos previstos na nova proposta.
+
+### Observações iniciais
+
+As observações iniciais do grupo se concentraram na rotina acadêmica, em que é necessário conciliar conteúdos, avaliações, trabalhos e outros compromissos.
+
+A ampliação do projeto considera também situações em que uma pessoa deseja compreender um assunto por curiosidade, desenvolver conhecimentos profissionais ou estudar um arquivo específico. Nesses contextos, a necessidade de reunir informações, organizar uma sequência de estudo e verificar a compreensão constitui uma hipótese a ser investigada com os futuros usuários.
+
+### Dados e evidências encontrados
+
+A pesquisa bibliográfica inicial indica que o planejamento, o acompanhamento das atividades e a administração do tempo integram o processo de aprendizagem autorregulada. Também aponta que o aproveitamento do tempo depende da maneira como as atividades de aprendizagem são organizadas e realizadas.
+
+Ainda não foram coletados dados diretamente com usuários sobre pesquisa de assuntos gerais, estudo de arquivos, histórico individual ou mini seminários interativos. Portanto, o interesse e as necessidades relacionados a essas funcionalidades deverão ser verificados nas próximas etapas.
+
+### Diagnóstico
+
+O diagnóstico inicial aponta a necessidade de apoiar a organização dos estudos. A partir da ampliação do escopo, o StudyIA propõe reunir pesquisa de assuntos, estudo de arquivos anexados, geração de planos de estudo e mini seminários interativos com perguntas e respostas para verificar a compreensão.
+
+A aplicação contará com login e senha e histórico individual de pesquisas, permitindo retomar os assuntos estudados. No modo de estudo por arquivo, as atividades deverão utilizar exclusivamente o conteúdo anexado.
+
+A adequação dessa proposta aos diferentes públicos ainda deverá ser validada por meio de pesquisa com potenciais usuários.
+
+### Principais conclusões
+
+A pesquisa inicial oferece fundamentos para o planejamento e a organização da aprendizagem, mas precisa ser complementada para contemplar o público ampliado do StudyIA.
+
+A proposta passa a atender pessoas com objetivos acadêmicos, profissionais e pessoais. O aplicativo deverá apoiar a compreensão e a continuidade dos estudos, preservando a autonomia do usuário na escolha dos assuntos, objetivos e materiais.
+
+As funcionalidades propostas representam decisões iniciais do projeto e deverão ser avaliadas quanto à utilidade, facilidade de uso e correspondência às necessidades dos usuários.
+
+### Próxima etapa da pesquisa
+
+Nas próximas etapas, o grupo poderá aplicar um questionário com estudantes, profissionais e pessoas interessadas em conhecimentos gerais para investigar:
+
+* Os objetivos e assuntos que costumam pesquisar.
+* As dificuldades para compreender e organizar conteúdos.
+* As ferramentas utilizadas atualmente.
+* A necessidade de estudar arquivos específicos.
+* O interesse em planos de estudo e mini seminários interativos.
+* A importância de consultar um histórico individual de pesquisas.
+
+Os resultados deverão ser acrescentados posteriormente a esta página e utilizados para confirmar ou ajustar os requisitos do StudyIA.
+
+
+# 05. PROPOSTA DA SOLUÇÃO
+
+Apresentação da solução proposta, seu funcionamento, diferencial e benefícios esperados.
+
+### Descrição da solução
+
+O StudyIA será uma aplicação digital que utilizará Inteligência Artificial para apoiar a pesquisa e a aprendizagem sobre diferentes assuntos. Será destinado a pessoas que desejam estudar para escola, faculdade, desenvolvimento profissional, conhecimentos gerais ou curiosidade pessoal.
+
+A solução permitirá pesquisar temas, estudar arquivos anexados, gerar planos de estudo personalizados e realizar mini seminários interativos com perguntas e respostas para verificar a compreensão do conteúdo. Cada usuário terá acesso por login e senha e um histórico individual dos assuntos pesquisados.
+
+### Como funcionará
+
+Após realizar o cadastro e acessar sua conta, o usuário poderá escolher entre pesquisar um assunto ou anexar um arquivo para estudar.
+
+Na área de pesquisas, informará o tema que deseja conhecer e poderá interagir com o assistente de IA para obter explicações e esclarecer dúvidas. Cada assunto pesquisado ficará salvo em seu histórico individual, permitindo consultar o conteúdo e retomar o estudo posteriormente.
+
+A partir do assunto pesquisado, o usuário poderá solicitar um plano de estudo, informando seu objetivo, nível de conhecimento, tempo disponível e prazo, quando houver. O StudyIA organizará os tópicos em uma sequência de aprendizagem compatível com essas informações.
+
+O usuário também poderá gerar um mini seminário interativo, no qual responderá a perguntas sobre o conteúdo estudado e receberá retorno sobre suas respostas, identificando pontos compreendidos e assuntos que precisam de revisão.
+
+No modo de estudo por arquivo, o aplicativo utilizará exclusivamente o conteúdo do material anexado para responder às perguntas e gerar planos de estudo e mini seminários. Quando uma informação não estiver presente no documento, essa limitação deverá ser comunicada ao usuário.
+
+### Proposta de valor
+
+A proposta de valor do StudyIA é transformar um assunto de interesse ou um arquivo em uma experiência de aprendizagem organizada, reunindo pesquisa, explicações, planejamento e verificação da compreensão em um único ambiente.
+
+O histórico individual permitirá dar continuidade aos estudos sem precisar iniciar novamente cada pesquisa.
+
+### Diferencial
+
+O diferencial proposto será a integração entre pesquisa de assuntos gerais, estudo exclusivo de arquivos anexados, planos personalizados e mini seminários interativos.
+
+A Inteligência Artificial será utilizada para organizar os conteúdos conforme o objetivo e a disponibilidade do usuário, além de elaborar perguntas relacionadas ao material estudado e oferecer retorno sobre as respostas.
+
+### Benefícios esperados
+
+Espera-se que o StudyIA facilite a compreensão de diferentes assuntos, ajude a organizar o tempo disponível e ofereça uma sequência clara de estudo.
+
+A solução também pretende facilitar a retomada de pesquisas, apoiar o estudo de documentos específicos e ajudar o usuário a reconhecer dúvidas e pontos que precisam de aprofundamento. Esses benefícios deverão ser avaliados durante os testes com usuários.
+
+### Escopo inicial do MVP
+
+A primeira versão deverá permitir:
+
+* Cadastro e acesso por login e senha.
+* Pesquisa de assuntos gerais e interação com o assistente de IA.
+* Salvamento automático das pesquisas no histórico individual.
+* Consulta e retomada de pesquisas anteriores.
+* Anexo de arquivo para estudo exclusivo de seu conteúdo.
+* Geração de planos de estudo a partir de pesquisas ou arquivos.
+* Geração de mini seminários interativos com perguntas, registro das respostas e retorno sobre a compreensão.
+* Consulta dos planos de estudo e mini seminários vinculados à pesquisa ou ao arquivo de origem.
+
+Os formatos e o tamanho máximo dos arquivos aceitos deverão ser definidos na etapa de requisitos técnicos do projeto.
+
+
+# 06. REQUISITOS E FUNCIONALIDADES
+
+Definição dos requisitos, funcionalidades e prioridades da primeira versão do StudyIA.
+
+#### Requisitos funcionais
+
+Os requisitos funcionais descrevem as ações que o StudyIA deverá permitir que o usuário realize.
+
+| ID  | Funcionalidade                  | Descrição                                                                                                                                                   | Prioridade |
+| --- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| F01 | Cadastro e acesso               | Permitir que o usuário crie uma conta, acesse a aplicação com login e senha e encerre sua sessão.                                                           | Alta       |
+| F02 | Pesquisa de assuntos            | Permitir que o usuário informe um assunto de interesse e solicite conteúdos e explicações para fins acadêmicos, profissionais ou pessoais.                  | Alta       |
+| F03 | Assistente de IA                | Permitir que o usuário faça perguntas e solicite esclarecimentos sobre o assunto pesquisado ou o arquivo anexado.                                           | Alta       |
+| F04 | Histórico individual            | Salvar automaticamente cada pesquisa na conta do usuário, com identificação do assunto e data, permitindo consultar e retomar o conteúdo posteriormente.    | Alta       |
+| F05 | Anexo de arquivo                | Permitir o envio de um arquivo para estudo, informando os formatos aceitos, o limite de tamanho e o resultado do processamento.                             | Alta       |
+| F06 | Estudo exclusivo do arquivo     | Permitir perguntas e atividades baseadas somente no conteúdo do arquivo anexado, informando quando uma resposta não estiver disponível no material.         | Alta       |
+| F07 | Preferências de estudo          | Permitir informar o objetivo, o nível de conhecimento, os dias e o tempo disponível para estudar e, quando houver, o prazo para conclusão.                  | Alta       |
+| F08 | Geração do plano de estudo      | Utilizar IA para criar um plano personalizado a partir do assunto pesquisado ou exclusivamente do arquivo anexado, considerando as preferências informadas. | Alta       |
+| F09 | Visualização do plano           | Apresentar os tópicos e as atividades em uma sequência de estudo, com distribuição por dia e duração estimada.                                              | Alta       |
+| F10 | Geração do mini seminário       | Gerar uma atividade interativa com perguntas relacionadas ao assunto pesquisado ou exclusivamente ao conteúdo do arquivo anexado.                           | Alta       |
+| F11 | Respostas e retorno             | Permitir que o usuário responda às perguntas do mini seminário e receba retorno sobre acertos, dúvidas e pontos que precisam de revisão.                    | Alta       |
+| F12 | Consulta das atividades geradas | Salvar planos de estudo, mini seminários e respostas na conta do usuário, vinculados à pesquisa ou ao arquivo de origem.                                    | Alta       |
+| F13 | Acompanhamento do progresso     | Permitir marcar atividades do plano como concluídas e visualizar o progresso de sua realização.                                                             | Média      |
+| F14 | Ajuste do plano                 | Permitir alterar as preferências de estudo e solicitar uma nova organização do plano.                                                                       | Média      |
+| F15 | Exclusão de conteúdos           | Permitir que o usuário exclua pesquisas, arquivos e atividades salvas em sua conta, com confirmação antes da exclusão.                                      | Média      |
+
+#### Requisitos não funcionais
+
+Os requisitos não funcionais definem características de qualidade e funcionamento da aplicação.
+
+| ID    | Requisito                | Descrição                                                                                                                                                                                                                                                  |
+| ----- | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| RNF01 | Usabilidade              | A aplicação deverá apresentar uma interface simples e clara, com identificação das áreas de pesquisa, arquivos, planos de estudo, mini seminários e histórico.                                                                                             |
+| RNF02 | Responsividade           | A interface deverá funcionar adequadamente em computadores e dispositivos móveis.                                                                                                                                                                          |
+| RNF03 | Desempenho               | Durante o processamento de arquivos e a geração de conteúdos, a aplicação deverá indicar que a solicitação está em andamento e informar falhas ou indisponibilidade. Os tempos de resposta aceitáveis deverão ser definidos e avaliados nos testes do MVP. |
+| RNF04 | Segurança                | As senhas deverão ser armazenadas por meio de hash seguro, sem armazenamento em texto legível. O acesso aos dados deverá exigir autenticação, e a comunicação deverá utilizar conexão criptografada.                                                       |
+| RNF05 | Privacidade e isolamento | Cada usuário deverá acessar somente seus próprios arquivos, pesquisas, planos e respostas. A aplicação deverá solicitar apenas os dados necessários e informar a finalidade de seu uso e eventual processamento por serviços externos de IA.               |
+| RNF06 | Transparência            | A aplicação deverá identificar os conteúdos gerados com auxílio de IA e informar que eles podem conter erros e devem ser revisados pelo usuário.                                                                                                           |
+| RNF07 | Fidelidade ao arquivo    | No modo de estudo exclusivo, as respostas e atividades deverão se basear no arquivo selecionado. Informações ausentes não deverão ser completadas com conteúdo externo; essa limitação deverá ser informada ao usuário.                                    |
+| RNF08 | Persistência dos dados   | Pesquisas e atividades salvas deverão permanecer disponíveis após o encerramento da sessão, permitindo sua retomada em acessos posteriores.                                                                                                                |
+| RNF09 | Validação de arquivos    | A aplicação deverá validar o formato e o tamanho do arquivo e informar quando ele estiver ilegível, vazio ou não puder ser processado.                                                                                                                     |
+| RNF10 | Acessibilidade           | A interface deverá utilizar textos legíveis, contraste adequado, identificação dos campos e navegação por teclado nas funcionalidades principais.                                                                                                          |
+
+#### Funcionalidades do MVP
+
+A primeira versão do StudyIA terá como foco dois fluxos principais: **pesquisar um assunto** e **estudar um arquivo anexado**.
+
+Em ambos os fluxos, o usuário deverá acessar sua conta, interagir com o assistente de IA, gerar um plano de estudo e realizar um mini seminário com perguntas e retorno sobre suas respostas.
+
+Cada pesquisa deverá ser salva no histórico individual. Os arquivos, planos e mini seminários deverão permanecer vinculados ao conteúdo de origem, permitindo sua consulta e retomada.
+
+No MVP, o envio de arquivos poderá ser limitado a um formato inicialmente definido pela equipe. O formato aceito e o tamanho máximo deverão ser documentados antes da implementação.
+
+O acompanhamento do progresso, o ajuste dos planos e a exclusão de conteúdos poderão ser desenvolvidos após a conclusão das funcionalidades prioritárias.
+
+#### Critério de prioridade
+
+As funcionalidades classificadas como **Alta** são essenciais para demonstrar os dois fluxos do MVP e atender à proposta central do StudyIA.
+
+As funcionalidades classificadas como **Média** complementam a experiência e poderão ser implementadas após o funcionamento do fluxo principal. Essa classificação não reduz a necessidade de proteção dos dados e de acesso individual às informações de cada usuário.
+
+
+# 07. INTELIGÊNCIA ARTIFICIAL
+
+Descrição do papel da Inteligência Artificial, das entradas, do processamento e das saídas do StudyIA.
+
+### Onde está a Inteligência Artificial?
+
+A Inteligência Artificial estará presente nas explicações sobre assuntos pesquisados, no estudo de arquivos anexados, na geração de planos de estudo personalizados e na criação de mini seminários interativos.
+
+Ela utilizará o tema ou material selecionado e as informações fornecidas pelo usuário para organizar conteúdos e apoiar a aprendizagem em contextos acadêmicos, profissionais ou pessoais.
+
+### IA escolhida
+
+O StudyIA utilizará uma IA generativa baseada em modelo de linguagem de grande porte (LLM), acessada por meio da **API Gemini, do Google**.
+
+O Gemini será responsável pela geração de explicações, planos de estudo, perguntas e retorno sobre as respostas dos usuários. A aplicação será responsável pelo cadastro, autenticação, armazenamento e controle de acesso ao histórico individual.
+
+### Finalidade da IA
+
+A IA será utilizada para:
+
+* Produzir explicações sobre assuntos de interesse do usuário.
+* Responder a perguntas e esclarecer dúvidas.
+* Auxiliar na compreensão de arquivos anexados.
+* Organizar tópicos em uma sequência de aprendizagem.
+* Gerar planos de estudo conforme o objetivo e o tempo disponível.
+* Criar mini seminários interativos com perguntas sobre o conteúdo estudado.
+* Analisar as respostas e indicar pontos que precisam de revisão.
+* Ajustar o planejamento quando o usuário alterar suas preferências.
+
+### Entradas
+
+A IA receberá, conforme a funcionalidade utilizada:
+
+* Assunto pesquisado e perguntas do usuário.
+* Conteúdo do arquivo selecionado, quando houver.
+* Modo de estudo: pesquisa por assunto ou estudo exclusivo do arquivo.
+* Objetivo da aprendizagem.
+* Nível de conhecimento informado.
+* Dias e tempo disponível para estudar.
+* Prazo para conclusão, quando houver.
+* Respostas às perguntas do mini seminário.
+* Contexto da pesquisa retomada pelo usuário.
+
+Somente as informações necessárias à solicitação deverão ser encaminhadas à IA. Senhas e dados de autenticação não deverão integrar essas entradas.
+
+### Processamento
+
+A aplicação organizará as entradas e enviará uma solicitação estruturada ao Gemini, indicando a atividade desejada e o modo de estudo selecionado.
+
+Na pesquisa por assunto, a IA produzirá explicações e atividades relacionadas ao tema. Caso a aplicação disponibilize pesquisa em fontes externas, essa consulta deverá ser implementada e identificada separadamente, pois uma resposta gerada pela IA não representa, por si só, uma busca atualizada na internet.
+
+No estudo exclusivo de arquivo, a aplicação disponibilizará o conteúdo do material selecionado e orientará a IA a utilizar somente essas informações. Quando o documento não contiver elementos suficientes para responder, o sistema deverá informar essa limitação.
+
+Para gerar o plano, a IA organizará os tópicos conforme o objetivo, o nível de conhecimento e a disponibilidade informados. Para o mini seminário, elaborará perguntas e oferecerá retorno sobre as respostas com base no conteúdo de origem.
+
+Antes da apresentação ao usuário, a aplicação deverá validar a estrutura da resposta. A fidelidade ao arquivo e a qualidade dos conteúdos também deverão ser avaliadas durante os testes.
+
+### Saídas
+
+A IA poderá gerar:
+
+* Explicações sobre o assunto pesquisado.
+* Respostas às dúvidas do usuário.
+* Sínteses e identificação dos principais tópicos de um arquivo.
+* Planos de estudo personalizados.
+* Cronogramas com atividades e duração estimada.
+* Perguntas para mini seminários interativos.
+* Retorno sobre as respostas, com explicações e pontos para revisão.
+* Sugestões de ajuste do plano.
+* Avisos sobre informações ausentes no arquivo ou insuficiência de conteúdo.
+
+As pesquisas e atividades geradas serão salvas pela aplicação na conta do usuário e vinculadas ao assunto ou arquivo correspondente.
+
+### Exemplo de funcionamento
+
+**Pesquisa por assunto**
+
+**Entrada:** o usuário deseja aprender sobre educação financeira, informa conhecimento inicial e disponibilidade de 30 minutos por dia durante uma semana.
+
+**Processamento:** a IA organiza os tópicos em uma sequência introdutória e distribui as atividades conforme o tempo informado.
+
+**Saída:** explicações sobre o tema, um plano de estudo de sete dias e um mini seminário com perguntas para verificar a compreensão.
+
+**Estudo exclusivo de arquivo**
+
+**Entrada:** o usuário anexa uma apostila sobre Banco de Dados e solicita um plano de estudo e perguntas sobre normalização.
+
+**Processamento:** a IA utiliza somente o conteúdo disponibilizado da apostila para organizar as atividades e elaborar as perguntas.
+
+**Saída:** um plano baseado no material e um mini seminário com retorno sobre as respostas. Se a apostila não abordar normalização, o aplicativo informa que o conteúdo é insuficiente para atender à solicitação.
+
+### Benefício para o usuário
+
+O principal benefício será transformar um assunto ou arquivo em uma sequência organizada de aprendizagem, reduzindo o esforço necessário para planejar os estudos e elaborar perguntas de revisão.
+
+A interação com a IA também poderá ajudar o usuário a esclarecer dúvidas e identificar conteúdos que precisam de aprofundamento.
+
+### Limites da IA
+
+As respostas da IA poderão conter erros, omissões ou interpretações inadequadas. Os planos e o retorno dos mini seminários serão apresentados como apoio à aprendizagem, sem garantir domínio do assunto ou substituir uma avaliação formal.
+
+No modo de pesquisa por assunto, informações que dependam de atualização deverão ser verificadas em fontes confiáveis. No modo de estudo exclusivo de arquivo, a qualidade das respostas dependerá da legibilidade e do conteúdo disponível no material.
+
+A instrução para utilizar somente o arquivo não garante, isoladamente, a fidelidade das respostas. Por isso, serão necessários controles na aplicação e testes específicos para verificar se os conteúdos gerados respeitam essa restrição.
+
+
+# 08. EXPERIÊNCIA E INTERFACE DO USUÁRIO
+
+Registro da jornada do usuário, do mapa de navegação, dos wireframes e do protótipo do StudyIA.
+
+
+# 09. ARQUITETURA E TECNOLOGIAS
+
+Registro da arquitetura, das tecnologias, plataformas, ferramentas, banco de dados e integrações utilizadas no StudyIA.
+
+
+# 10. DESENVOLVIMENTO
+
+https\://trello.com/invite/b/6ac5150c401af10074feb4a4/ATTI71f37bdf60f97a9cb44741f42f4c4874D0E5FD4A/studyia-plano-de-trabalho-a3
+
+<br>
+
+<figure><img src="https://734025836-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FOCvyqN5XKvvLsj74ZxzW%2Fuploads%2F0GRWEMWI2NKexXnrTcae%2Fimage.png?alt=media&amp;token=a7f8a8f6-5e11-49c0-af2a-a531e24e5ba0" alt=""><figcaption></figcaption></figure>
+
+
+# 11. TESTES
+
+Registro dos testes realizados, resultados obtidos, problemas identificados e correções aplicadas ao StudyIA.
+
+
+# 12. REVISÕES TÉCNICAS
+
+Registro das entregas, feedbacks, problemas e decisões tomadas em cada Revisão Técnica do projeto.
+
+
+# 12.1  RT01 — PROPOSTA E ESPECIFICAÇÃO
+
+Registro da proposta, das especificações iniciais e das decisões tomadas na RT01 do StudyIA.
+
+## 12.1 RT01 — PROPOSTA E ESPECIFICAÇÃO
+
+Registro da proposta, das especificações iniciais e das decisões tomadas na RT01 do StudyIA.
+
+#### Objetivo da RT01
+
+Definir a proposta do StudyIA, estabelecendo o problema a ser solucionado, o público-alvo, as necessidades dos usuários, as funcionalidades do MVP e a utilização da Inteligência Artificial como recurso de apoio à pesquisa e à aprendizagem.
+
+A proposta contempla o estudo de assuntos gerais e arquivos anexados, a geração de planos de estudo e a realização de mini seminários interativos, com acesso por login e senha e histórico individual de pesquisas.
+
+#### O que foi desenvolvido
+
+Nesta etapa, o grupo definiu:
+
+* O problema relacionado à dificuldade de pesquisar, compreender e organizar conteúdos para aprendizagem.
+* O público-alvo ampliado, composto por pessoas com interesses acadêmicos, profissionais ou pessoais.
+* As necessidades, dificuldades e expectativas inicialmente consideradas para esses usuários.
+* A pesquisa bibliográfica inicial e a necessidade de complementá-la para o público ampliado.
+* A proposta de solução do StudyIA.
+* Os requisitos funcionais e não funcionais.
+* As funcionalidades prioritárias do MVP.
+* A utilização do Gemini para apoiar explicações, planos de estudo e mini seminários.
+* As entradas, o processamento e as saídas esperadas da aplicação.
+* A necessidade de histórico individual e armazenamento das atividades.
+* Os limites da IA e a restrição de uso exclusivo do conteúdo no modo de estudo por arquivo.
+
+#### Decisões tomadas
+
+O grupo decidiu desenvolver uma aplicação denominada **StudyIA — Assistente Inteligente de Estudos**, destinada a pessoas que desejam aprender sobre diferentes assuntos, seja para escola, faculdade, desenvolvimento profissional, conhecimentos gerais ou curiosidade.
+
+A aplicação terá dois fluxos principais: pesquisa por assunto e estudo de arquivo anexado. Em ambos, o usuário poderá solicitar explicações, gerar um plano de estudo e realizar um mini seminário interativo com perguntas e retorno sobre suas respostas.
+
+Para o MVP, foram priorizadas as seguintes funcionalidades:
+
+* Cadastro e acesso por login e senha.
+* Pesquisa de assuntos gerais.
+* Interação com o assistente de IA.
+* Salvamento automático e consulta do histórico individual de pesquisas.
+* Anexo de arquivo para estudo exclusivo de seu conteúdo.
+* Registro do objetivo, nível de conhecimento e disponibilidade de estudo.
+* Geração e visualização de planos de estudo personalizados.
+* Geração de mini seminários interativos.
+* Registro das respostas e apresentação de retorno sobre a compreensão.
+* Salvamento dos planos e mini seminários vinculados à pesquisa ou ao arquivo de origem.
+
+O plano de estudo deverá considerar o conteúdo selecionado, o objetivo, o nível de conhecimento, os dias e o tempo disponível e, quando houver, o prazo informado pelo usuário.
+
+No modo de estudo por arquivo, as explicações, os planos e os mini seminários deverão utilizar somente o material anexado. Quando uma informação não estiver disponível no documento, o aplicativo deverá comunicar essa limitação.
+
+Foi mantida a utilização de uma IA generativa baseada em modelo de linguagem, acessada por meio da **API Gemini, do Google**. A aplicação será responsável pela autenticação, pelo armazenamento dos dados e pelo controle de acesso às informações de cada usuário.
+
+#### Problemas identificados
+
+Nesta etapa, foram identificados alguns pontos que ainda precisam ser definidos:
+
+*
+
+```
+Nesta etapa, foram identificados pontos que ainda precisam ser definidos ou validados:
+```
+
+```
+* Tecnologias de desenvolvimento e arquitetura da aplicação.
+* Estrutura do banco de dados e vínculos entre usuários, pesquisas, arquivos, planos e mini seminários.
+* Formato das telas e navegação entre os dois fluxos principais.
+* Formatos e tamanho máximo dos arquivos aceitos.
+* Forma de extração e processamento do conteúdo dos arquivos.
+* Critérios de organização dos tópicos e distribuição do tempo nos planos.
+* Critérios de elaboração das perguntas e análise das respostas dos mini seminários.
+* Controles para verificar a fidelidade das respostas ao arquivo anexado.
+* Forma de validação das respostas geradas pela IA.
+* Tratamento de falhas de processamento e indisponibilidade do serviço de IA.
+* Proteção dos dados e isolamento das informações entre usuários.
+* Adequação do escopo ao tempo disponível para o projeto.
+* Validação das necessidades do público ampliado por meio de pesquisa com potenciais usuários.
+```
+
+#### Feedback recebido
+
+Até o momento, a RT01 ainda não foi apresentada ao professor. O feedback recebido deverá ser registrado nesta seção após a revisão técnica, incluindo os ajustes solicitados e as decisões decorrentes da avaliação.
+
+#### Divisão inicial do trabalho
+
+| Função                           | Responsáveis         | Atividades                                                                                                               |
+| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Coordenação e documentação       | Rafael e Kauã        | Organizar o GitBook, controlar as atualizações e manter a coerência entre as seções do projeto.                          |
+| Problema e pesquisa              | Patrik e Arthur      | Documentar o problema, o público-alvo, a pesquisa e o diagnóstico, considerando os diferentes contextos de aprendizagem. |
+| Produto e experiência do usuário | Juan e Renzo         | Definir funcionalidades, jornada do usuário, telas e protótipo dos fluxos de pesquisa e estudo por arquivo.              |
+| Tecnologia e IA                  | Isaac e Luan         | Definir arquitetura, banco de dados, autenticação, integração com Gemini, processamento de arquivos e testes.            |
+| Atividades coletivas             | Todos os integrantes | Participar das decisões, revisões, testes e apresentação do projeto.                                                     |
+
+#### Situação atual
+
+A proposta e as especificações iniciais do StudyIA estão documentadas com o escopo ampliado para aprendizagem sobre assuntos gerais e arquivos anexados.
+
+O projeto prevê acesso individual por login e senha, histórico de pesquisas, interação com IA, planos de estudo personalizados e mini seminários para verificar a compreensão. As necessidades do público ampliado ainda deverão ser validadas com potenciais usuários.
+
+A próxima etapa será desenvolver a jornada do usuário, os wireframes, o protótipo das telas e a arquitetura simplificada da solução, contemplando os dois fluxos principais e o armazenamento individual das pesquisas e atividades.
+
+
+# 12.2 RT02 — PROTÓTIPO
+
+Registro do protótipo, da jornada do usuário, das telas apresentadas e do feedback recebido na RT02.
+
+
+# 12.3 RT03 — DESENVOLVIMENTO/MVP
+
+Registro das funcionalidades implementadas, dos testes, dos problemas, das correções e da situação do MVP na RT03.
+
+
+# 12.4 RT04 — VALIDAÇÃO E FINALIZAÇÃO
+
+Registro da validação, dos feedbacks, das melhorias realizadas e da versão final do StudyIA apresentada na RT04.
+
+
+# 13. EVOLUÇÃO DA SOLUÇÃO
+
+Histórico das versões, dos feedbacks, dos problemas identificados e das melhorias realizadas no StudyIA.
+
+
+# 14. REGISTRO DO USO DA IA
+
+Registro das ferramentas de IA utilizadas, das solicitações realizadas, dos resultados obtidos e das correções feitas pelo grupo.
+
+### Objetivo do registro
+
+Esta página documenta o uso de ferramentas de Inteligência Artificial durante o desenvolvimento do projeto. O registro apresenta as solicitações realizadas, os conteúdos produzidos, as limitações identificadas e os ajustes necessários para aproveitamento no StudyIA.
+
+O uso de IA como apoio ao desenvolvimento deve ser diferenciado da IA integrada ao produto. Durante o projeto, ferramentas como o ChatGPT apoiam a elaboração e a revisão da documentação. No aplicativo, o Gemini será utilizado para gerar explicações, planos de estudo e mini seminários interativos a partir de assuntos pesquisados ou arquivos anexados.
+
+### Registro inicial
+
+| Data       | IA utilizada | Solicitação realizada                                                                                                                 | Resultado produzido                                                                                     | Problema ou limitação                                                                               | Correção ou encaminhamento                                                                                 |
+| ---------- | ------------ | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| 2026-09-02 | ChatGPT      | Sugerir uma aplicação de IA para o cotidiano adequada ao projeto A3.                                                                  | Sugestões de propostas de aplicação.                                                                    | Algumas ideias apresentavam escopo amplo para o tempo disponível.                                   | O grupo selecionou o StudyIA e definiu inicialmente o foco na organização dos estudos.                     |
+| 2026-09-02 | ChatGPT      | Estruturar a proposta do StudyIA conforme o roteiro do GitBook.                                                                       | Organização inicial das páginas e dos conteúdos da RT01.                                                | Informações específicas do grupo não estavam disponíveis.                                           | O grupo inseriu os dados da turma, curso e professor e deixou os integrantes para preenchimento posterior. |
+| 2026-09-03 | ChatGPT      | Definir requisitos e funcionalidades da primeira versão.                                                                              | Lista inicial de requisitos funcionais e não funcionais.                                                | A proposta incluía funcionalidades que poderiam ampliar excessivamente o MVP.                       | O grupo classificou as funcionalidades por prioridade.                                                     |
+| 2026-09-03 | ChatGPT      | Explicar o papel da IA no StudyIA.                                                                                                    | Descrição das entradas, do processamento, das saídas e dos benefícios esperados.                        | A integração ainda não havia sido testada.                                                          | O Gemini foi registrado como tecnologia prevista para a integração.                                        |
+| 2026-09-29 | ChatGPT      | Adaptar o projeto para um aplicativo de aprendizagem sobre assuntos gerais, com login, histórico, arquivos, planos e mini seminários. | Textos revisados para as seções fornecidas do GitBook.                                                  | A documentação anterior estava concentrada na rotina acadêmica de estudantes.                       | Foi proposta a ampliação do público e dos fluxos de uso, mantendo o nome StudyIA.                          |
+| 2026-09-29 | ChatGPT      | Atualizar os requisitos e a descrição da IA, mantendo o Gemini.                                                                       | Requisitos para pesquisa, estudo exclusivo de arquivos, histórico individual, planos e mini seminários. | A ampliação exige definir controles de acesso, processamento de arquivos e validação das respostas. | Esses pontos foram registrados como requisitos e pendências de desenvolvimento.                            |
+| 2026-09-29 | ChatGPT      | Adequar a pesquisa e o diagnóstico ao novo público.                                                                                   | Texto que diferencia as evidências bibliográficas existentes das hipóteses da proposta ampliada.        | As fontes iniciais têm foco educacional e ainda não houve pesquisa direta com o público ampliado.   | Foi indicada a necessidade de complementar a pesquisa com potenciais usuários.                             |
+
+### O que pedimos à IA?
+
+Foi solicitado apoio para definir a proposta, organizar a documentação, descrever o problema, identificar o público-alvo, estruturar os requisitos e explicar o papel da Inteligência Artificial.
+
+Posteriormente, foi solicitada a revisão dos textos para ampliar o StudyIA a pessoas com interesses acadêmicos, profissionais ou pessoais. A atualização incluiu pesquisa de assuntos gerais, estudo de arquivos anexados, login e senha, histórico individual, planos de estudo e mini seminários interativos.
+
+Também foi informado que o **Gemini permanecerá como a IA integrada ao aplicativo**.
+
+### O que a IA produziu?
+
+A IA produziu sugestões de texto, estruturas de documentação, requisitos e descrições dos fluxos previstos para a aplicação.
+
+Na atualização, elaborou textos para os dois modos principais de uso: pesquisa por assunto e estudo exclusivo de arquivo. Também descreveu a geração de planos, as perguntas dos mini seminários, o retorno sobre as respostas e o armazenamento das atividades na conta do usuário.
+
+Esses resultados são propostas documentais e não representam funcionalidades já implementadas ou testadas.
+
+### O que precisava ser corrigido?
+
+Foi necessário atualizar as referências que limitavam o aplicativo a estudantes, matérias e avaliações, passando a contemplar diferentes objetivos de aprendizagem.
+
+Também foi necessário:
+
+* Incluir autenticação e histórico individual.
+* Definir o estudo baseado exclusivamente no arquivo anexado.
+* Incorporar mini seminários com perguntas e respostas para verificar a compreensão.
+* Ajustar as prioridades do MVP ao novo escopo.
+* Manter o Gemini como tecnologia escolhida.
+* Diferenciar evidências existentes de hipóteses ainda não validadas.
+* Evitar apresentar funcionalidades planejadas como resultados já alcançados.
+
+### Como o grupo realizou as correções?
+
+O grupo deve comparar as sugestões com as decisões do projeto, revisar o escopo e conferir a coerência entre as páginas antes de atualizar o GitBook.
+
+As informações sobre implementação, testes e feedback devem ser registradas somente após sua realização. Os textos gerados pela IA devem ser avaliados pelos integrantes, que permanecem responsáveis pelo conteúdo final da documentação.
+
+### Resultado atual
+
+Foram preparados textos que apresentam o StudyIA como um assistente de pesquisa e aprendizagem para diferentes públicos.
+
+A proposta atual contempla acesso por login e senha, histórico individual de pesquisas, estudo de assuntos gerais e arquivos anexados, geração de planos personalizados e mini seminários interativos. A implementação e a validação dessas funcionalidades ainda deverão ser realizadas pelo grupo.
+
+### Onde a IA estará presente na solução?
+
+O Gemini será utilizado para produzir explicações, responder a dúvidas, organizar planos de estudo e elaborar perguntas e retorno sobre as respostas dos mini seminários.
+
+No modo de estudo por arquivo, os conteúdos gerados deverão se limitar ao material anexado. Quando a informação solicitada estiver ausente, o aplicativo deverá comunicar essa limitação.
+
+O cadastro, a autenticação, o histórico e o controle de acesso serão responsabilidades da aplicação. As respostas da IA deverão passar por validação e testes, especialmente quanto à qualidade e à fidelidade ao arquivo utilizado.
+
+> Esta página deverá ser atualizada durante todo o projeto. Cada novo uso de IA, inclusive para criação de código, telas, testes ou correções, deverá ser registrado na tabela.
+
+
+# 15. ÉTICA, PRIVACIDADE E SEGURANÇA
+
+Registro dos cuidados éticos, dos dados utilizados, da privacidade, da segurança e dos limites da Inteligência Artificial no StudyIA.
+
+
+# 16. MVP FINAL
+
+Apresentação da versão final do MVP, das funcionalidades disponíveis, da demonstração da IA e das limitações do StudyIA.
+
+
+# 17. LIMITAÇÕES E PRÓXIMOS PASSOS
+
+Registro das limitações identificadas, das melhorias futuras e dos próximos passos para evolução do StudyIA.
+
+
+# 18. PREPARAÇÃO PARA A BANCA
+
+Organização do conteúdo, da demonstração e das evidências que serão apresentadas na banca final do StudyIA.
+
+

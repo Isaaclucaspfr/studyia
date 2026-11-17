@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StudyIA — Assistente Inteligente de Estudos{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=chakra_modern_ui_2026">
+    <!-- Google Fonts Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Navegação Superior -->
+    <nav class="navbar">
+        <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="nav-brand">
+            <span class="brand-badge">PROJETO A3</span>
+            <span>StudyIA</span>
+        </a>
+
+        {% if session.get('user_id') %}
+        <div class="nav-user">
+            <button type="button" class="btn btn-secondary btn-sm" id="openSettingsBtn" title="Configurar Chave da API Gemini">
+                ⚙️ Configurar IA
+            </button>
+            <div class="user-badge">
+                <span>👤 <strong>{{ session.get('name') }}</strong></span>
+            </div>
+            <a href="{{ url_for('logout') }}" class="btn btn-danger-outline btn-sm">Sair</a>
+        </div>
+        {% endif %}
+    </nav>
+
+    <!-- Modal de Configuração de Chave Gemini -->
+    {% if session.get('user_id') %}
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 0.5rem; color: var(--gray-900);">Configurações de Inteligência Artificial</h3>
+            <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1.25rem;">
+                O StudyIA utiliza a <strong>API Gemini do Google</strong> para produzir explicações, cronogramas e mini seminários.
+            </p>
+            <form action="{{ url_for('update_api_key') }}" method="POST">
+                <div class="form-group">
+                    <label for="gemini_api_key">Sua Chave da API Gemini (Google AI Studio):</label>
+                    <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" placeholder="AIzaSy..." value="">
+                    <small style="display: block; margin-top: 0.35rem; color: var(--gray-500); font-size: 0.75rem;">
+                        Se deixada em branco, o StudyIA operará no modo de demonstração didática inteligente.
+                    </small>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" id="closeSettingsBtn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Salvar Chave</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Mensagens de Alerta (Flash) -->
+    <div class="flash-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <span>{{ message }}</span>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Conteúdo Principal -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Rodapé Transparente (RNF06) -->
+    <footer style="text-align: center; padding: 2rem 1rem; color: var(--gray-500); font-size: 0.8rem; border-top: 1px solid var(--gray-200); margin-top: 3rem;">
+        <p><strong>StudyIA — Assistente Inteligente de Estudos</strong> | Unidade Curricular: Inteligência Artificial (Projeto A3)</p>
+        <p style="margin-top: 0.25rem;">Transparência (RNF06): As respostas, planos e seminários são gerados com apoio de Inteligência Artificial e devem ser revisados pelo usuário.</p>
+    </footer>
+
+    <!-- Marked.js para renderização de Markdown didático -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=chakra_modern_ui_2026"></script>
+    <script>
+        if (window.lucide) {
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>

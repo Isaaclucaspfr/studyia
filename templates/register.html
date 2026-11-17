@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Cadastro — StudyIA{% endblock %}
+
+{% block content %}
+<div style="max-width: 480px; margin: 2.5rem auto;">
+    <div class="card" style="padding: 2.5rem; border-radius: var(--chakra-radii-2xl); box-shadow: var(--chakra-shadows-lg);">
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="display: inline-block; padding: 0.25rem 0.85rem; background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-700); border: 1px solid var(--chakra-colors-teal-200); border-radius: var(--chakra-radii-full); font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; margin-bottom: 0.85rem; text-transform: uppercase;">
+                NOVA CONTA
+            </div>
+            <h2 style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">Criar sua Conta</h2>
+            <p style="color: var(--chakra-colors-gray-500); font-size: 0.9rem; margin-top: 0.35rem;">
+                Cadastre-se para manter seu histórico e cronogramas salvos
+            </p>
+        </div>
+
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="form-group">
+                <label for="name">Nome Completo:</label>
+                <input type="text" name="name" id="name" class="form-control" placeholder="ex: Isaac Lucas" required>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Nome de Usuário:</label>
+                <input type="text" name="username" id="username" class="form-control" placeholder="ex: isaac_estudos" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">E-mail:</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="ex: isaac@exemplo.com" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" name="password" id="password" class="form-control" placeholder="Mínimo 6 caracteres" minlength="6" required>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirmar Senha:</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control" placeholder="Repita a senha" minlength="6" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1.25rem; padding: 0.8rem; font-size: 0.95rem;">
+                Concluir Cadastro
+            </button>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.75rem; font-size: 0.875rem; color: var(--chakra-colors-gray-600); border-top: 1px solid var(--chakra-colors-gray-200); padding-top: 1.25rem;">
+            Já tem uma conta cadastrada? <a href="{{ url_for('login') }}" style="color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">Faça login</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

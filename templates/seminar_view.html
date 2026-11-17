@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{% block title %}{{ questions_data.title }} — StudyIA{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.75rem;">
+    <a href="{{ url_for('view_topic', topic_id=seminar.topic_id) }}" style="color: var(--chakra-colors-gray-500); text-decoration: none; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.75rem;">
+        ← Voltar ao Estudo ({{ seminar.topic_title }})
+    </a>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
+                    {{ questions_data.title }}
+                </h1>
+                {% if seminar.is_completed %}
+                <span class="badge badge-completed">Finalizado</span>
+                {% else %}
+                <span class="badge badge-pending">Em Andamento</span>
+                {% endif %}
+            </div>
+            <p style="font-size: 0.925rem; color: var(--chakra-colors-gray-600); margin-top: 0.35rem;">
+                {{ questions_data.instructions or 'Responda com atenção para verificar seu domínio sobre o conteúdo.' }}
+            </p>
+        </div>
+
+        {% if seminar.is_completed %}
+        <form action="{{ url_for('create_seminar', topic_id=seminar.topic_id) }}" method="POST" style="margin: 0;">
+            <button type="submit" class="btn btn-purple btn-sm">
+                🔄 Realizar Novo Seminário
+            </button>
+        </form>
+        {% endif %}
+    </div>
+</div>
+
+{% if seminar.is_completed and feedback_data %}
+<!-- PAINEL DE RESULTADOS E RETORNO PEDAGÓGICO CHAKRA (F11) -->
+<div class="card" style="margin-bottom: 2.25rem; border-top: 5px solid {% if seminar.score >= 70 %}var(--chakra-colors-green-500){% elif seminar.score >= 50 %}var(--chakra-colors-yellow-500){% else %}var(--chakra-colors-red-500){% endif %};">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem;">
+        <div>
+            <span style="font-size: 0.75rem; font-weight: 800; color: var(--chakra-colors-gray-500); text-transform: uppercase; letter-spacing: 0.08em;">
+                Avaliação Pedagógica da IA
+            </span>
+            <h2 style="font-size: 1.6rem; font-weight: 800; color: var(--chakra-colors-gray-900); margin-top: 0.25rem;">
+                {% if seminar.score >= 80 %}Excelente Desempenho! 🌟
+                {% elif seminar.score >= 60 %}Bom Domínio Conceitual! 👍
+                {% else %}Revisão Recomendada 💡{% endif %}
+            </h2>
+            <p style="font-size: 0.925rem; color: var(--chakra-colors-gray-700); margin-top: 0.5rem; max-width: 650px; line-height: 1.6;">
+                {{ feedback_data.summary }}
+            </p>
+        </div>
+
+        <div style="text-align: center; background: var(--chakra-colors-gray-50); border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-xl); padding: 1.5rem 2.25rem; box-shadow: var(--chakra-shadows-sm);">
+            <div style="font-size: 2.5rem; font-weight: 900; color: {% if seminar.score >= 70 %}var(--chakra-colors-green-500){% elif seminar.score >= 50 %}var(--chakra-colors-orange-500){% else %}var(--chakra-colors-red-500){% endif %}; line-height: 1;">
+                {{ seminar.score }}%
+            </div>
+            <div style="font-size: 0.75rem; font-weight: 700; color: var(--chakra-colors-gray-500); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 0.35rem;">
+                Aproveitamento
+            </div>
+        </div>
+    </div>
+
+    <!-- Pontos Fortes e Pontos a Revisar -->
+    <div class="grid-2" style="margin-top: 1.75rem; border-top: 1px solid var(--chakra-colors-gray-200); padding-top: 1.5rem;">
+        <div style="background: var(--chakra-colors-green-50); border: 1px solid var(--chakra-colors-green-100); border-radius: var(--chakra-radii-lg); padding: 1.25rem;">
+            <strong style="color: var(--chakra-colors-green-600); font-size: 0.875rem; display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.65rem;">
+                ✓ Pontos Fortes Identificados:
+            </strong>
+            <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--chakra-colors-green-600); line-height: 1.6;">
+                {% for item in feedback_data.strengths %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div style="background: var(--chakra-colors-orange-50); border: 1px solid var(--chakra-colors-orange-100); border-radius: var(--chakra-radii-lg); padding: 1.25rem;">
+            <strong style="color: var(--chakra-colors-orange-500); font-size: 0.875rem; display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.65rem;">
+                ⚠️ Tópicos Recomendados para Revisão:
+            </strong>
+            <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--chakra-colors-orange-500); line-height: 1.6;">
+                {% for item in feedback_data.topics_to_review %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- FORMULÁRIO / QUESTÕES DO SEMINÁRIO -->
+<form action="{{ url_for('submit_seminar', seminar_id=seminar.id) }}" method="POST">
+    <div style="display: flex; flex-direction: column; gap: 1.75rem;">
+        {% for q in questions_data.questions %}
+        {% set qid = q.id | string %}
+        {% set feedback_item = None %}
+        {% if feedback_data and feedback_data.feedback_items %}
+            {% for fi in feedback_data.feedback_items %}
+                {% if fi.question_id | string == qid %}
+                    {% set feedback_item = fi %}
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <span style="font-size: 0.8rem; font-weight: 800; color: var(--chakra-colors-teal-600); text-transform: uppercase; letter-spacing: 0.08em;">
+                    Questão {{ loop.index }}
+                </span>
+                {% if feedback_item %}
+                    {% if feedback_item.status == 'correct' %}
+                        <span class="badge badge-completed">✓ Correta</span>
+                    {% elif feedback_item.status == 'partial' %}
+                        <span class="badge badge-pending">~ Parcial</span>
+                    {% else %}
+                        <span class="badge" style="background: var(--chakra-colors-red-50); color: var(--chakra-colors-red-500); border: 1px solid var(--chakra-colors-red-100);">✗ Precisa Rever</span>
+                    {% endif %}
+                {% endif %}
+            </div>
+
+            <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--chakra-colors-gray-900); margin-bottom: 1.25rem; line-height: 1.45;">
+                {{ q.question }}
+            </h3>
+
+            <!-- Se for Múltipla Escolha -->
+            {% if q.type == 'multiple_choice' %}
+            <div style="display: flex; flex-direction: column; gap: 0.65rem;">
+                {% for opt in q.options %}
+                {% set opt_code = opt[:2] %}
+                <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.85rem 1.15rem; border: 1px solid {% if user_answers.get(qid) == opt %}var(--chakra-colors-teal-500){% else %}var(--chakra-colors-gray-200){% endif %}; border-radius: var(--chakra-radii-md); background: {% if user_answers.get(qid) == opt %}var(--chakra-colors-teal-50){% else %}#fff{% endif %}; cursor: {% if seminar.is_completed %}default{% else %}pointer{% endif %}; transition: all 0.15s ease;">
+                    <input 
+                        type="radio" 
+                        name="q_{{ qid }}" 
+                        value="{{ opt }}"
+                        style="accent-color: var(--chakra-colors-teal-500); width: 16px; height: 16px;"
+                        {% if user_answers.get(qid) == opt %}checked{% endif %}
+                        {% if seminar.is_completed %}disabled{% else %}required{% endif %}
+                    >
+                    <span style="font-size: 0.925rem; color: var(--chakra-colors-gray-800);">{{ opt }}</span>
+                </label>
+                {% endfor %}
+            </div>
+
+            <!-- Se for Discursiva -->
+            {% else %}
+            <div>
+                <textarea 
+                    name="q_{{ qid }}" 
+                    class="form-control" 
+                    rows="4" 
+                    placeholder="Escreva sua resposta de forma clara e fundamentada..."
+                    {% if seminar.is_completed %}disabled{% else %}required{% endif %}
+                >{{ user_answers.get(qid, '') }}</textarea>
+            </div>
+            {% endif %}
+
+            <!-- Feedback pontual da questão se já finalizado -->
+            {% if feedback_item %}
+            <div style="margin-top: 1.15rem; padding: 0.85rem 1.15rem; background: var(--chakra-colors-gray-50); border-left: 3px solid {% if feedback_item.status == 'correct' %}var(--chakra-colors-green-500){% elif feedback_item.status == 'partial' %}var(--chakra-colors-yellow-500){% else %}var(--chakra-colors-red-500){% endif %}; border-radius: 0 var(--chakra-radii-md) var(--chakra-radii-md) 0; font-size: 0.875rem; color: var(--chakra-colors-gray-700); line-height: 1.5;">
+                <strong style="color: var(--chakra-colors-gray-900);">Retorno da IA:</strong> {{ feedback_item.feedback }}
+            </div>
+            {% endif %}
+
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not seminar.is_completed %}
+    <div style="margin-top: 2.5rem; text-align: center;">
+        <button type="submit" class="btn btn-primary" style="padding: 0.85rem 3rem; font-size: 1rem;">
+            Enviar Respostas para Avaliação da IA
+        </button>
+    </div>
+    {% endif %}
+</form>
+{% endblock %}

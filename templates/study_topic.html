@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}{{ topic.title }} — StudyIA{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 1.75rem;">
+    <a href="{{ url_for('dashboard') }}" style="color: var(--chakra-colors-gray-500); text-decoration: none; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.75rem; transition: color 0.15s ease;">
+        ← Voltar ao Painel
+    </a>
+
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+        <div>
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
+                    {{ topic.title }}
+                </h1>
+                {% if topic.topic_type == 'file' %}
+                <span class="badge badge-file">Arquivo: {{ topic.file_name }}</span>
+                {% else %}
+                <span class="badge badge-subject">Assunto Geral</span>
+                {% endif %}
+            </div>
+            <p style="font-size: 0.85rem; color: var(--chakra-colors-gray-500); margin-top: 0.25rem;">
+                Iniciado em {{ topic.created_at[:16] }}
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
+            <a href="{{ url_for('export_topic', topic_id=topic.id) }}" class="btn btn-secondary btn-sm" title="Baixar todas as perguntas e respostas gravadas no banco de dados">
+                📥 Exportar Caderno (.md)
+            </a>
+            <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
+                📅 Gerar Plano de Estudo
+            </a>
+            <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
+                <button type="submit" class="btn btn-purple btn-sm">
+                    🎯 Iniciar Mini Seminário
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Banner de Fidelidade e Transparência Chakra Alert -->
+<div class="ai-notice">
+    {% if topic.topic_type == 'file' %}
+    <span>🔒 <strong>Modo Estudo Exclusivo de Arquivo:</strong> As respostas e planos são gerados estritamente com base no texto do documento anexado. Informações ausentes não são inventadas.</span>
+    {% else %}
+    <span>💡 <strong>Modo Pesquisa Geral:</strong> Fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini.</span>
+    {% endif %}
+</div>
+
+<!-- Layout Principal: Chat do Assistente + Painel Lateral de Atividades -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; align-items: start;">
+    
+    <!-- Coluna da Esquerda: Chat Conversacional com o Assistente -->
+    <div>
+        <div class="chat-window" style="height: 620px;">
+            <div style="padding: 0.75rem 1.25rem; background: var(--chakra-colors-gray-50); border-bottom: 1px solid var(--chakra-colors-gray-200); display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--chakra-colors-gray-600);">
+                <span>💬 <strong>Diálogo Conceitual & Dúvidas</strong></span>
+                <span class="badge" style="background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-700); border: 1px solid var(--chakra-colors-teal-200); font-weight: 700;">
+                    💾 {{ messages|length }} mensagens salvas no banco
+                </span>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                {% for msg in messages %}
+                <div class="message-row {{ msg.sender }}">
+                    <div class="avatar-circle {{ msg.sender }}">
+                        {% if msg.sender == 'assistant' %}🤖{% else %}👤{% endif %}
+                    </div>
+                    <div class="message-content-wrapper">
+                        <div class="message-sender-name">
+                            {% if msg.sender == 'assistant' %}StudyIA Tutor{% else %}Você{% endif %}
+                            <span class="message-time">{{ msg.created_at[11:16] }}</span>
+                        </div>
+                        <div class="chat-bubble {{ msg.sender }} markdown-content" data-raw="{{ msg.content | e }}">
+                            {{ msg.content | replace('\n', '<br>') | safe }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <form class="chat-input-area" id="chatForm" data-topic-id="{{ topic.id }}">
+                <input type="text" id="chatInput" class="form-control" placeholder="Traga uma dúvida sobre esse conceito (ex: 'como aplicar na prática?')..." required autocomplete="off">
+                <button type="submit" class="btn btn-primary" id="sendBtn">
+                    Perguntar à IA
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Coluna da Direita: Planos de Estudo e Mini Seminários Vinculados (F12) -->
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+        
+        <!-- Cartão: Planos de Estudo -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);">📅 Planos de Estudo</h3>
+                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" style="font-size: 0.8rem; color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">+ Novo</a>
+            </div>
+
+            {% if plans %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for p in plans %}
+                <div style="padding: 0.85rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-md); background: #ffffff;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong style="font-size: 0.85rem; color: var(--chakra-colors-gray-800);">Nível {{ p.level }}</strong>
+                        <span style="font-size: 0.75rem; color: var(--chakra-colors-gray-500); font-weight: 600;">{{ p.daily_minutes }} min/dia</span>
+                    </div>
+                    
+                    <div style="margin: 0.5rem 0;">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: {{ p.progress_percent }}%;"></div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--chakra-colors-gray-600);">
+                        <span>Progresso: <strong>{{ p.progress_percent }}%</strong></span>
+                        <a href="{{ url_for('view_plan', plan_id=p.id) }}" style="color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">Abrir Cronograma →</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="font-size: 0.825rem; color: var(--chakra-colors-gray-500); text-align: center; padding: 1.25rem 0;">
+                Nenhum plano gerado ainda.<br>
+                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" style="color: var(--chakra-colors-teal-600); font-weight: 700;">Criar cronograma personalizado</a>
+            </p>
+            {% endif %}
+        </div>
+
+        <!-- Cartão: Mini Seminários Interativos -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);">🎯 Mini Seminários</h3>
+                <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
+                    <button type="submit" style="background: none; border: none; font-size: 0.8rem; color: var(--chakra-colors-purple-600); font-weight: 700; cursor: pointer;">+ Gerar</button>
+                </form>
+            </div>
+
+            {% if seminars %}
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                {% for s in seminars %}
+                <div style="padding: 0.85rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-md); background: #ffffff;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.825rem; font-weight: 700; color: var(--chakra-colors-gray-800);">Seminário #{{ s.id }}</span>
+                        {% if s.is_completed %}
+                        <span class="badge badge-completed">Nota: {{ s.score }}%</span>
+                        {% else %}
+                        <span class="badge badge-pending">Pendente</span>
+                        {% endif %}
+                    </div>
+                    <div style="margin-top: 0.5rem; text-align: right;">
+                        <a href="{{ url_for('view_seminar', seminar_id=s.id) }}" style="font-size: 0.8rem; color: var(--chakra-colors-purple-600); font-weight: 700; text-decoration: none;">
+                            {% if s.is_completed %}Ver Avaliação & Respostas →{% else %}Responder Perguntas →{% endif %}
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p style="font-size: 0.825rem; color: var(--chakra-colors-gray-500); text-align: center; padding: 1.25rem 0;">
+                Nenhum seminário realizado ainda.<br>
+                Teste seu aprendizado gerando um teste interativo!
+            </p>
+            {% endif %}
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

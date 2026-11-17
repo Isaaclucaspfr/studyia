@@ -1,0 +1,549 @@
+/* ==========================================================================
+   StudyIA — Chakra UI Inspired Design System
+   Tokens, components and styles matching https://github.com/chakra-ui/chakra-ui
+   ========================================================================== */
+
+:root {
+  /* Chakra UI Color System */
+  --chakra-colors-transparent: transparent;
+  --chakra-colors-black: #000;
+  --chakra-colors-white: #fff;
+
+  /* Grays */
+  --chakra-colors-gray-50: #f7fafc;
+  --chakra-colors-gray-100: #edf2f7;
+  --chakra-colors-gray-200: #e2e8f0;
+  --chakra-colors-gray-300: #cbd5e0;
+  --chakra-colors-gray-400: #a0aec0;
+  --chakra-colors-gray-500: #718096;
+  --chakra-colors-gray-600: #4a5568;
+  --chakra-colors-gray-700: #2d3748;
+  --chakra-colors-gray-800: #1a202c;
+  --chakra-colors-gray-900: #171923;
+
+  /* Primary Brand: Chakra Teal / Blue */
+  --chakra-colors-teal-50: #e6fffa;
+  --chakra-colors-teal-100: #b2f5ea;
+  --chakra-colors-teal-200: #81e6d9;
+  --chakra-colors-teal-300: #4fd1c5;
+  --chakra-colors-teal-400: #38b2ac;
+  --chakra-colors-teal-500: #319795;
+  --chakra-colors-teal-600: #285e61;
+  --chakra-colors-teal-700: #234e52;
+  --chakra-colors-teal-800: #1d4044;
+
+  /* Accent: Chakra Purple */
+  --chakra-colors-purple-50: #faf5ff;
+  --chakra-colors-purple-100: #e9d8fd;
+  --chakra-colors-purple-200: #d6bcfa;
+  --chakra-colors-purple-500: #805ad5;
+  --chakra-colors-purple-600: #6b46c1;
+  --chakra-colors-purple-700: #553c9a;
+
+  /* Chakra Blue */
+  --chakra-colors-blue-50: #ebf8ff;
+  --chakra-colors-blue-100: #bee3f8;
+  --chakra-colors-blue-500: #3182ce;
+  --chakra-colors-blue-600: #2b6cb0;
+
+  /* Chakra Semantic: Green (Success), Orange (Warning), Red (Error) */
+  --chakra-colors-green-50: #f0fff4;
+  --chakra-colors-green-100: #c6f6d5;
+  --chakra-colors-green-500: #38a169;
+  --chakra-colors-green-600: #2f855a;
+
+  --chakra-colors-yellow-50: #fffff0;
+  --chakra-colors-yellow-100: #fefcbf;
+  --chakra-colors-yellow-500: #d69e2e;
+  --chakra-colors-orange-50: #fffaf0;
+  --chakra-colors-orange-100: #feebc8;
+  --chakra-colors-orange-500: #dd6b20;
+
+  --chakra-colors-red-50: #fff5f5;
+  --chakra-colors-red-100: #fed7d7;
+  --chakra-colors-red-500: #e53e3e;
+  --chakra-colors-red-600: #c53030;
+
+  /* Chakra UI Typography */
+  --chakra-fonts-heading: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  --chakra-fonts-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+
+  /* Chakra Radii */
+  --chakra-radii-none: 0;
+  --chakra-radii-sm: 0.125rem;
+  --chakra-radii-base: 0.25rem;
+  --chakra-radii-md: 0.375rem;
+  --chakra-radii-lg: 0.5rem;
+  --chakra-radii-xl: 0.75rem;
+  --chakra-radii-2xl: 1rem;
+  --chakra-radii-3xl: 1.5rem;
+  --chakra-radii-full: 9999px;
+
+  /* Chakra Shadows */
+  --chakra-shadows-xs: 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --chakra-shadows-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --chakra-shadows-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  --chakra-shadows-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --chakra-shadows-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --chakra-shadows-outline: 0 0 0 3px rgba(49, 151, 149, 0.4);
+}
+
+/* Global Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--chakra-fonts-body);
+  background-color: var(--chakra-colors-gray-50);
+  color: var(--chakra-colors-gray-800);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* Chakra Navbar / Header */
+.navbar {
+  background-color: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--chakra-colors-gray-200);
+  padding: 0.875rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: var(--chakra-shadows-xs);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--chakra-colors-gray-900);
+  letter-spacing: -0.02em;
+}
+
+.nav-brand .brand-badge {
+  background: linear-gradient(135deg, var(--chakra-colors-teal-500), var(--chakra-colors-purple-600));
+  color: #fff;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--chakra-radii-md);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--chakra-colors-gray-700);
+  background: var(--chakra-colors-gray-100);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--chakra-radii-full);
+}
+
+/* Chakra Container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.25rem 1.5rem;
+}
+
+/* Chakra Alerts */
+.flash-container {
+  max-width: 1200px;
+  margin: 1rem auto 0;
+  padding: 0 1.5rem;
+}
+
+.alert {
+  padding: 0.875rem 1.25rem;
+  border-radius: var(--chakra-radii-md);
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-left: 4px solid transparent;
+  box-shadow: var(--chakra-shadows-sm);
+}
+
+.alert-success { background: var(--chakra-colors-green-50); color: var(--chakra-colors-green-600); border-left-color: var(--chakra-colors-green-500); }
+.alert-danger { background: var(--chakra-colors-red-50); color: var(--chakra-colors-red-600); border-left-color: var(--chakra-colors-red-500); }
+.alert-warning { background: var(--chakra-colors-yellow-50); color: var(--chakra-colors-orange-500); border-left-color: var(--chakra-colors-yellow-500); }
+.alert-info { background: var(--chakra-colors-blue-50); color: var(--chakra-colors-blue-600); border-left-color: var(--chakra-colors-blue-500); }
+
+/* Chakra Button System */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.25rem;
+  border-radius: var(--chakra-radii-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Chakra Solid Teal (Primary) */
+.btn-primary {
+  background-color: var(--chakra-colors-teal-500);
+  color: #fff;
+  box-shadow: var(--chakra-shadows-sm);
+}
+.btn-primary:hover {
+  background-color: var(--chakra-colors-teal-600);
+  box-shadow: var(--chakra-shadows-md);
+}
+.btn-primary:focus {
+  box-shadow: var(--chakra-shadows-outline);
+}
+
+/* Chakra Solid Purple */
+.btn-purple {
+  background-color: var(--chakra-colors-purple-500);
+  color: #fff;
+}
+.btn-purple:hover {
+  background-color: var(--chakra-colors-purple-600);
+}
+
+/* Chakra Outline */
+.btn-secondary {
+  background-color: #fff;
+  color: var(--chakra-colors-gray-700);
+  border-color: var(--chakra-colors-gray-200);
+  box-shadow: var(--chakra-shadows-xs);
+}
+.btn-secondary:hover {
+  background-color: var(--chakra-colors-gray-50);
+  border-color: var(--chakra-colors-gray-300);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: var(--chakra-colors-teal-500);
+  color: var(--chakra-colors-teal-600);
+}
+.btn-outline:hover {
+  background: var(--chakra-colors-teal-50);
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border-color: var(--chakra-colors-red-200);
+  color: var(--chakra-colors-red-500);
+}
+.btn-danger-outline:hover {
+  background: var(--chakra-colors-red-50);
+  border-color: var(--chakra-colors-red-500);
+}
+
+.btn-sm {
+  padding: 0.35rem 0.8rem;
+  font-size: 0.8rem;
+  border-radius: var(--chakra-radii-md);
+}
+
+/* Chakra Card System */
+.card {
+  background: #ffffff;
+  border: 1px solid var(--chakra-colors-gray-200);
+  border-radius: var(--chakra-radii-xl);
+  padding: 1.75rem;
+  box-shadow: var(--chakra-shadows-base);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card:hover {
+  box-shadow: var(--chakra-shadows-md);
+}
+
+/* Chakra Badge System */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: var(--chakra-radii-base);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-subject { background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-700); border: 1px solid var(--chakra-colors-teal-200); }
+.badge-file { background: var(--chakra-colors-purple-50); color: var(--chakra-colors-purple-700); border: 1px solid var(--chakra-colors-purple-200); }
+.badge-completed { background: var(--chakra-colors-green-50); color: var(--chakra-colors-green-600); border: 1px solid var(--chakra-colors-green-100); }
+.badge-pending { background: var(--chakra-colors-yellow-50); color: var(--chakra-colors-orange-500); border: 1px solid var(--chakra-colors-yellow-100); }
+
+/* Chakra Stat Component */
+.stat-box {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+}
+
+.stat-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--chakra-radii-xl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+}
+
+/* Layout Grids */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.75rem;
+}
+
+.grid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* Chakra Form Controls */
+.form-group {
+  margin-bottom: 1.35rem;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--chakra-colors-gray-700);
+  margin-bottom: 0.45rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.95rem;
+  font-size: 0.925rem;
+  border: 1px solid var(--chakra-colors-gray-200);
+  border-radius: var(--chakra-radii-md);
+  background-color: #fff;
+  color: var(--chakra-colors-gray-800);
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: var(--chakra-colors-teal-500);
+  box-shadow: 0 0 0 1px var(--chakra-colors-teal-500);
+}
+
+.form-control::placeholder {
+  color: var(--chakra-colors-gray-400);
+}
+
+/* Chakra Chat Window & Message Rows */
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border: 1px solid var(--chakra-colors-gray-200);
+  border-radius: var(--chakra-radii-2xl);
+  overflow: hidden;
+  box-shadow: var(--chakra-shadows-base);
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  background: #f8fafc;
+}
+
+.message-row {
+  display: flex;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.message-row.user {
+  flex-direction: row-reverse;
+}
+
+.avatar-circle {
+  width: 38px;
+  height: 38px;
+  min-width: 38px;
+  border-radius: var(--chakra-radii-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  box-shadow: var(--chakra-shadows-sm);
+}
+
+.avatar-circle.assistant {
+  background: #ffffff;
+  border: 1.5px solid var(--chakra-colors-teal-300);
+}
+
+.avatar-circle.user {
+  background: #ffffff;
+  border: 1.5px solid var(--chakra-colors-purple-300);
+}
+
+.message-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  max-width: 84%;
+}
+
+.message-row.user .message-content-wrapper {
+  align-items: flex-end;
+}
+
+.message-sender-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--chakra-colors-gray-600);
+  margin-bottom: 0.3rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.message-time {
+  font-weight: 500;
+  color: var(--chakra-colors-gray-400);
+}
+
+.chat-bubble {
+  padding: 1.1rem 1.35rem;
+  border-radius: var(--chakra-radii-xl);
+  font-size: 0.935rem;
+  line-height: 1.65;
+  word-wrap: break-word;
+  box-shadow: var(--chakra-shadows-sm);
+}
+
+.chat-bubble.assistant {
+  align-self: flex-start;
+  background-color: #ffffff;
+  color: var(--chakra-colors-gray-800);
+  border: 1px solid var(--chakra-colors-gray-200);
+  border-bottom-left-radius: var(--chakra-radii-sm);
+}
+
+.chat-bubble.assistant h1 { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.6rem; color: var(--chakra-colors-gray-900); }
+.chat-bubble.assistant h2 { font-size: 1.15rem; font-weight: 700; margin-top: 0.8rem; margin-bottom: 0.4rem; color: var(--chakra-colors-gray-900); }
+.chat-bubble.assistant h3 { font-size: 1rem; font-weight: 700; margin-top: 0.75rem; margin-bottom: 0.35rem; color: var(--chakra-colors-teal-600); }
+.chat-bubble.assistant p { margin-bottom: 0.65rem; }
+.chat-bubble.assistant ul, .chat-bubble.assistant ol { margin-left: 1.35rem; margin-bottom: 0.75rem; }
+.chat-bubble.assistant li { margin-bottom: 0.3rem; }
+.chat-bubble.assistant code { background: var(--chakra-colors-gray-100); color: var(--chakra-colors-purple-700); padding: 0.15rem 0.4rem; border-radius: var(--chakra-radii-sm); font-family: monospace; font-size: 0.88em; }
+.chat-bubble.assistant pre { background: var(--chakra-colors-gray-900); color: #f8fafc; padding: 0.85rem; border-radius: var(--chakra-radii-lg); overflow-x: auto; margin-bottom: 0.75rem; }
+.chat-bubble.assistant pre code { background: transparent; color: inherit; padding: 0; }
+.chat-bubble.assistant blockquote { border-left: 3px solid var(--chakra-colors-teal-500); padding-left: 0.85rem; color: var(--chakra-colors-gray-600); margin: 0.65rem 0; font-style: italic; background: var(--chakra-colors-teal-50); border-radius: 0 var(--chakra-radii-md) var(--chakra-radii-md) 0; }
+
+.chat-bubble.user {
+  align-self: flex-end;
+  background: linear-gradient(135deg, var(--chakra-colors-teal-500), var(--chakra-colors-teal-600));
+  color: #ffffff;
+  border-bottom-right-radius: var(--chakra-radii-sm);
+}
+
+.chat-input-area {
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-top: 1px solid var(--chakra-colors-gray-200);
+  display: flex;
+  gap: 0.75rem;
+}
+
+/* Chakra Progress Bar Component */
+.progress-bar-container {
+  background: var(--chakra-colors-gray-100);
+  border-radius: var(--chakra-radii-full);
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  background: linear-gradient(90deg, var(--chakra-colors-teal-400), var(--chakra-colors-teal-500));
+  height: 100%;
+  border-radius: var(--chakra-radii-full);
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Chakra Transparency Banner */
+.ai-notice {
+  background: var(--chakra-colors-gray-50);
+  border: 1px solid var(--chakra-colors-gray-200);
+  border-radius: var(--chakra-radii-lg);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.825rem;
+  color: var(--chakra-colors-gray-600);
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Chakra Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(23, 25, 35, 0.6);
+  backdrop-filter: blur(6px);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: var(--chakra-radii-2xl);
+  width: 90%;
+  max-width: 520px;
+  padding: 2rem;
+  box-shadow: var(--chakra-shadows-lg);
+  border: 1px solid var(--chakra-colors-gray-200);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .grid-2 { grid-template-columns: 1fr; }
+  .navbar { flex-direction: column; gap: 0.85rem; align-items: flex-start; padding: 1rem 1.25rem; }
+  .chat-bubble { max-width: 95%; }
+}

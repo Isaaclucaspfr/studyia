@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Plano de Estudo — {{ topic.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 620px; margin: 2rem auto;">
+    <a href="{{ url_for('view_topic', topic_id=topic.id) }}" style="color: var(--chakra-colors-gray-500); text-decoration: none; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 1.25rem;">
+        ← Voltar ao Estudo
+    </a>
+
+    <div class="card" style="box-shadow: var(--chakra-shadows-lg); border-radius: var(--chakra-radii-2xl);">
+        <div style="margin-bottom: 1.75rem; border-bottom: 1px solid var(--chakra-colors-gray-200); padding-bottom: 1.25rem;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: var(--chakra-colors-teal-600); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.35rem;">
+                Configuração Pedagógica (F07)
+            </div>
+            <h1 style="font-size: 1.6rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
+                Gerar Plano de Estudo: {{ topic.title }}
+            </h1>
+            <p style="font-size: 0.9rem; color: var(--chakra-colors-gray-600); margin-top: 0.35rem;">
+                A IA organizará os tópicos em um cronograma diário temporizado conforme sua rotina.
+            </p>
+        </div>
+
+        <form action="{{ url_for('create_plan', topic_id=topic.id) }}" method="POST">
+            
+            <div class="form-group">
+                <label for="goal">Qual é o seu objetivo de aprendizagem?</label>
+                <input type="text" name="goal" id="goal" class="form-control" placeholder="ex: Compreender conceitos para prova, aplicar no trabalho, visão geral..." value="Compreensão sólida e aplicação prática" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="level">Seu nível de conhecimento atual:</label>
+                    <select name="level" id="level" class="form-control">
+                        <option value="Iniciante">Iniciante (Primeiro contato)</option>
+                        <option value="Intermediário" selected>Intermediário (Conceitos básicos conhecidos)</option>
+                        <option value="Avançado">Avançado (Foco em aprofundamento)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="daily_minutes">Tempo diário disponível (minutos):</label>
+                    <select name="daily_minutes" id="daily_minutes" class="form-control">
+                        <option value="15">15 minutos / dia (Rápido)</option>
+                        <option value="30" selected>30 minutos / dia (Recomendado)</option>
+                        <option value="45">45 minutos / dia</option>
+                        <option value="60">60 minutos / dia (Intensivo)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label for="days_per_week">Dias de estudo por semana:</label>
+                    <select name="days_per_week" id="days_per_week" class="form-control">
+                        <option value="3">3 dias por semana</option>
+                        <option value="5" selected>5 dias por semana (Dias úteis)</option>
+                        <option value="7">7 dias por semana (Todos os dias)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deadline">Prazo final desejado (opcional):</label>
+                    <input type="text" name="deadline" id="deadline" class="form-control" placeholder="ex: 2 semanas, até o dia 20...">
+                </div>
+            </div>
+
+            <div class="ai-notice" style="margin-top: 1.25rem;">
+                <span>🤖 O Gemini criará um cronograma temporizado e distribuirá as atividades de leitura, resumo e fixação para otimizar sua aprendizagem autorregulada.</span>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 0.85rem; margin-top: 1.75rem;">
+                <a href="{{ url_for('view_topic', topic_id=topic.id) }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">
+                    Gerar Cronograma de Estudos
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
