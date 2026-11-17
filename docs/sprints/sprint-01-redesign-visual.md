@@ -45,12 +45,14 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 
 ## Checklist de tarefas por tela
 
+> Lista de escopo original, por tela. O checklist operacional, com a auditoria da Fase 1 dividida por fase, está em [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1).
+
 ### Global (`style.css` + `base.html`)
 - [ ] Tokens semânticos + aliases das variáveis indefinidas (A1)
 - [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base)
 - [ ] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5)
 - [ ] Media queries mobile-first (`640`, `768`, `1024`, `1280`)
-- [ ] `<link>` do Google Fonts só com Inter (A7)
+- [ ] `<link>` do Google Fonts só com a fonte aprovada (A7; ver decisão D1 no [registro](#registro-de-decisões))
 - [ ] Navbar: layout em 375 px; "⚙️" com `aria-hidden` e rótulo de texto (A6)
 - [ ] Modal: estilos via `.modal-title`, `.modal-text`, `.modal-actions`. **Mantenha** `#settingsModal`, `#closeSettingsBtn`, `type="button"` e `display:none` inicial
 - [ ] Flashes: manter `alert-{{ category }}`
@@ -87,7 +89,7 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 ### `seminar_view.html`
 - [ ] `.score-panel` com a escala única `.score--high/mid/low` (A3, valores aprovados pelo grupo)
 - [ ] `.choice` para as alternativas. Manter `name="q_{{ qid }}"` e `value="{{ opt }}"`
-- [ ] `.feedback--*` para o retorno por questão. ⚠️ Por causa do B1, esse bloco provavelmente **não aparece** hoje: estilize pelo markup, mas não vai dar para validar visualmente até o B1 ser resolvido
+- [ ] `.feedback--*` para o retorno por questão. Por causa do B1 (✅ confirmado em 17/11/2026), esse bloco **não aparece** hoje: estilize pelo markup, mas não vai dar para validar visualmente até o B1 ser resolvido
 - [ ] **Não** alterar o `{% set %}` / `{% for %}` das linhas 98-104 (é o B1)
 
 ## Riscos
@@ -107,32 +109,180 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 
 ---
 
+## Progresso
+
+A sprint roda em uma branch só, `feat/redesign-visual`, dividida em 4 fases. Cada fase termina com commits por grupo de arquivos, feitos pelo Renzo. O PR para a main é aberto ao fim da Fase 4. A "ordem sugerida de PRs" acima fica como referência de risco.
+
+| Fase | Conteúdo | Status |
+|---|---|---|
+| 1 | Versão atual, auditoria e direção visual (sem código) | ✅ concluída em 17/11/2026 |
+| 2 | Fundação: tokens, fonte, componentes base, navbar, modal | ⏳ próxima |
+| 3 | Telas: migração do inline para classes, tela por tela | — |
+| 4 | Estados, microinterações, polish e PR | — |
+
+Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat).
+
+---
+
+## Registro de decisões
+
+Onde estas decisões divergirem da proposta do [06-padroes-visuais.md](../06-padroes-visuais.md), valem as decisões abaixo.
+
+### 17/11/2026 — Fase 1 (aprovadas pelo Renzo)
+
+**D1. Direção visual: "Caderno quieto".** Um app de estudos calmo e legível. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro.
+
+| Papel | Valor |
+|---|---|
+| Fundo da página | `#F5F6F4` |
+| Superfície (cards) | `#FFFFFF` |
+| Tinta (texto principal) | `#17201C` |
+| Texto secundário | `#55605A` (≥ 4,5:1 sobre o fundo e sobre branco) |
+| Borda | `#E2E5E1` |
+| Acento único (botão primário, progresso, links) | verde-petróleo `#1E6B5C` (texto branco ≥ 4,5:1) |
+| Sucesso | `#237A4B` |
+| Atenção | texto `#8A5A00` sobre `#FFF6DB` |
+| Perigo | `#B42318` |
+
+- **Fonte:** Atkinson Hyperlegible Next (Google Fonts, pesos 400/600/700), com fallback `system-ui`. **Condição:** se ela não tiver algarismos tabulares no Google Fonts, usar a Atkinson Hyperlegible original e avisar no relatório da Fase 2. Trocar a família no Google Fonts não é CDN nova.
+- **Raio:** 8 px nos cards, 6 px nos controles; pílula só em badges.
+- **Densidade:** média. Corpo de leitura com 16 px, interface com 14 px; títulos 24/20/16 px.
+- **Superfícies:** borda de 1 px, sem sombra em repouso; sombra só no modal. Sem gradiente, sem glass (`backdrop-filter`), sem borda colorida lateral ou superior.
+- **Ícones:** SVG inline com traço de 1,5 px, em cinza, `aria-hidden="true"`. Botões só com ícone ganham `aria-label` ou texto em `.sr-only`.
+
+**D2. Escala de nota única.** ⚠️ **Aprovado pelo Renzo, pendente de validação do grupo no PR.** Muda o veredito exibido; **destacar na descrição do PR (Fase 4)**.
+
+| Faixa | Cor | Título exibido |
+|---|---|---|
+| ≥ 70 | sucesso (verde) | "Domínio sólido" |
+| 50–69 | atenção (âmbar) | "Em consolidação" |
+| < 50 | perigo (vermelho) | "Revisão recomendada" |
+
+- A mesma escala vale para a borda do painel, o número da nota e o título (hoje são 70/50 nas cores e 80/60 no título). A questão com status "parcial" usa o âmbar.
+- Implementação: só os números e as cores dos `{% if %}` que **já existem** em `seminar_view.html` mudam, com as cores inline trocadas por classes (`.score--high/mid/low`). Nenhum `{% set %}` ou `{% if %}` novo.
+- Os títulos novos não têm emoji.
+
+**D3. Acento único.** O roxo deixa de ser o segundo acento. "Arquivo" e "assunto" passam a se diferenciar por ícone e rótulo; os botões de seminário viram secundários. Classes antigas (`.btn-purple`, `.badge-file`) continuam existindo com o visual novo.
+
+**D4. Ajustes de texto visível aprovados.** Remover eyebrows, emojis dos títulos, o código "(F07)", a pílula "PROJETO A3 — IA PARA O COTIDIANO" e os ":" dos labels. Os textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) e os `name`s não mudam.
+
+**D5. Selo "PROJETO A3".** Fica na navbar como texto discreto ao lado da marca, sem pílula com gradiente.
+
+**D6. Microinterações (Fase 4).** Feedback ao pressionar botões; entrada do modal com `@starting-style` (escala de .97 para 1 e opacidade, cerca de 200 ms, sem mexer no `display` controlado pelo JS); 3 pontos no "digitando"; transição da barra de progresso. Nada em listas nem no histórico. Tudo desligado com `prefers-reduced-motion: reduce`.
+
+**D7. Itens que não entram nesta sprint.** Ver [Pendências fora do escopo](#pendências-fora-do-escopo).
+
+**D8. Favicon.** Entra na Fase 4: SVG em `static/` e `<link rel="icon">` no `base.html`. Hoje `/favicon.ico` dá 404 no console.
+
+---
+
+## Checklist por fase (auditoria da Fase 1)
+
+IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboard, T = tópico/chat, P = criar plano, V = ver plano, S = seminário, M = modal. D1–D8 são as decisões do registro acima. Severidade: **C** crítico, **A** alto, **M** médio, **B** baixo. Antes de editar qualquer template, cumprir o [checklist do 04](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme).
+
+### Fase 2 — Fundação (`style.css` + `base.html`)
+- [ ] Verificar se a Atkinson Hyperlegible Next tem algarismos tabulares no Google Fonts (`font-variant-numeric: tabular-nums` muda a largura dos dígitos). Se não tiver, usar a Atkinson Hyperlegible original e avisar no relatório (D1)
+- [ ] `<link>` do Google Fonts só com a fonte aprovada; Plus Jakarta Sans removida (A7, G12)
+- [ ] Tokens semânticos da D1 (cor, tipografia, espaço, raio, movimento) + aliases dos `--chakra-*` e das variáveis indefinidas (A1, G12)
+- [ ] Contraste AA em todos os pares de texto: botão primário, texto secundário, placeholder, hora do chat, avisos, "Sair" (G1 · A)
+- [ ] `:focus-visible` global com anel de 2 px e offset; remover o `outline:none` sem substituto (G2 · A)
+- [ ] Navbar com 56 px em linha em 375 px; rótulo da engrenagem em `.sr-only` abaixo de 640 px; sem blur; selo "PROJETO A3" discreto (G3 · A, G11, D5)
+- [ ] Acento único e sem gradientes: marca, bolha do usuário, barra de progresso (G4 · M, D3)
+- [ ] Cards com borda de 1 px e sem sombra em repouso; sem hover em card que não é clicável (G5 · M)
+- [ ] Badges em sentence case (G6 · M)
+- [ ] Utilitários `.icon` (SVG inline) e `.sr-only` (G7 · M)
+- [ ] Alvos de toque ≥ 44 px abaixo de 768 px (G8 · M)
+- [ ] Base mobile-first com breakpoints 640/768/1024/1280 (G9 · M)
+- [ ] Transições com propriedades explícitas, `--ease-out` forte e bloco `prefers-reduced-motion` (G10 · B)
+- [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) em CSS puro
+- [ ] Modal: `.modal-title`, `.modal-text`, `.modal-actions`, overlay sólido, botões de 44 px. Manter `#settingsModal` (`display:none` por padrão, `display:flex` para abrir), `#closeSettingsBtn` com `type="button"` e a condição de sessão (M1 · M)
+- [ ] Cache-busting: `?v=redesign_v1`
+
+### Fase 3 — Telas
+**Global**
+- [ ] Flash: tinta clara, borda de 1 px e ícone SVG; manter `alert-{{ category }}` (G13 · B)
+- [ ] Rodapé RNF06 discreto (13 px), alinhado ao grid, sem inline (G14 · B, A1, A8)
+- [ ] Emojis trocados por SVG com `aria-hidden` nos templates; o botão de excluir ganha nome acessível (G7, A6)
+
+**Login e cadastro**
+- [ ] Remover a pílula "PROJETO A3 — IA PARA O COTIDIANO" (L1 · M, D4)
+- [ ] Título como `h1` de 24 px, sem quebrar em 375 px (L2 · M)
+- [ ] `.auth-card` com 24 px de padding no celular, sem sombra (L3 · B)
+
+**Dashboard**
+- [ ] `.notice` único (âmbar AA) no banner de demo; manter `#openSettingsBtn2` e o `onclick` (DB1 · A, A8)
+- [ ] KPIs em uma faixa dividida por linhas, número de 24 px com algarismos tabulares, "—" em cinza (DB2 · M)
+- [ ] Cards de fluxo com o mesmo peso; diferença só por título e ícone; manter `name`s, `enctype` e `accept` (DB3 · M)
+- [ ] `::file-selector-button` estilizado (DB4 · M)
+- [ ] Histórico como lista com divisórias; `aria-label` no excluir; item em 2 linhas em 375 px; manter `method="POST"` e o `onsubmit` (DB5 · M)
+- [ ] Remover o eyebrow; manter "Painel de Estudos" no título e no `h1` (DB6 · B)
+
+**Tópico e chat**
+- [ ] **Sem rolagem horizontal em 375 px**: grid em classe com 1 coluna abaixo de 1024 px; `.chat-window { height: min(620px, 70dvh) }`; `#chatMessages` continua com altura limitada e `overflow-y:auto` (T1 · **C**, A4)
+- [ ] Uma ação primária no cabeçalho; as outras secundárias; quebra correta em 375 px (T4 · M)
+- [ ] Bolha do usuário chapada; contador de mensagens como texto secundário; estrutura da bolha intacta (T5 · M)
+- [ ] Coluna lateral como painel com lista (sem cards aninhados); "+ Novo" e "+ Gerar" como `.btn-ghost` de 44 px; forms de seminário continuam POST (T6 · M)
+- [ ] Input e botão do chat com a mesma altura (44 px); botão sem quebrar linha (T7 · B)
+- [ ] Markdown da bolha com tipografia de leitura; `overflow-x:auto` em `pre` e `table` (T8 · B)
+
+**Criar plano**
+- [ ] Remover o eyebrow e o "(F07)" (P1 · M, D4)
+- [ ] Select com seta SVG e 44 px; card padrão; `value`s numéricos intactos (P2 · B)
+
+**Ver plano**
+- [ ] Cada dia como seção, sem borda colorida; minutos como texto secundário (V1 · M)
+- [ ] Tarefa concluída com cor AA via `.task-item:has(:checked)` (vale no carregamento; depois do clique, a cor inline do JS vence; ver pendências) (V2 · M)
+- [ ] Linha da tarefa com foco visível (`:has(:focus-visible)`) e 44 px; manter `.plan-task-checkbox`, `data-*`, `#label_{{ task_key }}` e a fórmula da `task_key` (V3 · B)
+- [ ] Manter "Progresso Geral de Execução" no HTML; `#planProgressBar` e `#planProgressText` intactos
+- [ ] CTA de seminário como faixa simples com botão (V5 · B)
+
+**Seminário**
+- [ ] Escala de nota da D2 em borda, número e título (S1 · A, A3)
+- [ ] Painéis "fortes" e "a revisar" com texto na cor normal e cor só no ícone e na borda (S2 · A)
+- [ ] `.choice` com `:has(:checked)` e `:has(:focus-visible)`; resposta marcada legível no resultado; manter `name="q_{{ qid }}"` e `value="{{ opt }}"` (S3 · M)
+- [ ] `.feedback--*` estilizado pelo markup (não validável por causa do B1)
+- [ ] Sentence case; sem emoji; botão de envio com largura total no celular (S4 · B)
+- [ ] **Não** alterar o `{% set %}` / `{% for %}` das linhas 98-104 (B1)
+
+### Fase 4 — Estados e polish
+- [ ] `.chat-bubble.typing`: texto atenuado e 3 pontos animados em CSS; estático com reduced-motion (T2 · A, A5)
+- [ ] `.chat-bubble.error`: tinta de perigo, borda e ícone via `::before` (T3 · A, A5)
+- [ ] Estado vazio do histórico com link-âncora para o campo `#title` (DB7 · B)
+- [ ] Barra de progresso: transição de 200 ms com ease-out (a largura continua pelo JS) (V4 · B)
+- [ ] Modal: entrada com `@starting-style` (M2 · B, D6)
+- [ ] Feedback ao pressionar botões (D6)
+- [ ] `::selection`, `accent-color` via token, scrollbar (G15 · B)
+- [ ] Favicon SVG em `static/` + `<link rel="icon">` no `base.html` (G15, D8)
+- [ ] Critérios de aceite completos (fluxo manual, 375/1440 px, `git diff --stat` fora do escopo vazio)
+- [ ] Descrição do PR destacando a D2 como **pendente de validação do grupo**
+
+---
+
+## Pendências fora do escopo
+
+Encontradas ou decididas na Fase 1. Nenhuma entra nesta sprint.
+
+| Pendência | Por que fica de fora | Categoria |
+|---|---|---|
+| Emojis dos avatares do chat (🤖/👤) | O `app.js` gera o avatar das mensagens novas; mudar só no Jinja deixaria o histórico diferente | B (B11) |
+| Cor da tarefa concluída depois do clique (`#94a3b8`, 2,45:1) | Estilo inline aplicado pelo `app.js` vence o CSS | B (B11) |
+| Nota de demo dentro da bolha do chat (`#718096`, estilo inline) | HTML com estilo gerado pelo `app.js` | B (B11) |
+| Cor da nota no badge da lista de seminários do tópico (hoje sempre verde) | Exige um `{% if %}` novo em `study_topic.html` | Lógica Jinja |
+| Nota exibida com decimal ("61.7%") | Exige um filtro Jinja (`round`/`int`) | Lógica Jinja |
+| Plural de "1 registros" no histórico | Exige lógica Jinja | Lógica Jinja |
+| Texto "No file chosen" do input de arquivo | Texto do navegador; traduzir exige JS | B |
+| Feedback por questão do seminário não aparece | Escopo de variável no Jinja ([B1](../05-achados-frontend.md), ✅ confirmado) | B |
+| "Piso" de imagens e de animações do taste-skill | Vale para landing pages, não para telas de app | — |
+| Tema escuro | Fora do escopo da sprint | — |
+
+---
+
 ## Contexto para retomar
 
-Cole o bloco abaixo no início de uma nova sessão do Claude Code:
+As regras da sprint (git, escopo, contratos, skills e protocolo de cada fase) estão no `CLAUDE.local.md`, carregado automaticamente. Este arquivo guarda o progresso e as decisões.
 
-```text
-Projeto: StudyIA (A3 de IA, em grupo). Flask + Jinja + CSS puro + JS puro (app.js), SQLite, Gemini com fallback "modo demo".
-Meu papel: SOMENTE a parte visual do frontend (HTML/CSS e apresentação nos templates Jinja).
-Estou na Sprint 01 — redesign visual: docs/sprints/sprint-01-redesign-visual.md (escopo = itens A1–A8 de docs/05-achados-frontend.md).
-
-ANTES de editar qualquer template, leia docs/04-contratos-frontend.md e cumpra o checklist do final.
-Siga as convenções de docs/06-padroes-visuais.md (tokens, componentes, estados, mobile-first, sem style="" inline salvo as exceções).
-
-Regras de git (não negociáveis):
-- Trabalhar em branch criada a partir da main atualizada: git checkout main && git pull && git checkout -b <branch>
-- Você PODE criar branches e rodar git status e git diff.
-- Você NÃO PODE rodar git add, commit, push, merge ou rebase. Eu faço os commits e os pushes. Nada vai direto para a main: PR → revisão do grupo → merge.
-- No fim, me entregue os comandos git add/commit separados por grupo de arquivos, com mensagens curtas.
-
-Restrições:
-- Não alterar *.py, static/js/app.js, requirements.txt, README.md, doc_completo.txt, .env.example.
-- Não mudar o stack: sem React, Tailwind, build step ou novas CDNs.
-- Itens de comportamento (categoria B) e de backend (categoria C) são só documentados, nunca corrigidos sem aprovação do grupo.
-- Não rodar o app nem os testes fora de branch (database.init_db() roda no import e cria studyia.db).
-  Testes: DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py
-- Validar as telas em 375px e 1440px.
-- Marcar como "⚠️ não confirmado" o que não foi verificado rodando o app.
-
-Docs: docs/README.md (índice), docs/04-contratos-frontend.md, docs/06-padroes-visuais.md, docs/05-achados-frontend.md.
-```
+**Próxima fase: Fase 2 — Fundação.**
+1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões) e o [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1)) e os SKILL.md das skills da fase.
+2. Trabalhar em `feat/redesign-visual`. Arquivos da fase: `static/css/style.css` e `templates/base.html`.
+3. Primeiro passo: verificar os algarismos tabulares da Atkinson Hyperlegible Next (D1).
+4. Comparar com as screenshots "antes" em `../studyia-screenshots/fase1-antes/` e salvar as novas em `../studyia-screenshots/fase2/`.
