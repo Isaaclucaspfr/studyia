@@ -4,13 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}StudyIA — Assistente Inteligente de Estudos{% endblock %}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <!-- Google Fonts: Atkinson Hyperlegible Next (D1) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Tokens antes dos componentes -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=redesign_v2">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=redesign_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=redesign_v3">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=redesign_v3">
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -52,7 +53,7 @@
 
         {% if session.get('user_id') %}
         <div class="nav-user">
-            <button type="button" class="btn btn-secondary btn-sm nav-settings-btn" id="openSettingsBtn" title="Configurar Chave da API Gemini">
+            <button type="button" class="btn btn-secondary btn-sm nav-settings-btn" id="openSettingsBtn" title="Configurar chave da API Gemini">
                 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-settings"></use></svg>
                 <span class="nav-btn-label">Configurar IA</span>
             </button>
@@ -69,13 +70,13 @@
     {% if session.get('user_id') %}
     <div class="modal-overlay" id="settingsModal">
         <div class="modal-content">
-            <h3 class="modal-title">Configurações de Inteligência Artificial</h3>
+            <h3 class="modal-title">Configurações de inteligência artificial</h3>
             <p class="modal-text">
                 O StudyIA utiliza a <strong>API Gemini do Google</strong> para produzir explicações, cronogramas e mini seminários.
             </p>
             <form action="{{ url_for('update_api_key') }}" method="POST">
                 <div class="form-group">
-                    <label for="gemini_api_key">Sua Chave da API Gemini (Google AI Studio)</label>
+                    <label for="gemini_api_key">Sua chave da API Gemini (Google AI Studio)</label>
                     <input type="password" name="gemini_api_key" id="gemini_api_key" class="form-control" placeholder="AIzaSy..." value="" aria-describedby="gemini_api_key_hint">
                     <small class="form-hint" id="gemini_api_key_hint">
                         Se deixada em branco, o StudyIA operará no modo de demonstração didática inteligente.
@@ -83,7 +84,7 @@
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="closeSettingsBtn">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Salvar Chave</button>
+                    <button type="submit" class="btn btn-primary">Salvar chave</button>
                 </div>
             </form>
         </div>
@@ -110,8 +111,8 @@
 
     <!-- Rodapé Transparente (RNF06) -->
     <footer class="site-footer">
-        <p><strong>StudyIA — Assistente Inteligente de Estudos</strong> | Unidade Curricular: Inteligência Artificial (Projeto A3)</p>
-        <p>Transparência (RNF06): As respostas, planos e seminários são gerados com apoio de Inteligência Artificial e devem ser revisados pelo usuário.</p>
+        <p><strong>StudyIA — Assistente Inteligente de Estudos</strong> | Unidade curricular: Inteligência Artificial (Projeto A3)</p>
+        <p>Transparência (RNF06): as respostas, planos e seminários são gerados com apoio de inteligência artificial e devem ser revisados pelo usuário.</p>
     </footer>
 
     <!-- Marked.js para renderização de Markdown didático -->

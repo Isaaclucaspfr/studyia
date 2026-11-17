@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Novo Plano de Estudo — {{ topic.title }}{% endblock %}
+{% block title %}Novo plano de estudo — {{ topic.title }}{% endblock %}
 
 {% block content %}
 <div class="narrow-page">
     <a href="{{ url_for('view_topic', topic_id=topic.id) }}" class="back-link">
         <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-left"></use></svg>
-        Voltar ao Estudo
+        Voltar ao estudo
     </a>
 
     <div class="card">
         <div class="card-header--divided">
             <h1 class="page-title">
-                Gerar Plano de Estudo: {{ topic.title }}
+                Gerar plano de estudo: {{ topic.title }}
             </h1>
             <p class="page-subtitle">
                 A IA organizará os tópicos em um cronograma diário temporizado conforme sua rotina.
@@ -30,19 +30,19 @@
                 <div class="form-group">
                     <label for="level">Seu nível de conhecimento atual</label>
                     <select name="level" id="level" class="form-control">
-                        <option value="Iniciante">Iniciante (Primeiro contato)</option>
-                        <option value="Intermediário" selected>Intermediário (Conceitos básicos conhecidos)</option>
-                        <option value="Avançado">Avançado (Foco em aprofundamento)</option>
+                        <option value="Iniciante">Iniciante (primeiro contato)</option>
+                        <option value="Intermediário" selected>Intermediário (conceitos básicos conhecidos)</option>
+                        <option value="Avançado">Avançado (foco em aprofundamento)</option>
                     </select>
                 </div>
 
                 <div class="form-group">
                     <label for="daily_minutes">Tempo diário disponível (minutos)</label>
                     <select name="daily_minutes" id="daily_minutes" class="form-control">
-                        <option value="15">15 minutos / dia (Rápido)</option>
-                        <option value="30" selected>30 minutos / dia (Recomendado)</option>
+                        <option value="15">15 minutos / dia (rápido)</option>
+                        <option value="30" selected>30 minutos / dia (recomendado)</option>
                         <option value="45">45 minutos / dia</option>
-                        <option value="60">60 minutos / dia (Intensivo)</option>
+                        <option value="60">60 minutos / dia (intensivo)</option>
                     </select>
                 </div>
             </div>
@@ -52,8 +52,8 @@
                     <label for="days_per_week">Dias de estudo por semana</label>
                     <select name="days_per_week" id="days_per_week" class="form-control">
                         <option value="3">3 dias por semana</option>
-                        <option value="5" selected>5 dias por semana (Dias úteis)</option>
-                        <option value="7">7 dias por semana (Todos os dias)</option>
+                        <option value="5" selected>5 dias por semana (dias úteis)</option>
+                        <option value="7">7 dias por semana (todos os dias)</option>
                     </select>
                 </div>
 
@@ -71,7 +71,7 @@
             <div class="form-actions">
                 <a href="{{ url_for('view_topic', topic_id=topic.id) }}" class="btn btn-secondary">Cancelar</a>
                 <button type="submit" class="btn btn-primary">
-                    Gerar Cronograma de Estudos
+                    Gerar cronograma de estudos
                 </button>
             </div>
 

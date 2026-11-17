@@ -5,7 +5,7 @@
 {% block content %}
 <a href="{{ url_for('view_topic', topic_id=plan.topic_id) }}" class="back-link">
     <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-left"></use></svg>
-    Voltar ao Estudo ({{ plan.topic_title }})
+    Voltar ao estudo ({{ plan.topic_title }})
 </a>
 
 <div class="page-header">
@@ -24,7 +24,7 @@
     <div class="page-actions">
         <a href="{{ url_for('create_plan', topic_id=plan.topic_id) }}" class="btn btn-secondary btn-sm" title="Reconfigurar metas e gerar outro cronograma">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg>
-            Reajustar Preferências
+            Reajustar preferências
         </a>
     </div>
 </div>
@@ -88,13 +88,13 @@
     <div>
         <h3>Pronto para testar seus conhecimentos?</h3>
         <p>
-            Após realizar as atividades do seu plano, realize um Mini Seminário Interativo para checar seus pontos fortes e fracos.
+            Após realizar as atividades do seu plano, realize um mini seminário interativo para checar seus pontos fortes e fracos.
         </p>
     </div>
     <form action="{{ url_for('create_seminar', topic_id=plan.topic_id) }}" method="POST">
         <button type="submit" class="btn btn-purple">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
-            Iniciar Mini Seminário deste Tema
+            Iniciar mini seminário deste tema
         </button>
     </form>
 </div>

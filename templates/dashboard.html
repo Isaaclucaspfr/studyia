@@ -13,8 +13,8 @@
 
     {% if not has_custom_key %}
     <div class="notice">
-        <span class="notice-text"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo Demonstração Ativo</span>
-        <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar Chave Gemini</button>
+        <span class="notice-text"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo demonstração ativo</span>
+        <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar chave Gemini</button>
     </div>
     {% endif %}
 </div>
@@ -22,12 +22,12 @@
 <!-- Métricas -->
 <div class="stats">
     <div class="stat">
-        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg> Tópicos de Estudo</div>
+        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg> Tópicos de estudo</div>
         <div class="stat-value">{{ total_topics }}</div>
     </div>
 
     <div class="stat">
-        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos Gerados</div>
+        <div class="stat-label"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos gerados</div>
         <div class="stat-value">{{ total_plans }}</div>
     </div>
 
@@ -45,8 +45,8 @@
     <div class="card flow-card">
         <div class="flow-head">
             <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
-            <h2>Pesquisar Assunto Geral</h2>
-            <span class="badge badge-subject">Modo Aberto</span>
+            <h2>Pesquisar assunto geral</h2>
+            <span class="badge badge-subject">Modo aberto</span>
         </div>
         <p class="card-text">
             Explore qualquer conceito ou tema. A IA preparará uma fundamentação conceitual detalhada e acompanhará suas dúvidas progressivas.
@@ -64,7 +64,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">
-                Iniciar Estudo com IA
+                Iniciar estudo com IA
             </button>
         </form>
     </div>
@@ -73,8 +73,8 @@
     <div class="card flow-card">
         <div class="flow-head">
             <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-file"></use></svg>
-            <h2>Estudo Exclusivo de Arquivo</h2>
-            <span class="badge badge-file">Fidelidade Restrita</span>
+            <h2>Estudo exclusivo de arquivo</h2>
+            <span class="badge badge-file">Fidelidade restrita</span>
         </div>
         <p class="card-text">
             Envie sua apostila, artigo ou PDF. O StudyIA ancorará suas respostas <strong>exclusivamente</strong> no texto do documento, evitando alucinações.
@@ -92,7 +92,7 @@
             </div>
 
             <button type="submit" class="btn btn-primary btn-block">
-                Processar e Estudar Arquivo
+                Processar e estudar arquivo
             </button>
         </form>
     </div>
@@ -102,7 +102,7 @@
 <div class="card">
     <div class="card-header">
         <div>
-            <h2 class="card-title">Seu Histórico de Estudos</h2>
+            <h2 class="card-title">Seu histórico de estudos</h2>
             <p class="card-subtitle">Todos os seus tópicos, perguntas, planos e notas gravados com segurança no banco de dados</p>
         </div>
         <span class="badge badge-neutral">{{ topics|length }} registros</span>
@@ -123,7 +123,7 @@
                     {% if t.topic_type == 'file' %}
                     <span class="badge badge-file">{{ t.file_name }}</span>
                     {% else %}
-                    <span class="badge badge-subject">Assunto Geral</span>
+                    <span class="badge badge-subject">Assunto geral</span>
                     {% endif %}
                 </div>
                 <div class="list-item-meta">
@@ -135,7 +135,7 @@
 
             <div class="list-item-actions">
                 <a href="{{ url_for('view_topic', topic_id=t.id) }}" class="btn btn-outline btn-sm">
-                    Abrir Estudo
+                    Abrir estudo
                     <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
                 </a>
                 <form action="{{ url_for('delete_topic', topic_id=t.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta pesquisa e todas as atividades vinculadas?');">

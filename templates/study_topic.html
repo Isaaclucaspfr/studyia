@@ -5,7 +5,7 @@
 {% block content %}
 <a href="{{ url_for('dashboard') }}" class="back-link">
     <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-left"></use></svg>
-    Voltar ao Painel
+    Voltar ao painel
 </a>
 
 <div class="page-header">
@@ -17,7 +17,7 @@
             {% if topic.topic_type == 'file' %}
             <span class="badge badge-file">Arquivo: {{ topic.file_name }}</span>
             {% else %}
-            <span class="badge badge-subject">Assunto Geral</span>
+            <span class="badge badge-subject">Assunto geral</span>
             {% endif %}
         </div>
         <p class="page-meta">
@@ -28,17 +28,17 @@
     <div class="page-actions">
         <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
-            Gerar Plano de Estudo
+            Gerar plano de estudo
         </a>
         <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
             <button type="submit" class="btn btn-purple btn-sm">
                 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
-                Iniciar Mini Seminário
+                Iniciar mini seminário
             </button>
         </form>
         <a href="{{ url_for('export_topic', topic_id=topic.id) }}" class="btn btn-secondary btn-sm btn-collapse" title="Baixar todas as perguntas e respostas gravadas no banco de dados">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
-            <span class="btn-label-collapse">Exportar Caderno (.md)</span>
+            <span class="btn-label-collapse">Exportar caderno (.md)</span>
         </a>
     </div>
 </div>
@@ -47,10 +47,10 @@
 <div class="ai-notice">
     {% if topic.topic_type == 'file' %}
     <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
-    <span><strong>Modo Estudo Exclusivo de Arquivo:</strong> As respostas e planos são gerados estritamente com base no texto do documento anexado. Informações ausentes não são inventadas.</span>
+    <span><strong>Modo estudo exclusivo de arquivo:</strong> as respostas e planos são gerados estritamente com base no texto do documento anexado. Informações ausentes não são inventadas.</span>
     {% else %}
     <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
-    <span><strong>Modo Pesquisa Geral:</strong> Fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini.</span>
+    <span><strong>Modo pesquisa geral:</strong> fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini.</span>
     {% endif %}
 </div>
 
@@ -60,7 +60,7 @@
     <!-- Chat com o assistente -->
     <div class="chat-window">
         <div class="chat-header">
-            <span class="chat-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chat"></use></svg> Diálogo Conceitual &amp; Dúvidas</span>
+            <span class="chat-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chat"></use></svg> Diálogo conceitual &amp; dúvidas</span>
             <span class="chat-count">
                 <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-database"></use></svg> {{ messages|length }} mensagens salvas no banco
             </span>
@@ -99,7 +99,7 @@
         <!-- Planos de estudo -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos de Estudo</h3>
+                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos de estudo</h3>
                 <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-ghost btn-sm">
                     <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg>
                     Novo
@@ -122,7 +122,7 @@
                     <div class="row-between">
                         <span class="item-meta">Progresso: <strong>{{ p.progress_percent }}%</strong></span>
                         <a href="{{ url_for('view_plan', plan_id=p.id) }}" class="link-action">
-                            Abrir Cronograma
+                            Abrir cronograma
                             <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
                         </a>
                     </div>
@@ -141,7 +141,7 @@
         <!-- Mini seminários -->
         <div class="card">
             <div class="card-header">
-                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini Seminários</h3>
+                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini seminários</h3>
                 <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
                     <button type="submit" class="btn btn-ghost btn-sm">
                         <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg>
@@ -163,7 +163,7 @@
                         {% endif %}
                     </div>
                     <a href="{{ url_for('view_seminar', seminar_id=s.id) }}" class="link-action">
-                        {% if s.is_completed %}Ver Avaliação &amp; Respostas{% else %}Responder Perguntas{% endif %}
+                        {% if s.is_completed %}Ver avaliação &amp; respostas{% else %}Responder perguntas{% endif %}
                         <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
                     </a>
                 </div>
