@@ -1,5 +1,6 @@
 # Sprint 01 — Redesign visual
 
+> **Status: concluída — aguardando revisão** (4 fases fechadas em 17/11/2026; PR `feat/redesign-visual` → `main` em revisão pelo grupo).
 > Responsável: Renzo (frontend visual). Revisão: grupo, via PR.
 > Pré-requisito: [06-padroes-visuais.md](../06-padroes-visuais.md) aprovado pelo grupo.
 
@@ -32,15 +33,15 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 
 ## Critérios de aceite
 
-- [ ] `test_app.py` passando, rodado **na branch** com o banco temporário:
+- [x] `test_app.py` passando, rodado **na branch** com o banco temporário:
   `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py`
-- [ ] O checklist ["Antes de mexer em um template, confirme"](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme) foi cumprido em **cada** template alterado. Nenhum contrato do [04](../04-contratos-frontend.md) foi quebrado.
-- [ ] Cada tela validada em **375 px** e **1440 px**, sem rolagem horizontal da página e sem texto cortado.
-- [ ] Nenhum `style=""` novo, fora das [exceções permitidas](../06-padroes-visuais.md#exceções-permitidas).
-- [ ] Foco visível (`:focus-visible`) em todos os elementos interativos; navegação por Tab na ordem visual.
-- [ ] Animações respeitam `prefers-reduced-motion`.
-- [ ] Nenhum arquivo fora do escopo alterado: `git diff --stat main -- '*.py' static/js/ requirements.txt README.md doc_completo.txt .env.example` sem saída.
-- [ ] Fluxos manuais executados em modo demo: cadastro → login → novo assunto → chat (2 mensagens) → plano → marcar e desmarcar 2 tarefas → seminário → enviar → upload de TXT → excluir tópico → configurar e limpar a chave → logout.
+- [x] O checklist ["Antes de mexer em um template, confirme"](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme) foi cumprido em **cada** template alterado. Nenhum contrato do [04](../04-contratos-frontend.md) foi quebrado.
+- [x] Cada tela validada em **375 px** e **1440 px** (e 768 px), sem rolagem horizontal da página e sem texto cortado.
+- [x] Nenhum `style=""` novo, fora das [exceções permitidas](../06-padroes-visuais.md#exceções-permitidas) (restam só os 2 `width` das barras).
+- [x] Foco visível (`:focus-visible`) em todos os elementos interativos; navegação por Tab na ordem visual (7 telas, 375 e 1440 px, 0 elemento sem anel).
+- [x] Animações respeitam `prefers-reduced-motion` (tudo desligado; conferido com a emulação do Chromium).
+- [x] Nenhum arquivo fora do escopo alterado: `git diff --stat main -- '*.py' static/js/ requirements.txt README.md doc_completo.txt .env.example` sem saída.
+- [x] Fluxos manuais executados em modo demo: cadastro → login → novo assunto → chat (2 mensagens) → plano → marcar e desmarcar 2 tarefas → seminário → enviar → upload de TXT → excluir tópico → configurar e limpar a chave → logout. (Playwright, Fase 4; sem erro de JS no console.)
 - [ ] PR revisado por pelo menos uma pessoa do grupo.
 
 ## Checklist de tarefas por tela
@@ -50,7 +51,7 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 ### Global (`style.css` + `base.html`)
 - [x] Tokens semânticos + aliases das variáveis indefinidas (A1) — Fase 2, `static/css/tokens.css`
 - [x] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) — genéricos na Fase 2, de tela na Fase 3 (lista na D24)
-- [ ] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5) — falta o erro e o digitando do chat (A5, Fase 4)
+- [x] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5) — erro e digitando do chat entraram na Fase 4
 - [x] Media queries mobile-first (`640`, `768`, `1024`, `1280`); referência em `--bp-*` no `tokens.css`
 - [x] `<link>` do Google Fonts só com a fonte aprovada (A7; ver decisão D1 no [registro](#registro-de-decisões))
 - [x] Navbar: layout em 375 px; "⚙️" com `aria-hidden` e rótulo de texto (A6)
@@ -73,7 +74,7 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 - [x] Grid responsivo (1 coluna < 1024 px), sem o inline da linha 54 (A4)
 - [x] Altura do chat via classe (`min(620px, 70dvh)`, mínimo de 22rem). O `#chatMessages` continua rolável (A4)
 - [x] Bolhas: só CSS. **Não** mudar a estrutura de `:67-81` (está duplicada no JS, B11)
-- [ ] `.chat-bubble.typing` e `.chat-bubble.error` estilizados (A5)
+- [x] `.chat-bubble.typing` e `.chat-bubble.error` estilizados (A5) — Fase 4
 - [x] Coluna lateral: `.card-header`, `.list-item`, `.empty-state`
 - [x] Forms "gerar seminário" continuam POST
 
@@ -118,9 +119,9 @@ A sprint roda em uma branch só, `feat/redesign-visual`, dividida em 4 fases. Ca
 | 1 | Versão atual, auditoria e direção visual (sem código) | ✅ concluída em 17/11/2026 |
 | 2 | Fundação: tokens, fonte, componentes base, navbar, modal | ✅ concluída em 17/11/2026 |
 | 3 | Telas: migração do inline para classes, tela por tela (**começa pelo T1**) | ✅ concluída em 17/11/2026 |
-| 4 | Estados, microinterações, polish e PR | ⏳ próxima |
+| 4 | Estados, microinterações, polish e PR | ✅ concluída em 17/11/2026 — aguardando revisão do PR |
 
-Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat). Fase 2: `../studyia-screenshots/fase2/` (375 e 1440 px). Fase 3: `../studyia-screenshots/fase3/` (todas as telas em 375, 768 e 1440 px, mais o modal e os estados vazios; medições em `../studyia-screenshots/fase3-report.json`).
+Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat). Fase 2: `../studyia-screenshots/fase2/` (375 e 1440 px). Fase 3: `../studyia-screenshots/fase3/` (todas as telas em 375, 768 e 1440 px, mais o modal e os estados vazios; medições em `../studyia-screenshots/fase3-report.json`). Fase 4: `../studyia-screenshots/fase4-base/` (estado antes da fase) e `../studyia-screenshots/fase4/` (todas as telas em 375, 768 e 1440 px, estados do chat, modal, foco, movimento reduzido e as simulações `simulacao-*` de B1 corrigido e de botão desabilitado; medições em `../studyia-screenshots/fase4-report.json`).
 
 ---
 
@@ -259,6 +260,38 @@ Onde estas decisões divergirem da proposta do [06-padroes-visuais.md](../06-pad
 
 **D31. Glifos viram ícones.** "←", "→" e "+" trocados por 3 SVGs novos no sprite (`arrow-left`, `arrow-right`, `plus`), com o mesmo traço da D11.
 
+### 17/11/2026 — Fase 4 (aprovadas pelo Renzo)
+
+**D32. Animações** (só CSS; easing `--ease-out` = `cubic-bezier(.23, 1, .32, 1)`; tudo desligado com `prefers-reduced-motion: reduce`):
+
+| O quê | Duração / easing |
+|---|---|
+| Pressionar botão: escala .98 (já existia) | 100 ms, ease-out |
+| Pressionar checkbox ou radio (ou a linha deles): caixa a .9; a linha da tarefa escurece um tom | 100 ms, ease-out |
+| Marcar alternativa: o ponto (`::before`) vai de opacidade 0 e escala .5 para 1 | 150 ms, ease-out |
+| Cor do texto da tarefa ao marcar (vale também para a cor inline do `app.js`) | 150 ms, ease-out |
+| Entrada das mensagens novas do chat: opacidade + 6 px de subida. Só as criadas pelo `app.js` (sem `.markdown-content`); o histórico não anima | 200 ms, ease-out |
+| "Digitando": 3 pontos em onda (um ponto + 2 `box-shadow`) | ciclo de 1 s, linear, infinito |
+| Barra de progresso (`width`, que continua vindo do `style.width`) | 200 ms, ease-out |
+| Modal: fade do overlay + card de .97 a 1, via `@starting-style` (o `display` continua com o JS); saída instantânea | 200 ms, ease-out |
+| Painel da nota: opacidade + 8 px de subida, uma vez ao carregar o resultado | 300 ms, ease-out |
+
+**D33. Barra de progresso com 200 ms** (antes 300 ms, da Fase 2), como previsto na V4 e na D6.
+
+**D34. Desabilitado com cores, não com opacidade.** `.btn:disabled` / `[aria-disabled="true"]`: texto sutil sobre `--color-surface-muted` (4,6:1), borda neutra, `cursor: not-allowed` (antes: `opacity: .5`, da Fase 2). `.btn-ghost` desabilitado fica sem fundo. Hoje nenhum botão fica desabilitado; o estado está pronto para o B4.
+
+**D35. Certo ou errado na alternativa escolhida.** Só CSS: `.card:has(> .feedback--correct|partial|incorrect) .choice.is-selected` pinta a alternativa marcada de verde, âmbar ou vermelho (anel, ponto, borda e fundo). Lê o `.feedback--*` que o Jinja já emite; nenhuma lógica nova. ⚠️ Só aparece quando o B1 for corrigido (validado por simulação: `simulacao-B1-certo-errado-1440.png`).
+
+**D36. "Digitando" com o mesmo quadro da bolha da IA** (branca, borda), texto secundário em 14 px. O sinal de espera vem dos 3 pontos, não de um fundo de "rascunho". **Erro**: tinta, fundo e borda de perigo, com o ícone de alerta do `.alert-danger` no `::before`.
+
+**D37. Cards continuam sem hover (G5).** "Hover em cards" vale para as linhas clicáveis (tarefa e alternativa), que já tinham hover de borda e ganharam pressão.
+
+**D38. Anel de foco mantido em 2 px com 2 px de afastamento (G2)**, 5,9–6,3:1 contra todos os fundos. Dentro do `#chatMessages` (que tem `overflow`) o anel vai para dentro (`outline-offset: -2px`); dentro da bolha do usuário usa a cor do texto.
+
+**D39. Sentence case (D27) aplicado.** Também no texto das `<option>` do plano (os `value` não mudam) e no `<title>` da tela de criar plano; minúscula depois de ":" no aviso do tópico e no rodapé; "Inteligência Artificial" fica maiúsculo como nome da unidade curricular e minúsculo no texto de transparência; "StudyIA — Assistente Inteligente de Estudos" e "StudyIA Tutor" (também gerado pelo `app.js`) não mudam. Textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) intactos.
+
+**D40. Polish da Fase 4:** `::selection`, `caret-color` e barras de rolagem com a paleta (tokens `--color-selection` e `--color-scrollbar`); favicon SVG (D8, `static/favicon.svg`); link do título no histórico com alvo de 44 px abaixo de 768 px (padding + margem negativa, sem mexer no layout); 1ª linha do rodapé sem quebra no "(Projeto A3)"; `textarea` desabilitada sem alça de redimensionar; cache-busting `?v=redesign_v3`.
+
 ---
 
 ## Checklist por fase (auditoria da Fase 1)
@@ -346,24 +379,30 @@ IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboa
 - [x] Sem emoji; sentence case no seminário; envio com largura total no celular (S4)
 - [x] `{% set %}` / `{% for %}` do B1 intocados
 
-### Fase 4 — Estados e polish
-- [ ] `.chat-bubble.typing`: texto atenuado e 3 pontos animados em CSS; estático com reduced-motion (T2 · A, A5)
-- [ ] `.chat-bubble.error`: tinta de perigo, borda e ícone via `::before` (T3 · A, A5)
+### Fase 4 — Estados e polish — ✅ concluída em 17/11/2026
+- [x] `.chat-bubble.typing`: texto atenuado e 3 pontos animados em CSS; estático com reduced-motion (T2 · A, A5; D36)
+- [x] `.chat-bubble.error`: tinta de perigo, borda e ícone via `::before` (T3 · A, A5; D36)
 - [x] Estado vazio do histórico com link-âncora para o campo `#title` (DB7 · B) — adiantado na Fase 3
-- [ ] Barra de progresso: transição de 200 ms com ease-out (a largura continua pelo JS) (V4 · B)
-- [ ] Modal: entrada com `@starting-style` (M2 · B, D6)
-- [ ] Feedback ao pressionar botões (D6)
-- [ ] `::selection`, `accent-color` via token, scrollbar (G15 · B)
-- [ ] Favicon SVG em `static/` + `<link rel="icon">` no `base.html` (G15, D8)
-- [ ] **Sentence case em todas as telas** (D27): títulos, botões, rótulos e badges. **Exceção: os textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) não mudam** ("Painel de Estudos", "Progresso Geral de Execução" e os demais), nem os `value`s e `name`s. Rodar o `test_app.py` depois
-- [ ] Critérios de aceite completos (fluxo manual, 375/1440 px, `git diff --stat` fora do escopo vazio)
-- [ ] Descrição do PR destacando a D2 como **pendente de validação do grupo**
+- [x] Barra de progresso: transição de 200 ms com ease-out (a largura continua pelo JS) (V4 · B; D33)
+- [x] Modal: entrada com `@starting-style` (M2 · B, D6; D32). Abre pelos 2 botões, fecha por Cancelar e pelo clique fora
+- [x] Feedback ao pressionar botões, checkbox, radio e linhas de tarefa/alternativa (D6; D32)
+- [x] Entrada das mensagens novas do chat (só as do `app.js`) e do painel da nota (D32)
+- [x] Foco visível conferido com Tab em todas as telas; anel interno no `#chatMessages` (D38)
+- [x] Desabilitado legível, sem opacidade (D34)
+- [x] Certo/errado na alternativa escolhida, por `:has` (D35; ⚠️ depende do B1)
+- [x] `::selection`, `caret-color`, `accent-color` via token, scrollbar (G15 · B; D40)
+- [x] Favicon SVG em `static/` + `<link rel="icon">` no `base.html` (G15, D8). O 404 do `/favicon.ico` sumiu do console
+- [x] **Sentence case em todas as telas** (D27, D39). Textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy), `value`s e `name`s intactos; `test_app.py` passando
+- [x] Auditoria de contraste AA (nenhum texto abaixo) e de alvos de toque (0 abaixo de 44 px em 375 px; o link do histórico tinha 22 px) (D40)
+- [x] Cache-busting: `?v=redesign_v3`
+- [x] Critérios de aceite completos (fluxo manual, 375/768/1440 px, `git diff --stat` fora do escopo vazio)
+- [x] Descrição do PR destacando a D2 como **pendente de validação do grupo** (entregue ao Renzo; o PR é aberto por ele)
 
 ---
 
 ## Pendências fora do escopo
 
-Encontradas ou decididas nas Fases 1 a 3. Nenhuma entra nesta sprint.
+Encontradas ou decididas nas Fases 1 a 4. Nenhuma entra nesta sprint.
 
 | Pendência | Por que fica de fora | Categoria |
 |---|---|---|
@@ -380,6 +419,11 @@ Encontradas ou decididas nas Fases 1 a 3. Nenhuma entra nesta sprint.
 | "Dia N:" repetido no título do dia do plano, logo acima de "Sessão N" (D23) | Texto gerado pelo fallback do `ai_service.py:249`; ver [backend-pendencias §14](../handoff/backend-pendencias.md#14-dia-n-repetido-no-título-do-dia-do-plano) | C |
 | Emojis no conteúdo do chat (📚 🎯 🚀 🧭 💬 💡) | Texto gerado pelo `ai_service.py` (fallback e modelo do prompt); ver [backend-pendencias §15](../handoff/backend-pendencias.md#15-emojis-no-conteúdo-gerado) | C |
 | Script `unpkg.com/lucide@latest` no `base.html`: **carregado e não usado — remover junto com a revisão das CDNs** | Nenhum template usa `data-lucide` e os ícones agora são SVG inline (D11). Remover mexe em CDN | B (versões de CDN) |
+| Texto do "digitando" já termina em "..." (`app.js:59`); os 3 pontos animados (D36) ficam antes dele, e a mensagem é longa para uma bolha de espera | Mudar o texto é mudar o `app.js` | B (Fase 4) |
+| Desabilitar o "Perguntar à IA" (`#sendBtn`) durante o envio do chat; o CSS do desabilitado (D34) está pronto | Exige o `app.js` aplicar `disabled`/`aria-busy` | B (B4; Fase 4) |
+| Saída animada do modal (hoje só a entrada anima, D32) | Exige o JS aplicar uma classe e esperar a transição antes do `display:none` | B (B5; Fase 4) |
+| Nome acessível do `#chatMessages`: o Chrome o põe na ordem do Tab (área rolável) e o leitor de tela anuncia só o conteúdo | `aria-label`/`role="log"` entram junto com os itens de acessibilidade do grupo | B (B5; Fase 4) |
+| Certo/errado na alternativa escolhida (D35) não aparece | Depende do `feedback_item` que o B1 deixa `None` | B (B1; Fase 4) |
 
 ---
 
@@ -387,12 +431,9 @@ Encontradas ou decididas nas Fases 1 a 3. Nenhuma entra nesta sprint.
 
 As regras da sprint (git, escopo, contratos, skills e protocolo de cada fase) estão no `CLAUDE.local.md`, carregado automaticamente. Este arquivo guarda o progresso e as decisões.
 
-**Próxima fase: Fase 4 — Estados, microinterações, polish e PR.**
-1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões), D1–D31, e o checklist da [Fase 4](#fase-4--estados-e-polish)) e os SKILL.md das skills da fase (emil kowalski para as microinterações, impeccable para estados e consistência).
-2. Trabalhar em `feat/redesign-visual`. Arquivos: `static/css/style.css` (estados e movimento), `templates/*.html` (só para o sentence case da D27 e o favicon da D8) e um SVG novo em `static/`.
-3. Itens da fase: `.chat-bubble.typing` com 3 pontos e `.chat-bubble.error` (A5); transição da barra de progresso; entrada do modal com `@starting-style`; feedback ao pressionar; `::selection`, `accent-color` e scrollbar; favicon; **sentence case em todas as telas, sem tocar nos textos da [tabela 7.5](../04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy)**. Tudo desligado com `prefers-reduced-motion: reduce`.
-4. Os estados `typing` e `error` vêm do `app.js` (a classe já é aplicada; só falta o CSS). Para vê-los: o typing aparece enquanto a resposta não chega; o error aparece com o servidor fora do ar durante o envio.
-5. Classes da Fase 3 (D24) já cobrem as telas; para algo novo, preferir estender uma delas a criar outra. Componentes usam só tokens semânticos (`--color-*`, `--space-*`, `--text-*`).
-6. Ao mudar o CSS, subir o cache-busting para `?v=redesign_v3`.
-7. Testar sem tocar no `studyia.db`: `DATABASE_PATH=<arquivo temporário> .venv/bin/flask --app app run --port 5055` (a 5000 pode estar ocupada). Comparar com `../studyia-screenshots/fase3/` e salvar em `../studyia-screenshots/fase4/`.
-8. Fim da fase = fim da sprint: critérios de aceite completos (fluxo manual, 375/1440 px, `git diff --stat main` fora do escopo vazio) e a descrição do PR destacando a **D2 como pendente de validação do grupo**.
+**A sprint 01 está concluída — aguardando revisão.** As 4 fases foram fechadas; o próximo passo é o PR `feat/redesign-visual` → `main`, aberto pelo Renzo.
+
+1. **Revisão do PR pelo grupo.** Pontos que precisam de validação explícita: a **D2** (escala de nota ≥ 70 / 50–69 / < 50 e os títulos novos, "pendente de validação do grupo"), as animações da D32 e o sentence case da D39.
+2. **Se a revisão pedir ajustes:** trabalhar na mesma branch, rodar `DATABASE_PATH=<arquivo temporário> .venv/bin/python -m unittest test_app.py`, subir o `?v=` (próximo: `redesign_v4`) e repetir o passeio de `../studyia-screenshots/fase4/`. Para testar no navegador sem tocar no `studyia.db`: `DATABASE_PATH=<arquivo temporário> .venv/bin/flask --app app run --port 5055` (o Flask sem debug guarda os templates em cache: reiniciar depois de editar um template).
+3. **Depois do merge:** o [06-padroes-visuais.md](../06-padroes-visuais.md) vira a referência (hoje "aguardando aprovação do grupo"); os aliases `--chakra-*` do `tokens.css` podem sair num PR separado, porque nenhum template os usa mais.
+4. **Próxima sprint (candidatos, dependem do grupo):** os itens B das [Pendências fora do escopo](#pendências-fora-do-escopo), começando por B1 (feedback do seminário; destrava a D35), B4 (loading e anti-clique-duplo; o CSS do desabilitado já está pronto), B5 (modal acessível, nome do `#chatMessages`, saída animada) e B11 (avatares e cores inline do `app.js`). Do backend, os itens 8, 9, 14 e 15 de [handoff/backend-pendencias.md](../handoff/backend-pendencias.md) são os que mais afetam o visual.
