@@ -48,12 +48,12 @@ Arquivos que podem mudar: `templates/*.html` (só markup e classes) e `static/cs
 > Lista de escopo original, por tela. O checklist operacional, com a auditoria da Fase 1 dividida por fase, está em [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1).
 
 ### Global (`style.css` + `base.html`)
-- [ ] Tokens semânticos + aliases das variáveis indefinidas (A1)
-- [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base)
+- [x] Tokens semânticos + aliases das variáveis indefinidas (A1) — Fase 2, `static/css/tokens.css`
+- [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) (parcial: os genéricos saíram na Fase 2; os de tela entram na Fase 3)
 - [ ] Estados: hover (só com `hover: hover`), focus-visible, disabled, vazio, erro (A5)
 - [ ] Media queries mobile-first (`640`, `768`, `1024`, `1280`)
-- [ ] `<link>` do Google Fonts só com a fonte aprovada (A7; ver decisão D1 no [registro](#registro-de-decisões))
-- [ ] Navbar: layout em 375 px; "⚙️" com `aria-hidden` e rótulo de texto (A6)
+- [x] `<link>` do Google Fonts só com a fonte aprovada (A7; ver decisão D1 no [registro](#registro-de-decisões))
+- [x] Navbar: layout em 375 px; "⚙️" com `aria-hidden` e rótulo de texto (A6)
 - [ ] Modal: estilos via `.modal-title`, `.modal-text`, `.modal-actions`. **Mantenha** `#settingsModal`, `#closeSettingsBtn`, `type="button"` e `display:none` inicial
 - [ ] Flashes: manter `alert-{{ category }}`
 - [ ] Rodapé RNF06 com classe e sem inline (A1, A8)
@@ -116,11 +116,11 @@ A sprint roda em uma branch só, `feat/redesign-visual`, dividida em 4 fases. Ca
 | Fase | Conteúdo | Status |
 |---|---|---|
 | 1 | Versão atual, auditoria e direção visual (sem código) | ✅ concluída em 17/11/2026 |
-| 2 | Fundação: tokens, fonte, componentes base, navbar, modal | ⏳ próxima |
-| 3 | Telas: migração do inline para classes, tela por tela | — |
+| 2 | Fundação: tokens, fonte, componentes base, navbar, modal | ✅ concluída em 17/11/2026 |
+| 3 | Telas: migração do inline para classes, tela por tela (**começa pelo T1**) | ⏳ próxima |
 | 4 | Estados, microinterações, polish e PR | — |
 
-Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat).
+Screenshots "antes" (fora do repositório): `../studyia-screenshots/fase1-antes/` (375, 768 e 1440 px, mais os estados do chat). Fase 2: `../studyia-screenshots/fase2/` (375 e 1440 px).
 
 ---
 
@@ -174,35 +174,95 @@ Onde estas decisões divergirem da proposta do [06-padroes-visuais.md](../06-pad
 
 **D8. Favicon.** Entra na Fase 4: SVG em `static/` e `<link rel="icon">` no `base.html`. Hoje `/favicon.ico` dá 404 no console.
 
+### 17/11/2026 — Fase 2 (aprovadas pelo Renzo)
+
+**Condição da D1 cumprida:** a Atkinson Hyperlegible Next servida pelo Google Fonts tem `tnum` (também `pnum` e `frac`; eixo `wght` 200–800). Os algarismos padrão são proporcionais, então números que precisam alinhar usam `font-variant-numeric: tabular-nums`. A Next fica.
+
+**D9. Paleta final** (tokens em `static/css/tokens.css`; contraste WCAG medido):
+
+| Par | Hex | Contraste |
+|---|---|---|
+| Tinta / fundo · superfície | `#17201C` / `#F5F6F4` · `#FFFFFF` | 15,4 · 16,7 |
+| Secundário / fundo · superfície | `#55605A` | 6,0 · 6,6 |
+| Sutil (placeholder, hora) / fundo · superfície | `#646E68` | 4,9 · 5,3 |
+| Branco / acento (botão) · hover | `#1E6B5C` · `#18584B` | 6,3 · 8,3 |
+| Acento como link / superfície · fundo | `#1E6B5C` | 6,3 · 5,9 |
+| Sucesso: texto / fundo claro | `#1A5E39` / `#EBF5EF` | 7,0 |
+| Atenção: texto / fundo claro | `#8A5A00` / `#FFF6DB` | 5,5 |
+| Perigo: texto / fundo claro · "Sair" / branco | `#912018` / `#FDF0EE` · `#B42318` | 7,8 · 6,6 |
+| Borda de campo / branco (não-texto, mín. 3:1) | `#868F89` | 3,3 |
+| Barra de progresso / trilho (não-texto) | `#1E6B5C` / `#E2E5E1` | 4,8 |
+
+- O "sutil" da D1 foi ajustado de `#6B756F` (4,40:1 no fundo, reprovado) para `#646E68`.
+- Os aliases `--chakra-*` apontam para a paleta nova: roxo e azul viram o acento (D3), as sombras viram `none` (D1) e os cinzas 400/500 usados como texto foram escurecidos para AA (de 2,3:1 para 4,9:1).
+
+**D10. Escala tipográfica.** 12 (badge) · 13 (metadados, botão pequeno, dica) · 14 (interface) · 16 (leitura, campos, h3) · 20 (h2, título do modal) · 24 (h1, KPI) · 36 (nota). Pesos 400/600/700. Altura de linha 1,2 nos títulos, 1,35 em rótulos, 1,5 na interface e 1,6 na leitura. Títulos com −0,015em.
+
+**D11. Ícones.** 19 SVGs desenhados à mão num sprite no `base.html` (`<svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>`), com traço de 1,5 px na tela (`.icon` 18 px, `.icon-sm` 16 px, `.icon-lg` 24 px). Ícones: `settings` (sliders), `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`. Um ícone por tipo: assunto = `search`, arquivo = `file`.
+
+**D12. Marca.** Livro aberto em branco sobre um quadrado verde-petróleo, ao lado de "StudyIA". Candidata a favicon na Fase 4 (D8).
+
+**D13. Selo.** "Projeto A3" em texto cinza depois do nome; some abaixo de 640 px.
+
+**D14. `.btn-purple` = visual de botão secundário** (D3). O "Processar e Estudar Arquivo" troca para `.btn-primary` na Fase 3 (DB3).
+
+**D15. Alertas.** Fundo claro, borda de 1 px e ícone desenhado no CSS (máscara SVG, sem mudar o Jinja). `.alert-info` é neutro: fundo branco, borda e ícone no acento.
+
+**D16. Badges de assunto e de arquivo neutros (cinza).** Só concluído (verde), pendente (âmbar) e perigo (vermelho) têm cor.
+
+**D17. Classes novas** (nenhuma antiga foi renomeada): `.btn-ghost`, `.btn-block`, `.btn-icon`, `.badge-neutral`, `.badge-danger`, `.form-hint`, `.form-error`, `.task-item`, `.task-text`, `.empty-state` (+ `-icon`, `-title`, `-text`), `.modal-title`, `.modal-text`, `.modal-actions`, `.icon` (+ `-sm`, `-lg`), `.icon-sprite`, `.sr-only`, `.brand-mark`, `.nav-settings-btn`, `.nav-btn-label`, `.user-name`.
+
+**D18. Raio de 12 px no modal** (`--radius-lg`), como exceção aos 8 px dos cards: dá hierarquia a uma superfície que flutua.
+
+**D19. Tamanhos de controle.** Campos sempre com 44 px e fonte de 16 px (evita zoom no iOS). Botões com 44 px abaixo de 768 px e 40 px (36 px no `.btn-sm`) a partir daí.
+
+**D20. Escopo da Fase 2.** Entraram a navbar numa linha em 375 px, os alvos de toque de 44 px e as grades `.grid-2`/`.grid-3` sem estouro (fazem parte do `base.html` ou dos componentes). No modal, só foram acrescentadas as classes e o `aria-describedby` do campo; o inline sai na Fase 3. O layout das telas não foi tocado.
+
 ---
 
 ## Checklist por fase (auditoria da Fase 1)
 
 IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboard, T = tópico/chat, P = criar plano, V = ver plano, S = seminário, M = modal. D1–D8 são as decisões do registro acima. Severidade: **C** crítico, **A** alto, **M** médio, **B** baixo. Antes de editar qualquer template, cumprir o [checklist do 04](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme).
 
-### Fase 2 — Fundação (`style.css` + `base.html`)
-- [ ] Verificar se a Atkinson Hyperlegible Next tem algarismos tabulares no Google Fonts (`font-variant-numeric: tabular-nums` muda a largura dos dígitos). Se não tiver, usar a Atkinson Hyperlegible original e avisar no relatório (D1)
-- [ ] `<link>` do Google Fonts só com a fonte aprovada; Plus Jakarta Sans removida (A7, G12)
-- [ ] Tokens semânticos da D1 (cor, tipografia, espaço, raio, movimento) + aliases dos `--chakra-*` e das variáveis indefinidas (A1, G12)
-- [ ] Contraste AA em todos os pares de texto: botão primário, texto secundário, placeholder, hora do chat, avisos, "Sair" (G1 · A)
-- [ ] `:focus-visible` global com anel de 2 px e offset; remover o `outline:none` sem substituto (G2 · A)
-- [ ] Navbar com 56 px em linha em 375 px; rótulo da engrenagem em `.sr-only` abaixo de 640 px; sem blur; selo "PROJETO A3" discreto (G3 · A, G11, D5)
-- [ ] Acento único e sem gradientes: marca, bolha do usuário, barra de progresso (G4 · M, D3)
-- [ ] Cards com borda de 1 px e sem sombra em repouso; sem hover em card que não é clicável (G5 · M)
-- [ ] Badges em sentence case (G6 · M)
-- [ ] Utilitários `.icon` (SVG inline) e `.sr-only` (G7 · M)
-- [ ] Alvos de toque ≥ 44 px abaixo de 768 px (G8 · M)
-- [ ] Base mobile-first com breakpoints 640/768/1024/1280 (G9 · M)
-- [ ] Transições com propriedades explícitas, `--ease-out` forte e bloco `prefers-reduced-motion` (G10 · B)
-- [ ] Componentes base do [06 §2](../06-padroes-visuais.md#2-componentes-base) em CSS puro
-- [ ] Modal: `.modal-title`, `.modal-text`, `.modal-actions`, overlay sólido, botões de 44 px. Manter `#settingsModal` (`display:none` por padrão, `display:flex` para abrir), `#closeSettingsBtn` com `type="button"` e a condição de sessão (M1 · M)
-- [ ] Cache-busting: `?v=redesign_v1`
+### Fase 2 — Fundação (`style.css` + `base.html`) — ✅ concluída em 17/11/2026
+- [x] Verificar se a Atkinson Hyperlegible Next tem algarismos tabulares no Google Fonts: **tem `tnum`**; a Next fica (D1)
+- [x] `<link>` do Google Fonts só com a fonte aprovada; Plus Jakarta Sans e Inter removidas (A7, G12)
+- [x] Tokens semânticos da D1 (cor, tipografia, espaço, raio, sombra, layout, movimento) em `static/css/tokens.css` + aliases dos `--chakra-*` e das variáveis indefinidas (A1, G12)
+- [x] Contraste AA em todos os pares de texto: botão primário, texto secundário, placeholder, hora do chat, avisos, "Sair" (G1 · A; ver D9)
+- [x] `:focus-visible` global com anel de 2 px e offset; o `outline:none` do `.btn` foi removido (G2 · A)
+- [x] Navbar com 56 px em linha em 375 px; rótulo da engrenagem oculto (com nome acessível) abaixo de 640 px; sem blur; selo "Projeto A3" discreto (G3 · A, G11, D5, D13)
+- [x] Acento único e sem gradientes: marca, bolha do usuário, barra de progresso (G4 · M, D3)
+- [x] Cards com borda de 1 px e sem sombra em repouso; sem hover (G5 · M). As sombras inline viraram `none` pelos aliases
+- [x] Badges em sentence case (G6 · M)
+- [x] Utilitários `.icon` (sprite SVG inline) e `.sr-only` (G7 · M, D11)
+- [x] Alvos de toque ≥ 44 px abaixo de 768 px (G8 · M, D19)
+- [x] Base mobile-first com breakpoints 640/768/1024/1280 nos componentes (G9 · M). As telas ficam para a Fase 3
+- [x] Transições com propriedades explícitas, `--ease-out` forte e bloco `prefers-reduced-motion` (G10 · B)
+- [x] Componentes base em CSS puro: `.btn` (todas as variantes + `-ghost`/`-block`/`-icon`), `.form-control` (+ select com seta, `.form-hint`, `.form-error`), `.card`, `.badge` (+ `-neutral`/`-danger`), `.alert-*`, modal, barra de progresso, checkbox do checklist + `.task-item`, `.empty-state`, chat e `.ai-notice`. Os de tela (`.page-header`, `.back-link`, `.list-item`, `.stat`, `.choice`, `.score-panel`, `.feedback`, `.auth-card`, `.notice`) entram na Fase 3
+- [x] Modal: `.modal-title`, `.modal-text`, `.modal-actions` aplicadas, overlay sólido, botões de 44 px, raio de 12 px (D18). `#settingsModal`, `#closeSettingsBtn` e a condição de sessão intactos. **O inline do modal sai na Fase 3**
+- [x] Emojis que funcionam como ícone trocados por SVG com `aria-hidden` (navbar, botões, cards, stats, avisos, badges); o botão de excluir ganhou "Excluir estudo" em `.sr-only` (A6). Ficam os avatares do chat (B11) e os títulos da nota (D2, Fase 3)
+- [x] Cache-busting: `?v=redesign_v1` em `tokens.css` e `style.css`
 
 ### Fase 3 — Telas
+
+**⚠️ PRIMEIRO ITEM DA FASE (antes de qualquer outra tela)**
+- [ ] **T1: rolagem horizontal da tela do tópico em 375 px** (✅ confirmada pelo Renzo no navegador em 17/11/2026; na Fase 2 o Playwright mediu 149 px de estouro). Causa: grid inline `grid-template-columns: 2fr 1fr` em `study_topic.html:54` e `height: 620px` inline no `.chat-window`. Correção: grid em classe com 1 coluna abaixo de 1024 px; `.chat-window { height: min(620px, 70dvh) }`; o `#chatMessages` continua com altura limitada e `overflow-y:auto`. **Validar em 375, 768 e 1440 px** (sem rolagem horizontal e com o chat rolando e recebendo mensagens novas) antes de seguir para o resto da fase (T1 · **C**, A4)
+
+**Restos de inline encontrados na Fase 2** (o inline ainda vence os componentes novos)
+- [ ] Eyebrows e labels dos stats em caixa alta (`text-transform: uppercase` inline): remover (D4, DB2, DB6)
+- [ ] Bordas coloridas de 4 px (laterais e superiores) nos stats, nos cards de fluxo, nos dias do plano e no painel da nota: remover (G5, V1, S1)
+- [ ] Quadradinhos coloridos atrás dos ícones (`background` inline em `.stat-icon` e nos cabeçalhos dos cards): ícone cinza, sem fundo colorido (D1)
+- [ ] Borda tracejada do CTA de seminário em `plan_view.html` (V5)
+- [ ] Checkbox do plano: o inline força 18 px (o componente tem 20 px) e o `<label>` ainda não usa `.task-item`/`.task-text` (V2, V3)
+- [ ] Badge "N registros" do histórico cortado em 375 px: o cabeçalho é um flex inline sem quebra (DB5)
+- [ ] Radios desabilitados do seminário com o visual nativo: aplicar `.choice` (S3)
+- [ ] "Processar e Estudar Arquivo": trocar `.btn-purple` por `.btn-primary` (D14, DB3)
+- [ ] Modal: remover o inline de `h3`, `p`, `small` e da linha de ações; as classes já estão aplicadas (M1, D20)
+
 **Global**
 - [ ] Flash: tinta clara, borda de 1 px e ícone SVG; manter `alert-{{ category }}` (G13 · B)
 - [ ] Rodapé RNF06 discreto (13 px), alinhado ao grid, sem inline (G14 · B, A1, A8)
-- [ ] Emojis trocados por SVG com `aria-hidden` nos templates; o botão de excluir ganha nome acessível (G7, A6)
+- [x] Emojis trocados por SVG com `aria-hidden` nos templates; o botão de excluir ganha nome acessível (G7, A6) — adiantado na Fase 2, exceto os títulos da nota (S1/D2) e os avatares (B11)
 
 **Login e cadastro**
 - [ ] Remover a pílula "PROJETO A3 — IA PARA O COTIDIANO" (L1 · M, D4)
@@ -218,7 +278,7 @@ IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboa
 - [ ] Remover o eyebrow; manter "Painel de Estudos" no título e no `h1` (DB6 · B)
 
 **Tópico e chat**
-- [ ] **Sem rolagem horizontal em 375 px**: grid em classe com 1 coluna abaixo de 1024 px; `.chat-window { height: min(620px, 70dvh) }`; `#chatMessages` continua com altura limitada e `overflow-y:auto` (T1 · **C**, A4)
+- [ ] T1: ver o [primeiro item da fase](#fase-3--telas) (resolver antes de tudo)
 - [ ] Uma ação primária no cabeçalho; as outras secundárias; quebra correta em 375 px (T4 · M)
 - [ ] Bolha do usuário chapada; contador de mensagens como texto secundário; estrutura da bolha intacta (T5 · M)
 - [ ] Coluna lateral como painel com lista (sem cards aninhados); "+ Novo" e "+ Gerar" como `.btn-ghost` de 44 px; forms de seminário continuam POST (T6 · M)
@@ -260,7 +320,7 @@ IDs da auditoria entre parênteses: G = global, L = login/cadastro, DB = dashboa
 
 ## Pendências fora do escopo
 
-Encontradas ou decididas na Fase 1. Nenhuma entra nesta sprint.
+Encontradas ou decididas nas Fases 1 e 2. Nenhuma entra nesta sprint.
 
 | Pendência | Por que fica de fora | Categoria |
 |---|---|---|
@@ -274,6 +334,7 @@ Encontradas ou decididas na Fase 1. Nenhuma entra nesta sprint.
 | Feedback por questão do seminário não aparece | Escopo de variável no Jinja ([B1](../05-achados-frontend.md), ✅ confirmado) | B |
 | "Piso" de imagens e de animações do taste-skill | Vale para landing pages, não para telas de app | — |
 | Tema escuro | Fora do escopo da sprint | — |
+| Script `unpkg.com/lucide@latest` no `base.html`: **carregado e não usado — remover junto com a revisão das CDNs** | Nenhum template usa `data-lucide` e os ícones agora são SVG inline (D11). Remover mexe em CDN | B (versões de CDN) |
 
 ---
 
@@ -281,8 +342,12 @@ Encontradas ou decididas na Fase 1. Nenhuma entra nesta sprint.
 
 As regras da sprint (git, escopo, contratos, skills e protocolo de cada fase) estão no `CLAUDE.local.md`, carregado automaticamente. Este arquivo guarda o progresso e as decisões.
 
-**Próxima fase: Fase 2 — Fundação.**
-1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões) e o [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1)) e os SKILL.md das skills da fase.
-2. Trabalhar em `feat/redesign-visual`. Arquivos da fase: `static/css/style.css` e `templates/base.html`.
-3. Primeiro passo: verificar os algarismos tabulares da Atkinson Hyperlegible Next (D1).
-4. Comparar com as screenshots "antes" em `../studyia-screenshots/fase1-antes/` e salvar as novas em `../studyia-screenshots/fase2/`.
+**Próxima fase: Fase 3 — Telas.**
+1. Ler o `CLAUDE.local.md`, este arquivo (principalmente o [Registro de decisões](#registro-de-decisões), D1–D20, e o [Checklist por fase](#checklist-por-fase-auditoria-da-fase-1)) e os SKILL.md das skills da fase.
+2. Trabalhar em `feat/redesign-visual`. Arquivos da fase: `templates/*.html` (markup e classes) e `static/css/style.css`. Os tokens estão em `static/css/tokens.css`; componentes novos usam só os tokens semânticos (`--color-*`, `--space-*`, `--text-*`), nunca `--chakra-*`.
+3. **Primeiro passo, obrigatório: corrigir o T1** (rolagem horizontal da tela do tópico em 375 px) e validar em **375, 768 e 1440 px** antes de qualquer outra tela. Ver o primeiro item do checklist da Fase 3.
+4. Depois: a migração do inline para classes, tela por tela (login e cadastro primeiro), cumprindo o [checklist do 04](../04-contratos-frontend.md#antes-de-mexer-em-um-template-confirme) em cada template. Incluir a lista "Restos de inline encontrados na Fase 2".
+5. Ícones: usar o sprite do `base.html` (`<use href="#i-nome">`, D11). Para um ícone novo, acrescentar um `<symbol>` no sprite, com o mesmo traço.
+6. Ao mudar o CSS, subir o cache-busting para `?v=redesign_v2`.
+7. A porta 5000 pode estar ocupada por uma instância antiga. Para testar sem tocar no `studyia.db`: `DATABASE_PATH=<arquivo temporário> .venv/bin/flask --app app run --port 5055`.
+8. Comparar com `../studyia-screenshots/fase2/` e salvar as novas em `../studyia-screenshots/fase3/`.
