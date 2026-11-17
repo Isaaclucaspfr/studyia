@@ -23,7 +23,8 @@
 
         <div>
             <a href="{{ url_for('create_plan', topic_id=plan.topic_id) }}" class="btn btn-secondary btn-sm" title="Reconfigurar metas e gerar outro cronograma">
-                🔄 Reajustar Preferências
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg>
+                Reajustar Preferências
             </a>
         </div>
     </div>
@@ -39,7 +40,7 @@
         <div class="progress-bar-fill" id="planProgressBar" style="width: {{ plan.progress_percent }}%;"></div>
     </div>
     <div style="display: flex; justify-content: space-between; margin-top: 0.65rem; font-size: 0.8rem; color: var(--chakra-colors-gray-500); flex-wrap: wrap; gap: 0.5rem;">
-        <span>✓ Marque as caixas abaixo conforme for cumprindo suas atividades</span>
+        <span><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Marque as caixas abaixo conforme for cumprindo suas atividades</span>
         <span>Meta diária: <strong>{{ plan.daily_minutes }} min</strong> • Frequência: <strong>{{ plan.days_per_week }}x na semana</strong></span>
     </div>
 </div>
@@ -58,7 +59,7 @@
                 </h3>
             </div>
             <span class="badge" style="background: var(--chakra-colors-gray-100); color: var(--chakra-colors-gray-700);">
-                ⏱️ {{ day.estimated_minutes or plan.daily_minutes }} min
+                <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg> {{ day.estimated_minutes or plan.daily_minutes }} min
             </span>
         </div>
 
@@ -96,7 +97,8 @@
     </p>
     <form action="{{ url_for('create_seminar', topic_id=plan.topic_id) }}" method="POST" style="margin: 0;">
         <button type="submit" class="btn btn-purple">
-            🎯 Iniciar Mini Seminário deste Tema
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
+            Iniciar Mini Seminário deste Tema
         </button>
     </form>
 </div>

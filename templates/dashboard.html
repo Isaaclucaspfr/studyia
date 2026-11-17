@@ -19,7 +19,7 @@
 
         {% if not has_custom_key %}
         <div style="background: var(--chakra-colors-yellow-50); border: 1px solid var(--chakra-colors-yellow-100); border-radius: var(--chakra-radii-md); padding: 0.55rem 0.95rem; font-size: 0.8rem; color: var(--chakra-colors-orange-500); display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--chakra-shadows-xs);">
-            <span>⚡ Modo Demonstração Ativo</span>
+            <span><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo Demonstração Ativo</span>
             <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar Chave Gemini</button>
         </div>
         {% endif %}
@@ -30,7 +30,7 @@
 <div class="grid-3" style="margin-bottom: 2.5rem;">
     <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-teal-500);">
         <div class="stat-icon" style="background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-600);">
-            📚
+            <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-book"></use></svg>
         </div>
         <div>
             <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">{{ total_topics }}</div>
@@ -40,7 +40,7 @@
 
     <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-purple-500);">
         <div class="stat-icon" style="background: var(--chakra-colors-purple-50); color: var(--chakra-colors-purple-600);">
-            📅
+            <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
         </div>
         <div>
             <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">{{ total_plans }}</div>
@@ -50,7 +50,7 @@
 
     <div class="card stat-box" style="border-left: 4px solid var(--chakra-colors-green-500);">
         <div class="stat-icon" style="background: var(--chakra-colors-green-50); color: var(--chakra-colors-green-600);">
-            🎯
+            <svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
         </div>
         <div>
             <div style="font-size: 1.75rem; font-weight: 800; color: var(--chakra-colors-gray-900); line-height: 1.1;">
@@ -66,7 +66,7 @@
     <!-- Fluxo 1: Pesquisar Assunto Geral -->
     <div class="card" style="border-top: 4px solid var(--chakra-colors-teal-500);">
         <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem;">
-            <div style="background: var(--chakra-colors-teal-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;">🔍</div>
+            <div style="background: var(--chakra-colors-teal-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;"><svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg></div>
             <div>
                 <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900);">Pesquisar Assunto Geral</h2>
                 <span class="badge badge-subject" style="margin-top: 0.15rem;">Modo Aberto</span>
@@ -96,7 +96,7 @@
     <!-- Fluxo 2: Estudar Arquivo Anexado -->
     <div class="card" style="border-top: 4px solid var(--chakra-colors-purple-500);">
         <div style="display: flex; align-items: center; gap: 0.65rem; margin-bottom: 0.65rem;">
-            <div style="background: var(--chakra-colors-purple-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;">📄</div>
+            <div style="background: var(--chakra-colors-purple-50); padding: 0.5rem; border-radius: var(--chakra-radii-md); font-size: 1.25rem;"><svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-file"></use></svg></div>
             <div>
                 <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900);">Estudo Exclusivo de Arquivo</h2>
                 <span class="badge badge-file" style="margin-top: 0.15rem;">Fidelidade Restrita</span>
@@ -142,7 +142,7 @@
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-lg); background: #ffffff; flex-wrap: wrap; gap: 0.85rem; transition: all 0.15s ease;">
             <div style="display: flex; align-items: center; gap: 1rem;">
                 <div style="width: 44px; height: 44px; border-radius: var(--chakra-radii-md); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; background: {% if t.topic_type == 'file' %}var(--chakra-colors-purple-50){% else %}var(--chakra-colors-teal-50){% endif %};">
-                    {% if t.topic_type == 'file' %}📄{% else %}💡{% endif %}
+                    {% if t.topic_type == 'file' %}<svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-file"></use></svg>{% else %}<svg class="icon icon-lg" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>{% endif %}
                 </div>
                 <div>
                     <div style="display: flex; align-items: center; gap: 0.65rem;">
@@ -169,7 +169,8 @@
                 </a>
                 <form action="{{ url_for('delete_topic', topic_id=t.id) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta pesquisa e todas as atividades vinculadas?');" style="margin: 0;">
                     <button type="submit" class="btn btn-danger-outline btn-sm" title="Excluir">
-                        🗑️
+                        <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-trash"></use></svg>
+                        <span class="sr-only">Excluir estudo</span>
                     </button>
                 </form>
             </div>

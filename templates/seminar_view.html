@@ -28,7 +28,8 @@
         {% if seminar.is_completed %}
         <form action="{{ url_for('create_seminar', topic_id=seminar.topic_id) }}" method="POST" style="margin: 0;">
             <button type="submit" class="btn btn-purple btn-sm">
-                🔄 Realizar Novo Seminário
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg>
+                Realizar Novo Seminário
             </button>
         </form>
         {% endif %}
@@ -67,7 +68,7 @@
     <div class="grid-2" style="margin-top: 1.75rem; border-top: 1px solid var(--chakra-colors-gray-200); padding-top: 1.5rem;">
         <div style="background: var(--chakra-colors-green-50); border: 1px solid var(--chakra-colors-green-100); border-radius: var(--chakra-radii-lg); padding: 1.25rem;">
             <strong style="color: var(--chakra-colors-green-600); font-size: 0.875rem; display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.65rem;">
-                ✓ Pontos Fortes Identificados:
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Pontos Fortes Identificados:
             </strong>
             <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--chakra-colors-green-600); line-height: 1.6;">
                 {% for item in feedback_data.strengths %}
@@ -78,7 +79,7 @@
 
         <div style="background: var(--chakra-colors-orange-50); border: 1px solid var(--chakra-colors-orange-100); border-radius: var(--chakra-radii-lg); padding: 1.25rem;">
             <strong style="color: var(--chakra-colors-orange-500); font-size: 0.875rem; display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.65rem;">
-                ⚠️ Tópicos Recomendados para Revisão:
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-alert"></use></svg> Tópicos Recomendados para Revisão:
             </strong>
             <ul style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--chakra-colors-orange-500); line-height: 1.6;">
                 {% for item in feedback_data.topics_to_review %}
@@ -111,11 +112,11 @@
                 </span>
                 {% if feedback_item %}
                     {% if feedback_item.status == 'correct' %}
-                        <span class="badge badge-completed">✓ Correta</span>
+                        <span class="badge badge-completed"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Correta</span>
                     {% elif feedback_item.status == 'partial' %}
-                        <span class="badge badge-pending">~ Parcial</span>
+                        <span class="badge badge-pending"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-minus"></use></svg> Parcial</span>
                     {% else %}
-                        <span class="badge" style="background: var(--chakra-colors-red-50); color: var(--chakra-colors-red-500); border: 1px solid var(--chakra-colors-red-100);">✗ Precisa Rever</span>
+                        <span class="badge" style="background: var(--chakra-colors-red-50); color: var(--chakra-colors-red-500); border: 1px solid var(--chakra-colors-red-100);"><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-x"></use></svg> Precisa Rever</span>
                     {% endif %}
                 {% endif %}
             </div>

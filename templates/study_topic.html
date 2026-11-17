@@ -27,14 +27,17 @@
 
         <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
             <a href="{{ url_for('export_topic', topic_id=topic.id) }}" class="btn btn-secondary btn-sm" title="Baixar todas as perguntas e respostas gravadas no banco de dados">
-                📥 Exportar Caderno (.md)
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
+                Exportar Caderno (.md)
             </a>
             <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
-                📅 Gerar Plano de Estudo
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
+                Gerar Plano de Estudo
             </a>
             <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
                 <button type="submit" class="btn btn-purple btn-sm">
-                    🎯 Iniciar Mini Seminário
+                    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
+                    Iniciar Mini Seminário
                 </button>
             </form>
         </div>
@@ -44,9 +47,11 @@
 <!-- Banner de Fidelidade e Transparência Chakra Alert -->
 <div class="ai-notice">
     {% if topic.topic_type == 'file' %}
-    <span>🔒 <strong>Modo Estudo Exclusivo de Arquivo:</strong> As respostas e planos são gerados estritamente com base no texto do documento anexado. Informações ausentes não são inventadas.</span>
+    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
+    <span><strong>Modo Estudo Exclusivo de Arquivo:</strong> As respostas e planos são gerados estritamente com base no texto do documento anexado. Informações ausentes não são inventadas.</span>
     {% else %}
-    <span>💡 <strong>Modo Pesquisa Geral:</strong> Fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini.</span>
+    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-search"></use></svg>
+    <span><strong>Modo Pesquisa Geral:</strong> Fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini.</span>
     {% endif %}
 </div>
 
@@ -57,9 +62,9 @@
     <div>
         <div class="chat-window" style="height: 620px;">
             <div style="padding: 0.75rem 1.25rem; background: var(--chakra-colors-gray-50); border-bottom: 1px solid var(--chakra-colors-gray-200); display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--chakra-colors-gray-600);">
-                <span>💬 <strong>Diálogo Conceitual & Dúvidas</strong></span>
+                <span><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chat"></use></svg> <strong>Diálogo Conceitual & Dúvidas</strong></span>
                 <span class="badge" style="background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-700); border: 1px solid var(--chakra-colors-teal-200); font-weight: 700;">
-                    💾 {{ messages|length }} mensagens salvas no banco
+                    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-database"></use></svg> {{ messages|length }} mensagens salvas no banco
                 </span>
             </div>
 
@@ -97,7 +102,7 @@
         <!-- Cartão: Planos de Estudo -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);">📅 Planos de Estudo</h3>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos de Estudo</h3>
                 <a href="{{ url_for('create_plan', topic_id=topic.id) }}" style="font-size: 0.8rem; color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">+ Novo</a>
             </div>
 
@@ -134,7 +139,7 @@
         <!-- Cartão: Mini Seminários Interativos -->
         <div class="card">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);">🎯 Mini Seminários</h3>
+                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini Seminários</h3>
                 <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
                     <button type="submit" style="background: none; border: none; font-size: 0.8rem; color: var(--chakra-colors-purple-600); font-weight: 700; cursor: pointer;">+ Gerar</button>
                 </form>
