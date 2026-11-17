@@ -3,48 +3,47 @@
 {% block title %}{{ topic.title }} — StudyIA{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 1.75rem;">
-    <a href="{{ url_for('dashboard') }}" style="color: var(--chakra-colors-gray-500); text-decoration: none; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.75rem; transition: color 0.15s ease;">
-        ← Voltar ao Painel
-    </a>
+<a href="{{ url_for('dashboard') }}" class="back-link">
+    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-left"></use></svg>
+    Voltar ao Painel
+</a>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
-                    {{ topic.title }}
-                </h1>
-                {% if topic.topic_type == 'file' %}
-                <span class="badge badge-file">Arquivo: {{ topic.file_name }}</span>
-                {% else %}
-                <span class="badge badge-subject">Assunto Geral</span>
-                {% endif %}
-            </div>
-            <p style="font-size: 0.85rem; color: var(--chakra-colors-gray-500); margin-top: 0.25rem;">
-                Iniciado em {{ topic.created_at[:16] }}
-            </p>
+<div class="page-header">
+    <div class="page-heading">
+        <div class="page-title-row">
+            <h1 class="page-title">
+                {{ topic.title }}
+            </h1>
+            {% if topic.topic_type == 'file' %}
+            <span class="badge badge-file">Arquivo: {{ topic.file_name }}</span>
+            {% else %}
+            <span class="badge badge-subject">Assunto Geral</span>
+            {% endif %}
         </div>
+        <p class="page-meta">
+            Iniciado em {{ topic.created_at[:16] }}
+        </p>
+    </div>
 
-        <div style="display: flex; gap: 0.65rem; flex-wrap: wrap;">
-            <a href="{{ url_for('export_topic', topic_id=topic.id) }}" class="btn btn-secondary btn-sm" title="Baixar todas as perguntas e respostas gravadas no banco de dados">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
-                Exportar Caderno (.md)
-            </a>
-            <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
-                Gerar Plano de Estudo
-            </a>
-            <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
-                <button type="submit" class="btn btn-purple btn-sm">
-                    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
-                    Iniciar Mini Seminário
-                </button>
-            </form>
-        </div>
+    <div class="page-actions">
+        <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-primary btn-sm">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
+            Gerar Plano de Estudo
+        </a>
+        <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
+            <button type="submit" class="btn btn-purple btn-sm">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
+                Iniciar Mini Seminário
+            </button>
+        </form>
+        <a href="{{ url_for('export_topic', topic_id=topic.id) }}" class="btn btn-secondary btn-sm btn-collapse" title="Baixar todas as perguntas e respostas gravadas no banco de dados">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-download"></use></svg>
+            <span class="btn-label-collapse">Exportar Caderno (.md)</span>
+        </a>
     </div>
 </div>
 
-<!-- Banner de Fidelidade e Transparência Chakra Alert -->
+<!-- Aviso de fidelidade e transparência -->
 <div class="ai-notice">
     {% if topic.topic_type == 'file' %}
     <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-lock"></use></svg>
@@ -55,121 +54,127 @@
     {% endif %}
 </div>
 
-<!-- Layout Principal: Chat do Assistente + Painel Lateral de Atividades -->
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; align-items: start;">
-    
-    <!-- Coluna da Esquerda: Chat Conversacional com o Assistente -->
-    <div>
-        <div class="chat-window" style="height: 620px;">
-            <div style="padding: 0.75rem 1.25rem; background: var(--chakra-colors-gray-50); border-bottom: 1px solid var(--chakra-colors-gray-200); display: flex; justify-content: space-between; align-items: center; font-size: 0.825rem; color: var(--chakra-colors-gray-600);">
-                <span><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chat"></use></svg> <strong>Diálogo Conceitual & Dúvidas</strong></span>
-                <span class="badge" style="background: var(--chakra-colors-teal-50); color: var(--chakra-colors-teal-700); border: 1px solid var(--chakra-colors-teal-200); font-weight: 700;">
-                    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-database"></use></svg> {{ messages|length }} mensagens salvas no banco
-                </span>
-            </div>
+<!-- Layout principal: chat + painel lateral (1 coluna abaixo de 1024 px) -->
+<div class="topic-layout">
 
-            <div class="chat-messages" id="chatMessages">
-                {% for msg in messages %}
-                <div class="message-row {{ msg.sender }}">
-                    <div class="avatar-circle {{ msg.sender }}">
-                        {% if msg.sender == 'assistant' %}🤖{% else %}👤{% endif %}
+    <!-- Chat com o assistente -->
+    <div class="chat-window">
+        <div class="chat-header">
+            <span class="chat-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-chat"></use></svg> Diálogo Conceitual &amp; Dúvidas</span>
+            <span class="chat-count">
+                <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-database"></use></svg> {{ messages|length }} mensagens salvas no banco
+            </span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            {% for msg in messages %}
+            <div class="message-row {{ msg.sender }}">
+                <div class="avatar-circle {{ msg.sender }}">
+                    {% if msg.sender == 'assistant' %}🤖{% else %}👤{% endif %}
+                </div>
+                <div class="message-content-wrapper">
+                    <div class="message-sender-name">
+                        {% if msg.sender == 'assistant' %}StudyIA Tutor{% else %}Você{% endif %}
+                        <span class="message-time">{{ msg.created_at[11:16] }}</span>
                     </div>
-                    <div class="message-content-wrapper">
-                        <div class="message-sender-name">
-                            {% if msg.sender == 'assistant' %}StudyIA Tutor{% else %}Você{% endif %}
-                            <span class="message-time">{{ msg.created_at[11:16] }}</span>
-                        </div>
-                        <div class="chat-bubble {{ msg.sender }} markdown-content" data-raw="{{ msg.content | e }}">
-                            {{ msg.content | replace('\n', '<br>') | safe }}
-                        </div>
+                    <div class="chat-bubble {{ msg.sender }} markdown-content" data-raw="{{ msg.content | e }}">
+                        {{ msg.content | replace('\n', '<br>') | safe }}
                     </div>
                 </div>
-                {% endfor %}
             </div>
-
-            <form class="chat-input-area" id="chatForm" data-topic-id="{{ topic.id }}">
-                <input type="text" id="chatInput" class="form-control" placeholder="Traga uma dúvida sobre esse conceito (ex: 'como aplicar na prática?')..." required autocomplete="off">
-                <button type="submit" class="btn btn-primary" id="sendBtn">
-                    Perguntar à IA
-                </button>
-            </form>
+            {% endfor %}
         </div>
+
+        <form class="chat-input-area" id="chatForm" data-topic-id="{{ topic.id }}">
+            <input type="text" id="chatInput" class="form-control" placeholder="Traga uma dúvida sobre esse conceito (ex: 'como aplicar na prática?')..." required autocomplete="off">
+            <button type="submit" class="btn btn-primary" id="sendBtn">
+                Perguntar à IA
+            </button>
+        </form>
     </div>
 
-    <!-- Coluna da Direita: Planos de Estudo e Mini Seminários Vinculados (F12) -->
-    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-        
-        <!-- Cartão: Planos de Estudo -->
+    <!-- Painel lateral: planos e mini seminários vinculados (F12) -->
+    <div class="topic-side">
+
+        <!-- Planos de estudo -->
         <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos de Estudo</h3>
-                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" style="font-size: 0.8rem; color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">+ Novo</a>
+            <div class="card-header">
+                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg> Planos de Estudo</h3>
+                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="btn btn-ghost btn-sm">
+                    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg>
+                    Novo
+                </a>
             </div>
 
             {% if plans %}
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="list">
                 {% for p in plans %}
-                <div style="padding: 0.85rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-md); background: #ffffff;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <strong style="font-size: 0.85rem; color: var(--chakra-colors-gray-800);">Nível {{ p.level }}</strong>
-                        <span style="font-size: 0.75rem; color: var(--chakra-colors-gray-500); font-weight: 600;">{{ p.daily_minutes }} min/dia</span>
-                    </div>
-                    
-                    <div style="margin: 0.5rem 0;">
-                        <div class="progress-bar-container">
-                            <div class="progress-bar-fill" style="width: {{ p.progress_percent }}%;"></div>
-                        </div>
+                <div class="list-item list-item--stack">
+                    <div class="row-between">
+                        <strong class="item-title">Nível {{ p.level }}</strong>
+                        <span class="item-meta">{{ p.daily_minutes }} min/dia</span>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: var(--chakra-colors-gray-600);">
-                        <span>Progresso: <strong>{{ p.progress_percent }}%</strong></span>
-                        <a href="{{ url_for('view_plan', plan_id=p.id) }}" style="color: var(--chakra-colors-teal-600); font-weight: 700; text-decoration: none;">Abrir Cronograma →</a>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" style="width: {{ p.progress_percent }}%;"></div>
                     </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p style="font-size: 0.825rem; color: var(--chakra-colors-gray-500); text-align: center; padding: 1.25rem 0;">
-                Nenhum plano gerado ainda.<br>
-                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" style="color: var(--chakra-colors-teal-600); font-weight: 700;">Criar cronograma personalizado</a>
-            </p>
-            {% endif %}
-        </div>
 
-        <!-- Cartão: Mini Seminários Interativos -->
-        <div class="card">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--chakra-colors-gray-900);"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini Seminários</h3>
-                <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST" style="margin: 0;">
-                    <button type="submit" style="background: none; border: none; font-size: 0.8rem; color: var(--chakra-colors-purple-600); font-weight: 700; cursor: pointer;">+ Gerar</button>
-                </form>
-            </div>
-
-            {% if seminars %}
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                {% for s in seminars %}
-                <div style="padding: 0.85rem; border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-md); background: #ffffff;">
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.825rem; font-weight: 700; color: var(--chakra-colors-gray-800);">Seminário #{{ s.id }}</span>
-                        {% if s.is_completed %}
-                        <span class="badge badge-completed">Nota: {{ s.score }}%</span>
-                        {% else %}
-                        <span class="badge badge-pending">Pendente</span>
-                        {% endif %}
-                    </div>
-                    <div style="margin-top: 0.5rem; text-align: right;">
-                        <a href="{{ url_for('view_seminar', seminar_id=s.id) }}" style="font-size: 0.8rem; color: var(--chakra-colors-purple-600); font-weight: 700; text-decoration: none;">
-                            {% if s.is_completed %}Ver Avaliação & Respostas →{% else %}Responder Perguntas →{% endif %}
+                    <div class="row-between">
+                        <span class="item-meta">Progresso: <strong>{{ p.progress_percent }}%</strong></span>
+                        <a href="{{ url_for('view_plan', plan_id=p.id) }}" class="link-action">
+                            Abrir Cronograma
+                            <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
                         </a>
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-            <p style="font-size: 0.825rem; color: var(--chakra-colors-gray-500); text-align: center; padding: 1.25rem 0;">
-                Nenhum seminário realizado ainda.<br>
-                Teste seu aprendizado gerando um teste interativo!
-            </p>
+            <div class="empty-state empty-state--compact">
+                <svg class="icon empty-state-icon" aria-hidden="true" focusable="false"><use href="#i-calendar"></use></svg>
+                <p class="empty-state-title">Nenhum plano gerado ainda.</p>
+                <a href="{{ url_for('create_plan', topic_id=topic.id) }}" class="link-action">Criar cronograma personalizado</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Mini seminários -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini Seminários</h3>
+                <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
+                    <button type="submit" class="btn btn-ghost btn-sm">
+                        <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg>
+                        Gerar
+                    </button>
+                </form>
+            </div>
+
+            {% if seminars %}
+            <div class="list">
+                {% for s in seminars %}
+                <div class="list-item list-item--stack">
+                    <div class="row-between">
+                        <span class="item-title">Seminário #{{ s.id }}</span>
+                        {% if s.is_completed %}
+                        <span class="badge badge-completed">Nota: {{ s.score }}%</span>
+                        {% else %}
+                        <span class="badge badge-pending">Pendente</span>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('view_seminar', seminar_id=s.id) }}" class="link-action">
+                        {% if s.is_completed %}Ver Avaliação &amp; Respostas{% else %}Responder Perguntas{% endif %}
+                        <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-right"></use></svg>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state empty-state--compact">
+                <svg class="icon empty-state-icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
+                <p class="empty-state-title">Nenhum seminário realizado ainda.</p>
+                <p class="empty-state-text">Teste seu aprendizado gerando um teste interativo!</p>
+            </div>
             {% endif %}
         </div>
 
