@@ -3,83 +3,77 @@
 {% block title %}{{ plan_data.title }} — StudyIA{% endblock %}
 
 {% block content %}
-<div style="margin-bottom: 1.75rem;">
-    <a href="{{ url_for('view_topic', topic_id=plan.topic_id) }}" style="color: var(--chakra-colors-gray-500); text-decoration: none; font-size: 0.875rem; font-weight: 500; display: inline-flex; align-items: center; gap: 0.35rem; margin-bottom: 0.75rem;">
-        ← Voltar ao Estudo ({{ plan.topic_title }})
-    </a>
+<a href="{{ url_for('view_topic', topic_id=plan.topic_id) }}" class="back-link">
+    <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-arrow-left"></use></svg>
+    Voltar ao Estudo ({{ plan.topic_title }})
+</a>
 
-    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
-        <div>
-            <div style="display: flex; align-items: center; gap: 0.65rem; flex-wrap: wrap;">
-                <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--chakra-colors-gray-900); letter-spacing: -0.02em;">
-                    {{ plan_data.title }}
-                </h1>
-                <span class="badge badge-subject">Nível {{ plan.level }}</span>
-            </div>
-            <p style="font-size: 0.925rem; color: var(--chakra-colors-gray-600); margin-top: 0.35rem; max-width: 750px;">
-                {{ plan_data.overview }}
-            </p>
+<div class="page-header">
+    <div class="page-heading">
+        <div class="page-title-row">
+            <h1 class="page-title">
+                {{ plan_data.title }}
+            </h1>
+            <span class="badge badge-subject">Nível {{ plan.level }}</span>
         </div>
+        <p class="page-subtitle">
+            {{ plan_data.overview }}
+        </p>
+    </div>
 
-        <div>
-            <a href="{{ url_for('create_plan', topic_id=plan.topic_id) }}" class="btn btn-secondary btn-sm" title="Reconfigurar metas e gerar outro cronograma">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg>
-                Reajustar Preferências
-            </a>
-        </div>
+    <div class="page-actions">
+        <a href="{{ url_for('create_plan', topic_id=plan.topic_id) }}" class="btn btn-secondary btn-sm" title="Reconfigurar metas e gerar outro cronograma">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-refresh"></use></svg>
+            Reajustar Preferências
+        </a>
     </div>
 </div>
 
-<!-- Barra de Progresso Chakra Progress (F13) -->
-<div class="card" style="margin-bottom: 2rem; padding: 1.5rem;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-        <span style="font-size: 0.875rem; font-weight: 700; color: var(--chakra-colors-gray-700); text-transform: uppercase; letter-spacing: 0.05em;">Progresso Geral de Execução:</span>
-        <span style="font-size: 1.25rem; font-weight: 800; color: var(--chakra-colors-teal-600);" id="planProgressText">{{ plan.progress_percent }}%</span>
+<!-- Barra de progresso (F13) -->
+<div class="card progress-card">
+    <div class="progress-summary">
+        <span class="progress-label">Progresso Geral de Execução</span>
+        <span class="progress-value" id="planProgressText">{{ plan.progress_percent }}%</span>
     </div>
-    <div class="progress-bar-container" style="height: 14px;">
+    <div class="progress-bar-container progress-lg">
         <div class="progress-bar-fill" id="planProgressBar" style="width: {{ plan.progress_percent }}%;"></div>
     </div>
-    <div style="display: flex; justify-content: space-between; margin-top: 0.65rem; font-size: 0.8rem; color: var(--chakra-colors-gray-500); flex-wrap: wrap; gap: 0.5rem;">
+    <div class="progress-foot">
         <span><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg> Marque as caixas abaixo conforme for cumprindo suas atividades</span>
         <span>Meta diária: <strong>{{ plan.daily_minutes }} min</strong> • Frequência: <strong>{{ plan.days_per_week }}x na semana</strong></span>
     </div>
 </div>
 
-<!-- Dias do Cronograma -->
-<div style="display: flex; flex-direction: column; gap: 1.5rem;">
+<!-- Dias do cronograma -->
+<div class="plan-days">
     {% for day in plan_data.days %}
-    <div class="card" style="border-left: 4px solid var(--chakra-colors-teal-500);">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem; border-bottom: 1px solid var(--chakra-colors-gray-100); padding-bottom: 0.85rem;">
-            <div>
-                <span style="font-size: 0.75rem; font-weight: 800; color: var(--chakra-colors-teal-600); text-transform: uppercase; letter-spacing: 0.08em;">
-                    Sessão {{ day.day_number }}
-                </span>
-                <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--chakra-colors-gray-900); margin-top: 0.15rem;">
-                    {{ day.topic }}
-                </h3>
+    <div class="card plan-day">
+        <div class="plan-day-header">
+            <h3>
+                {{ day.topic }}
+            </h3>
+            <div class="meta-line">
+                <span class="meta-label">Sessão {{ day.day_number }}</span>
+                <span><svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg> {{ day.estimated_minutes or plan.daily_minutes }} min</span>
             </div>
-            <span class="badge" style="background: var(--chakra-colors-gray-100); color: var(--chakra-colors-gray-700);">
-                <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-clock"></use></svg> {{ day.estimated_minutes or plan.daily_minutes }} min
-            </span>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div class="task-list">
             {% for task in day.tasks %}
             {% set task_key = "d" ~ day.day_number ~ "_t" ~ loop.index0 %}
             {% set is_checked = task_key in completed_tasks %}
-            
-            <label style="display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.75rem 1rem; background: var(--chakra-colors-gray-50); border: 1px solid var(--chakra-colors-gray-200); border-radius: var(--chakra-radii-md); cursor: pointer; transition: all 0.15s ease;">
-                <input 
-                    type="checkbox" 
-                    class="plan-task-checkbox" 
-                    data-plan-id="{{ plan.id }}" 
+
+            <label class="task-item">
+                <input
+                    type="checkbox"
+                    class="plan-task-checkbox"
+                    data-plan-id="{{ plan.id }}"
                     data-task-key="{{ task_key }}"
-                    style="margin-top: 0.25rem; width: 18px; height: 18px; accent-color: var(--chakra-colors-teal-500); cursor: pointer;"
                     {% if is_checked %}checked{% endif %}
                 >
-                <span 
-                    id="label_{{ task_key }}" 
-                    style="font-size: 0.925rem; line-height: 1.5; color: var(--chakra-colors-gray-800); {% if is_checked %}text-decoration: line-through; color: var(--chakra-colors-gray-400);{% endif %}"
+                <span
+                    id="label_{{ task_key }}"
+                    class="task-text{% if is_checked %} is-done{% endif %}"
                 >
                     {{ task }}
                 </span>
@@ -90,12 +84,14 @@
     {% endfor %}
 </div>
 
-<div style="text-align: center; margin-top: 3rem; padding: 2.25rem; background: #fff; border-radius: var(--chakra-radii-xl); border: 2px dashed var(--chakra-colors-gray-200);">
-    <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--chakra-colors-gray-900); margin-bottom: 0.5rem;">Pronto para testar seus conhecimentos?</h3>
-    <p style="font-size: 0.875rem; color: var(--chakra-colors-gray-500); margin-bottom: 1.25rem;">
-        Após realizar as atividades do seu plano, realize um Mini Seminário Interativo para checar seus pontos fortes e fracos.
-    </p>
-    <form action="{{ url_for('create_seminar', topic_id=plan.topic_id) }}" method="POST" style="margin: 0;">
+<div class="cta-strip">
+    <div>
+        <h3>Pronto para testar seus conhecimentos?</h3>
+        <p>
+            Após realizar as atividades do seu plano, realize um Mini Seminário Interativo para checar seus pontos fortes e fracos.
+        </p>
+    </div>
+    <form action="{{ url_for('create_seminar', topic_id=plan.topic_id) }}" method="POST">
         <button type="submit" class="btn btn-purple">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
             Iniciar Mini Seminário deste Tema
