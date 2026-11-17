@@ -171,6 +171,18 @@
   --icon-md: 1.125rem; /* 18 */
   --icon-lg: 1.5rem;   /* 24 */
 
+  /* Breakpoints (mobile-first, sempre min-width). CSS não aceita var() dentro
+     de @media: estes valores são a referência; as media queries do style.css
+     repetem os números literais.
+     sm 640: KPIs em 3 colunas, rótulos de botão visíveis, ações em tamanho natural
+     md 768: botões de 40 px, painéis laterais do tópico lado a lado, CTA em linha
+     lg 1024: tópico em 2 colunas (chat + lateral), cabeçalho de página em linha
+     xl 1280: container no máximo (1200 px)                                      */
+  --bp-sm: 640px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+
   --z-nav:   50;
   --z-modal: 100;
 
