@@ -96,6 +96,9 @@
   --color-danger-soft:    var(--danger-50);
   --color-danger-border:  var(--danger-200);
 
+  --color-selection:      var(--accent-100);   /* ::selection; tinta por cima: 12,8:1 */
+  --color-scrollbar:      var(--neutral-300);  /* polegar das barras de rolagem */
+
   --color-overlay:        rgb(23 32 28 / 0.5);
   --color-code-bg:        var(--neutral-900);
   --color-code-text:      var(--neutral-50);

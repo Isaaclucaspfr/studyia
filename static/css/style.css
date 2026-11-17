@@ -19,6 +19,13 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   accent-color: var(--color-accent);
+  scrollbar-color: var(--color-scrollbar) var(--color-bg);
+}
+
+/* Superfícies do navegador com a paleta (G15) */
+::selection {
+  color: var(--color-text);
+  background-color: var(--color-selection);
 }
 
 body {
@@ -62,6 +69,16 @@ svg.icon { display: inline-block; }
 :focus-visible {
   outline: 2px solid var(--color-focus);
   outline-offset: 2px;
+}
+
+/* Dentro de caixas com overflow (chat), o anel vai para dentro para não ser cortado */
+.chat-messages:focus-visible {
+  outline-offset: -2px;
+}
+
+/* Sobre o acento (bolha do usuário), o anel usa a cor do texto */
+.chat-bubble.user :focus-visible {
+  outline-color: currentColor;
 }
 
 /* Texto só para leitor de tela */
@@ -291,7 +308,8 @@ svg.icon { display: inline-block; }
   border-color: var(--color-success-border);
 }
 
-.alert-danger {
+.alert-danger,
+.chat-bubble.error {
   --alert-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='8.5'/%3E%3Cpath d='M12 7.5v5.25M12 16.25v.01'/%3E%3C/svg%3E");
   color: var(--color-danger-text);
   background-color: var(--color-danger-soft);
@@ -351,10 +369,19 @@ svg.icon { display: inline-block; }
   transform: scale(0.98);
 }
 
+/* Desabilitado: legível (texto sutil 4,6:1 sobre o cinza), sem depender de opacidade.
+   Vence as variantes: (0,2,0) contra (0,1,0). */
 .btn:disabled,
 .btn[aria-disabled="true"] {
-  opacity: 0.5;
+  color: var(--color-text-subtle);
+  background-color: var(--color-surface-muted);
+  border-color: var(--color-border);
   cursor: not-allowed;
+}
+.btn-ghost:disabled,
+.btn-ghost[aria-disabled="true"] {
+  background-color: transparent;
+  border-color: transparent;
 }
 
 /* Primário: o acento único */
@@ -594,6 +621,7 @@ svg.icon { display: inline-block; }
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--color-text);
+  caret-color: var(--color-accent);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-input);
   border-radius: var(--radius-sm);
@@ -627,6 +655,8 @@ textarea.form-control {
   resize: vertical;
   line-height: var(--leading-relaxed);
 }
+/* Resposta já enviada (seminário concluído): leitura, sem alça de redimensionar */
+textarea.form-control:disabled { resize: none; }
 
 select.form-control {
   appearance: none;
@@ -681,7 +711,14 @@ select.form-control {
   cursor: pointer;
   transition:
     background-color var(--duration-fast) var(--ease-out),
-    border-color var(--duration-fast) var(--ease-out);
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-instant) var(--ease-out);
+}
+
+/* Pressionar a caixa (ou a linha inteira, que é o <label>) afunda a caixa */
+.plan-task-checkbox:active:not(:disabled),
+.task-item:active .plan-task-checkbox:not(:disabled) {
+  transform: scale(0.9);
 }
 
 .plan-task-checkbox:checked {
@@ -709,7 +746,11 @@ select.form-control {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
 }
+.task-item:active { background-color: var(--color-bg); }
 
 .task-item .plan-task-checkbox { margin-top: 0.125rem; }
 
@@ -717,6 +758,8 @@ select.form-control {
   font-size: var(--text-base);
   line-height: var(--leading-normal);
   color: var(--color-text);
+  /* vale também para a cor inline que o app.js escreve ao marcar */
+  transition: color var(--duration-fast) var(--ease-out);
 }
 
 /* Concluída no carregamento (depois do clique, o inline do app.js vence — B11) */
@@ -744,11 +787,12 @@ select.form-control {
   border-radius: var(--radius-full);
 }
 
+/* A largura vem do style.width (contrato); a transição só suaviza a mudança (V4) */
 .progress-bar-fill {
   height: 100%;
   background-color: var(--color-accent);
   border-radius: var(--radius-full);
-  transition: width var(--duration-slow) var(--ease-out);
+  transition: width var(--duration-base) var(--ease-out);
 }
 
 /* --------------------------------------------------------------------------
@@ -862,6 +906,8 @@ select.form-control {
   padding: var(--space-4);
   overflow-y: auto;
   overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar) transparent;
   background-color: var(--color-bg);
 }
 
@@ -946,6 +992,78 @@ select.form-control {
 
 .chat-bubble.user a { color: inherit; text-decoration: underline; }
 
+/* Digitando (A5/T2): o app.js cria "chat-bubble assistant typing" enquanto espera.
+   Texto atenuado em 14 px; 3 pontos que pulsam em onda (um ponto + 2 sombras). */
+.chat-bubble.typing {
+  font-size: var(--text-ui);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+.chat-bubble.typing::before {
+  content: "";
+  display: inline-block;
+  width: 0.375rem;
+  height: 0.375rem;
+  /* 2 × 10 px de sombra + 8 px até o texto */
+  margin: 0 calc(1.25rem + var(--space-2)) 0 0.125rem;
+  vertical-align: 0.1em;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-subtle);
+  box-shadow:
+    0.625rem 0 0 var(--color-text-subtle),
+    1.25rem 0 0 var(--color-text-subtle);
+  animation: typing-dots 1s linear infinite;
+}
+
+@keyframes typing-dots {
+  0%, 100% {
+    background-color: var(--color-text-subtle);
+    box-shadow: 0.625rem 0 0 var(--color-border-strong), 1.25rem 0 0 var(--color-border-strong);
+  }
+  33% {
+    background-color: var(--color-border-strong);
+    box-shadow: 0.625rem 0 0 var(--color-text-subtle), 1.25rem 0 0 var(--color-border-strong);
+  }
+  66% {
+    background-color: var(--color-border-strong);
+    box-shadow: 0.625rem 0 0 var(--color-border-strong), 1.25rem 0 0 var(--color-text-subtle);
+  }
+}
+
+/* Erro (A5/T3): "chat-bubble assistant error". Tinta e fundo de perigo, ícone no ::before
+   (posição absoluta: funciona com o <p> do marked ou com texto puro). */
+.chat-bubble.error {
+  position: relative;
+  padding-left: calc(var(--space-4) + var(--icon-md) + var(--space-2));
+  color: var(--color-danger-text);
+  background-color: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+}
+.chat-bubble.error::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--space-3) + 0.2rem); /* centra o ícone de 18 px na 1ª linha (25,6 px) */
+  left: var(--space-4);
+  width: var(--icon-md);
+  height: var(--icon-md);
+  background-color: currentColor;
+  -webkit-mask: var(--alert-icon) center / contain no-repeat;
+  mask: var(--alert-icon) center / contain no-repeat;
+}
+
+/* Entrada das mensagens novas. Só as criadas pelo app.js: elas não têm .markdown-content,
+   então o histórico carregado pelo Jinja não anima (D6: nada no histórico). */
+.message-row:has(> .message-content-wrapper > .chat-bubble:not(.markdown-content)) {
+  animation: message-in var(--duration-base) var(--ease-out) both;
+}
+
+@keyframes message-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.375rem);
+  }
+}
+
 /* Markdown dentro da bolha */
 .chat-bubble.assistant > :first-child { margin-top: 0; }
 .chat-bubble.assistant > :last-child { margin-bottom: 0; }
@@ -973,6 +1091,8 @@ select.form-control {
   background-color: var(--color-code-bg);
   border-radius: var(--radius-sm);
 }
+.chat-bubble.assistant pre,
+.chat-bubble.assistant table { scrollbar-width: thin; }
 .chat-bubble.assistant pre code {
   padding: 0;
   color: inherit;
@@ -1024,6 +1144,7 @@ select.form-control {
   justify-content: center;
   padding: var(--space-4);
   background-color: var(--color-overlay);
+  transition: opacity var(--duration-base) var(--ease-out);
 }
 
 .modal-content {
@@ -1031,11 +1152,22 @@ select.form-control {
   max-width: 32rem;
   max-height: calc(100dvh - 2 * var(--space-4));
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-scrollbar) transparent;
   padding: var(--space-6);
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-overlay);
+  transition: transform var(--duration-base) var(--ease-out);
+}
+
+/* Entrada do modal (M2, D6). O app.js troca o display de none para flex; o
+   @starting-style dá o estado inicial dessa 1ª renderização. O overlay faz o fade
+   (e leva o card junto); o card só cresce de 0,97. Saída instantânea. */
+@starting-style {
+  .modal-overlay { opacity: 0; }
+  .modal-content { transform: scale(0.97); }
 }
 
 .modal-title {
@@ -1312,9 +1444,16 @@ h3.card-title { font-size: var(--text-base); }
   color: var(--color-text);
   text-decoration: none;
   overflow-wrap: anywhere;
+  /* alvo de 44 px no toque: o padding cresce e a margem negativa devolve o espaço */
+  padding-block: 0.6875rem;
+  margin-block: -0.6875rem;
+  border-radius: var(--radius-xs);
 }
 @media (hover: hover) {
   .list-item-link:hover { text-decoration: underline; }
+}
+@media (min-width: 768px) {
+  .list-item-link { padding-block: var(--space-1); margin-block: calc(-1 * var(--space-1)); }
 }
 
 .list-item-meta {
@@ -1515,6 +1654,8 @@ input[type="file"].form-control::file-selector-button {
   border-top: 1px solid var(--color-border);
 }
 .site-footer p { max-width: var(--measure); }
+/* A linha de identificação não quebra no meio do "(Projeto A3)" no desktop */
+.site-footer p:first-child { max-width: none; }
 .site-footer p + p { margin-top: var(--space-1); }
 .site-footer strong { font-weight: var(--weight-semibold); color: var(--color-text); }
 
@@ -1705,6 +1846,15 @@ input[type="file"].form-control::file-selector-button {
 .score-panel {
   margin-bottom: var(--space-8);
   border-color: var(--score-border, var(--color-border));
+  /* revelação da nota: acontece uma vez por seminário, então pode ter um pouco mais de presença */
+  animation: rise-in var(--duration-slow) var(--ease-out) both;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
 }
 
 .score-head {
@@ -1828,6 +1978,7 @@ input[type="file"].form-control::file-selector-button {
 
 /* Alternativa (S3): a linha inteira é o alvo; marcada = borda e fundo do acento */
 .choice {
+  --choice-dot: var(--color-accent); /* cor do anel e do ponto quando marcada */
   display: flex;
   align-items: flex-start;
   gap: var(--space-3);
@@ -1842,9 +1993,12 @@ input[type="file"].form-control::file-selector-button {
     border-color var(--duration-fast) var(--ease-out);
 }
 
+/* Radio desenhado: o anel é a borda; o ponto é o ::before, que cresce ao marcar */
 .choice-input {
   appearance: none;
   -webkit-appearance: none;
+  display: grid;
+  place-content: center;
   flex: none;
   width: 1.125rem;
   height: 1.125rem;
@@ -1853,12 +2007,31 @@ input[type="file"].form-control::file-selector-button {
   border: 1.5px solid var(--color-border-input);
   border-radius: var(--radius-full);
   cursor: inherit;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    transform var(--duration-instant) var(--ease-out);
+}
+.choice-input::before {
+  content: "";
+  width: 0.5625rem;
+  height: 0.5625rem;
+  border-radius: var(--radius-full);
+  background-color: var(--choice-dot);
+  opacity: 0;
+  transform: scale(0.5);
+  transition:
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
 }
 .choice-input:checked {
-  background-color: var(--color-accent);
-  border-color: var(--color-accent);
-  box-shadow: inset 0 0 0 3px var(--color-surface);
+  background-color: transparent; /* o fundo da linha aparece entre o anel e o ponto */
+  border-color: var(--choice-dot);
 }
+.choice-input:checked::before {
+  opacity: 1;
+  transform: scale(1);
+}
+.choice.is-editable:active .choice-input { transform: scale(0.9); }
 
 .choice-text {
   font-size: var(--text-base);
@@ -1871,8 +2044,6 @@ input[type="file"].form-control::file-selector-button {
   background-color: var(--color-accent-soft);
   border-color: var(--color-accent);
 }
-.choice:has(.choice-input:checked) .choice-input,
-.choice.is-selected .choice-input { box-shadow: inset 0 0 0 3px var(--color-accent-soft); }
 
 .choice:has(.choice-input:focus-visible) {
   outline: 2px solid var(--color-focus);
@@ -1903,10 +2074,30 @@ input[type="file"].form-control::file-selector-button {
 .feedback--partial   { border-color: var(--color-warning-border); }
 .feedback--incorrect { border-color: var(--color-danger-border); }
 
+/* Certo ou errado na alternativa escolhida: lê o .feedback--* que o Jinja já emite
+   no card da questão (sem lógica nova). Só aparece quando o B1 for corrigido. */
+.card:has(> .feedback--correct) .choice.is-selected {
+  --choice-dot: var(--color-success);
+  background-color: var(--color-success-soft);
+  border-color: var(--color-success);
+}
+.card:has(> .feedback--partial) .choice.is-selected {
+  --choice-dot: var(--color-warning);
+  background-color: var(--color-warning-soft);
+  border-color: var(--color-warning);
+}
+.card:has(> .feedback--incorrect) .choice.is-selected {
+  --choice-dot: var(--color-danger);
+  background-color: var(--color-danger-soft);
+  border-color: var(--color-danger);
+}
+
 /* --------------------------------------------------------------------------
    Movimento reduzido
    -------------------------------------------------------------------------- */
 
+/* Tudo desligado (D6): transições e animações terminam na hora, no estado final.
+   Os 3 pontos do "digitando" ficam parados; o que é escala ao pressionar some. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1916,5 +2107,9 @@ input[type="file"].form-control::file-selector-button {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-  .btn:active:not(:disabled):not([aria-disabled="true"]) { transform: none; }
+  .chat-bubble.typing::before { animation: none; }
+  .btn:active:not(:disabled):not([aria-disabled="true"]),
+  .plan-task-checkbox:active:not(:disabled),
+  .task-item:active .plan-task-checkbox:not(:disabled),
+  .choice.is-editable:active .choice-input { transform: none; }
 }
