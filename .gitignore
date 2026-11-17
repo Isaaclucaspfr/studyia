@@ -7,3 +7,6 @@ studyia.db
 studyia.db-wal
 studyia.db-shm
 .vscode/
+
+# Arquivo pessoal do Claude Code (não versionar)
+CLAUDE.local.md
