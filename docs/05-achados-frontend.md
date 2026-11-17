@@ -55,15 +55,17 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Requisito:** RNF01.
 - **Observação:** trocar os limiares é apresentação (A), mas os valores escolhidos devem ser **combinados com o grupo**, porque mudam o "veredito" exibido.
 
-### A4. Layout fixo da tela de estudo quebra a responsividade ✅ (efeito ⚠️ não confirmado visualmente)
+### A4. Layout fixo da tela de estudo quebra a responsividade ✅ (confirmado rodando o app em 17/11/2026)
 - **Onde:** `study_topic.html:54`, com `grid-template-columns: 2fr 1fr` inline, e `study_topic.html:58`, com `height: 620px` inline. A media query `style.css:545-549` não alcança estilos inline.
 - **Impacto:** em 375 px, o chat ocupa cerca de 2/3 de uma tela já estreita e a coluna de planos e seminários fica espremida ao lado.
+- **Medido:** em 375 px, a página do tópico fica com **578 px de largura** (`document.documentElement.scrollWidth`), com rolagem horizontal; o placeholder do `#chatInput` aparece cortado.
 - **Requisito:** RNF02.
 - **Cuidado de contrato:** ao tornar responsivo, o `#chatMessages` precisa continuar com **altura limitada** e `overflow-y:auto` (ver [04 §7.2](04-contratos-frontend.md#72-ids-e-classes-usados-pelo-appjs)).
 
-### A5. `.chat-bubble.typing` e `.chat-bubble.error` sem estilo ✅
+### A5. `.chat-bubble.typing` e `.chat-bubble.error` sem estilo ✅ (confirmado rodando o app em 17/11/2026)
 - **Onde:** o JS gera as classes `assistant typing` (`app.js:59`) e `assistant error` (`app.js:75`, `:79`). O `style.css` não tem regra para nenhuma delas.
 - **Impacto:** o texto "StudyIA está analisando sua pergunta…" e as mensagens de erro parecem respostas normais do tutor.
+- **Medido:** com a resposta do servidor atrasada e depois com a rede cortada, as duas bolhas aparecem com o mesmo fundo branco, a mesma borda e a mesma tipografia de uma resposta comum.
 - **Requisito:** RNF03 (indicar que a solicitação está em andamento e informar falhas).
 - **Por que é A:** basta adicionar regras CSS para classes que o JS **já gera**. Não muda o JS.
 
@@ -75,12 +77,12 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 
 ### A7. Fonte carregada e não usada ✅
 - **Onde:** `base.html:11` carrega **Plus Jakarta Sans** (5 pesos) junto com a Inter. O CSS só usa Inter (`style.css:68-69`).
-- **Impacto:** download extra em toda página.
+- **Impacto:** pequeno. O navegador só baixa os arquivos de fonte das famílias que o CSS usa, então os arquivos da Plus Jakarta Sans **não são baixados** (verificado rodando o app em 17/11/2026: só as faces da Inter carregam). O custo real é o CSS extra do Google Fonts (as declarações `@font-face` da família não usada) em toda página.
 - **Requisito:** RNF03 (desempenho).
 
-### A8. Aparência do aviso de modo demo ✅
+### A8. Aparência do aviso de modo demo ✅ (contraste confirmado em 17/11/2026)
 - **Onde:** banner do dashboard (`dashboard.html:20-25`, todo inline, texto `orange-500` sobre `yellow-50`); nota no chat (`app.js:118`, inline no JS); aviso de transparência no rodapé (`base.html:81-84`).
-- **Impacto:** cada aviso tem um visual diferente. O contraste do banner é ⚠️ não confirmado (laranja claro sobre fundo amarelo).
+- **Impacto:** cada aviso tem um visual diferente. O contraste do banner é **3,36:1** (`#dd6b20` sobre `#fffff0`), abaixo do mínimo AA de 4,5:1 para texto normal.
 - **Requisito:** RNF06.
 - **Limite do escopo:** a **aparência** do banner e do rodapé é A. **Quando** o aviso aparece depende do backend (`has_custom_key`, `is_simulated`, ver C). A nota do chat está dentro do JS (B).
 
@@ -88,11 +90,12 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 
 ## B. Comportamento do frontend (documentar e decidir com o grupo)
 
-### B1. Feedback por questão do seminário provavelmente nunca aparece ⚠️ não confirmado
+### B1. Feedback por questão do seminário nunca aparece ✅ (confirmado rodando o app em 17/11/2026)
 - **Onde:** `seminar_view.html:98-104`. O `{% set feedback_item = fi %}` fica dentro de `{% for fi in ... %}`. No Jinja2, uma atribuição feita dentro de um loop não é visível fora dele, então `feedback_item` continua `None`.
-- **Impacto:** depois da avaliação, os badges "✓ Correta / ~ Parcial / ✗ Precisa Rever" (`:112-120`) e o bloco "Retorno da IA" (`:160-164`) não seriam exibidos. Só o resumo geral aparece.
+- **Impacto:** depois da avaliação, os badges "✓ Correta / ~ Parcial / ✗ Precisa Rever" (`:112-120`) e o bloco "Retorno da IA" (`:160-164`) não são exibidos. Só o resumo geral aparece.
+- **Medido:** seminário respondido e avaliado em modo demo: a página do resultado tem **0** blocos "Retorno da IA", e o único badge é o "Finalizado" do título.
 - **Requisito:** F11 (respostas e retorno).
-- **Por que não é só visual:** é escopo de variável na lógica do template. A correção usual (`namespace()`) muda o que a página exibe. Confirmar rodando o app na branch.
+- **Por que não é só visual:** é escopo de variável na lógica do template. A correção usual (`namespace()`) muda o que a página exibe.
 
 ### B2. XSS na renderização do chat ✅ (por leitura; não testado)
 - **Onde:** `study_topic.html:78`, `{{ msg.content | replace('\n', '<br>') | safe }}`, imprime o conteúdo sem escapar. `marked.parse()` (`app.js:38`, `:112`) gera HTML sem sanitização.
