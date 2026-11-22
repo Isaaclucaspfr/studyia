@@ -8,6 +8,7 @@ Permitir que a pessoa escolha entre tema **Claro**, **Escuro** ou **Dispositivo*
 
 - **Problema:** hoje o StudyIA só tem o tema claro. Quem estuda à noite ou usa o sistema no modo escuro recebe uma tela clara no meio de tudo escuro. O tema escuro ficou explicitamente fora da sprint 01 ([pendências da sprint](../sprints/sprint-01-redesign-visual.md#pendências-fora-do-escopo)).
 - **Valor:** conforto de leitura em sessões longas (a [03](03-conteudo-do-plano.md) vai trazer textos mais longos para ler), respeito à preferência do sistema por padrão e nenhuma mudança de comportamento.
+- **Natureza:** a funcionalidade é **EXCLUSIVAMENTE ESTÉTICA**. Não muda rota, dado, fluxo nem regra, e **não mexe no backend** (nenhum `.py`, nenhuma tabela). O único JS novo serve para aplicar e lembrar o tema.
 
 ## 2. Como funciona hoje
 
@@ -54,8 +55,8 @@ Cores que **não** passam pelos tokens semânticos, ou tokens que não fariam se
 ## 3. Como deve funcionar
 
 1. Na primeira visita, o tema é **Dispositivo**: claro ou escuro conforme o sistema operacional.
-2. Na navbar, no lugar do antigo "Configurar IA", há um controle de tema. Ele mostra o ícone do tema em uso e, a partir de 640 px, o rótulo "Tema".
-3. A pessoa abre o controle e escolhe **Claro**, **Escuro** ou **Dispositivo**. A troca é imediata, sem recarregar a página.
+2. Na navbar, no lugar do antigo "Configurar IA", há um botão de tema de 44 px, **em todas as páginas**: com sessão (dashboard, tópico, plano, seminário) e sem sessão (login, cadastro e a landing page da [04](04-landing-page.md)). Ele mostra o ícone do tema em uso e, a partir de 640 px, o rótulo "Tema".
+3. A pessoa clica no botão, que abre um painel com **Claro**, **Escuro** e **Dispositivo**, e escolhe uma opção. A troca é imediata, sem recarregar a página.
 4. A escolha fica salva no navegador. Recarregar, mudar de página, fechar e abrir de novo: o tema continua o escolhido, **sem piscar** o tema errado durante o carregamento.
 5. Com **Dispositivo**, se o sistema trocar de claro para escuro (por exemplo, no horário automático), a página acompanha na hora, sem recarregar.
 6. Com o JavaScript desligado, a página segue o sistema operacional e o controle de tema não aparece (um controle que não funciona não deve ser exibido).
@@ -64,10 +65,13 @@ Cores que **não** passam pelos tokens semânticos, ou tokens que não fariam se
 ## 4. Decisões do grupo
 
 - ✅ **Decidido:** 3 opções: Claro, Escuro e Dispositivo. O Dispositivo segue o sistema operacional e acompanha mudanças ao vivo. **Padrão: Dispositivo.**
-- ✅ **Decidido:** a funcionalidade é **exclusivamente estética**. Não muda nenhuma rota, dado, fluxo ou comportamento e **não mexe no backend**.
+- ✅ **Decidido:** a funcionalidade é **EXCLUSIVAMENTE ESTÉTICA**. Não muda nenhuma rota, dado, fluxo ou comportamento e **não mexe no backend**.
 - ✅ **Decidido:** a preferência fica salva **no navegador**. Salvar no banco é possibilidade futura (registrada no [handoff](../handoff/backend-pendencias.md)).
 - ✅ **Decidido:** sem flash do tema errado ao carregar (anti-FOUC).
 - ✅ **Decidido:** o seletor fica na navbar, no espaço liberado pelo "Configurar IA" ([01](01-remover-configurar-ia.md)).
+- ✅ **Decidido (padrão do seletor):** um **botão de 44 × 44 px** que abre um **painel** com as 3 opções (Claro, Escuro, Dispositivo). É a opção A de §5.6.
+- ✅ **Decidido (onde aparece):** o seletor fica **fora** do `{% if session.get('user_id') %}` (`base.html:54`) e aparece também no **login**, no **cadastro** e na **landing page** ([04](04-landing-page.md)). O nome do usuário e o "Sair" continuam dentro da condição.
+- ✅ **Decidido (cores inline do `app.js`):** trocar **só os hex** por `var(--color-text-subtle)`, sem mudar nenhuma lógica. É uma mudança puramente estética, a opção 3 de §5.5.
 
 ## 5. Proposta técnica
 
@@ -161,18 +165,22 @@ Carregado com `<script src=".../theme.js" defer>`. **Não mexe na ordem `marked`
 
 ### 5.5 Cores inline do `app.js` (B11)
 
+> ✅ **Decidido:** opção **3**, trocar só os hex por `var(--color-text-subtle)`, sem mudar a lógica. A tabela fica como registro das alternativas.
+
 O `app.js` escreve cor inline em 2 lugares (auditoria, itens 9 e 10). Inline vence o CSS, então o tema não alcança essas cores.
 
 | Opção | Como | Prós | Contras |
 |---|---|---|---|
 | 1. Deixar e documentar | nada | zero mudança no JS | `#718096` fica abaixo de AA nos **dois** temas; `#94a3b8` continua ≈ 2,5:1 no claro |
 | 2. Sobrescrever via CSS | `.task-text { color: … !important }` e `.chat-bubble [style*="718096"] { … !important }` | não toca o JS | `!important` contra o inline e um seletor por **conteúdo do atributo**: frágil, quebra se o JS mudar um caractere |
-| **3. Trocar só os hex por `var(--token)`** (recomendada) | `app.js:170`: `label.style.color = 'var(--color-text-subtle)'`; `app.js:118`: `color: var(--color-text-subtle)` dentro do `style` | 2 strings trocadas, nenhuma lógica alterada; os dois temas ficam AA (5,3:1 no claro e 5,7:1 no escuro, na superfície); a cor bate com a do template (`style.css:766-770`) | é mudança no `app.js` (B), precisa do ok do grupo |
+| **3. Trocar só os hex por `var(--token)`** (✅ decidida) | `app.js:170`: `label.style.color = 'var(--color-text-subtle)'`; `app.js:118`: `color: var(--color-text-subtle)` dentro do `style` | 2 strings trocadas, nenhuma lógica alterada; os dois temas ficam AA (5,3:1 no claro e 5,7:1 no escuro, na superfície); a cor bate com a do template (`style.css:766-770`) | é mudança no `app.js` (B), já aprovada |
 
-- A [01](01-remover-configurar-ia.md#53-textos-de-transparência-rnf06) já precisa reescrever o texto do `app.js:118`. Se ela trocar o `style=""` dessa linha por uma classe, o item 9 se resolve lá, e aqui sobra só o `:170`.
-- A [03 (PR 4c)](03-conteudo-do-plano.md#pr-4c--regra-do-indicador-de-conclusão) provavelmente apaga o bloco do checklist (`app.js:144-181`), e o `:170` some junto. A opção 3 é barata o bastante para valer até lá.
+- A [01](01-remover-configurar-ia.md#4-decisões-do-grupo) já reescreve o texto do `app.js:118` e troca o `style=""` dessa linha por uma classe (✅ decidido lá). Como a 01 entra antes, o item 9 se resolve na 01 e aqui sobra só o `app.js:170` (`'#94a3b8'` → `'var(--color-text-subtle)'`). Se por algum motivo a 01 atrasar, a mesma troca de hex vale para o `:118`.
+- A [03 (PR 4c)](03-conteudo-do-plano.md#pr-4c--trava-da-conclusão-antes-ou-junto-do-4b) provavelmente apaga o bloco do checklist (`app.js:144-181`), e o `:170` some junto. A opção 3 é barata o bastante para valer até lá.
 
 ### 5.6 Seletor na navbar
+
+> ✅ **Decidido:** botão de 44 px que abre um painel com as 3 opções (opção A abaixo), **fora** da condição de sessão. O resto desta seção (`popover`, radios, fallback) continua 💡 proposta.
 
 Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint 01):
 
@@ -187,11 +195,26 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 
 | Opção | Como | Prós | Contras |
 |---|---|---|---|
-| **A. Botão + painel `popover` com 3 radios** (recomendada) | `<button popovertarget="themeMenu">` + `<div id="themeMenu" popover>` com um `<fieldset>` de 3 `<input type="radio" name="theme">` | abrir, fechar, Esc e clicar fora são **nativos** (sem JS); radios nativos dão as setas e o "selecionado, 1 de 3" ao leitor de tela; o `theme.js` só escuta `change` | `popover` é de 2024 (Chrome 114, Firefox 125, Safari 17); navegadores mais antigos precisam de um fallback (o `theme.js` alterna `hidden`). Sem anchor positioning, o painel é posicionado com `position: fixed` abaixo da navbar, que já é sticky |
+| **A. Botão + painel `popover` com 3 radios** (✅ decidido o botão + painel; `popover` e radios são a proposta de implementação) | `<button popovertarget="themeMenu">` + `<div id="themeMenu" popover>` com um `<fieldset>` de 3 `<input type="radio" name="theme">` | abrir, fechar, Esc e clicar fora são **nativos** (sem JS); radios nativos dão as setas e o "selecionado, 1 de 3" ao leitor de tela; o `theme.js` só escuta `change` | `popover` é de 2024 (Chrome 114, Firefox 125, Safari 17); navegadores mais antigos precisam de um fallback (o `theme.js` alterna `hidden`). Sem anchor positioning, o painel é posicionado com `position: fixed` abaixo da navbar, que já é sticky |
 | B. Botão que alterna em ciclo | cada clique passa para o próximo tema | o mais simples; 1 botão de 44 px | até 2 cliques para chegar a uma opção; trocar para "Dispositivo" pode manter o mesmo visual e parecer que o clique não fez nada |
 | C. `<select>` nativo | `<select>` com 3 `<option>` | acessível sem esforço | aparência de campo de formulário na navbar; precisa de cerca de 120 px em 375 px |
 
-**Onde fica:** hoje a `.nav-user` (onde estava o "Configurar IA") só existe com sessão (`base.html:54`). Isso deixaria o login e o cadastro sem seletor, embora o tema salvo continue valendo nessas páginas. Ver ❓ em §11.
+**Onde fica (✅ decidido):** hoje a `.nav-user` (onde estava o "Configurar IA") só existe com sessão (`base.html:54-66`). O seletor sai dessa condição e vira um irmão da `.nav-user` dentro da `.navbar` (`base.html:47-67`), visível em todas as páginas que estendem o `base.html`, inclusive a landing ([04](04-landing-page.md), que estende o `base.html` na proposta dela). Estrutura proposta:
+
+```html
+<nav class="navbar">
+  <a class="nav-brand">…</a>
+  <div class="nav-actions">
+    <!-- seletor de tema: SEMPRE presente (fora do if) -->
+    {% if session.get('user_id') %}
+    <div class="nav-user">… nome · Sair …</div>
+    {% endif %}
+  </div>
+</nav>
+```
+
+- **Não é lógica nova:** o `{% if %}` continua igual e envolve as mesmas coisas (nome e "Sair"). Só o seletor fica do lado de fora.
+- **Sem sessão**, a navbar fica com a marca + o seletor (e, na landing, os links de entrada da [04](04-landing-page.md)). Conferir o alinhamento à direita nos dois casos.
 
 ## 6. Impacto por camada
 
@@ -199,7 +222,7 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 |---|---|
 | **Backend** | **nada** (decisão do grupo) |
 | **Banco** | nada |
-| **Templates** | `base.html`: script inline no `<head>` antes do `:13`; `<script src="theme.js" defer>`; o seletor na navbar (no lugar de `:56-59`, que a [01](01-remover-configurar-ia.md) remove); 3 ícones novos no sprite; opcional `<meta name="theme-color">`. Nenhum outro template muda |
+| **Templates** | `base.html`: script inline no `<head>` antes do `:13`; `<script src="theme.js" defer>`; o seletor na navbar, **fora** do `{% if session.get('user_id') %}` (`:54`), no espaço de `:56-59` que a [01](01-remover-configurar-ia.md) libera; 3 ícones novos no sprite; opcional `<meta name="theme-color">`. Com isso o seletor aparece também no `login.html`, no `register.html` e no futuro `landing.html` ([04](04-landing-page.md)) **sem mexer nesses templates**, porque todos estendem o `base.html`. Nenhum outro template muda |
 | **CSS** | `tokens.css`: `color-scheme` e o bloco escuro (duas vezes); remover aliases `--chakra-*`/`--gray-*`. `style.css`: itens 5 a 8 da auditoria; estilos do seletor e do painel; subir o `?v=` (próximo: `redesign_v4`) |
 | **JS** | novo `static/js/theme.js`; `app.js:170` (e `:118`, se a 01 não resolver) com a opção 3 |
 | **Testes** | o `test_app.py` não é afetado (o tema não muda HTML de resposta, só um atributo aplicado no navegador). Teste manual: §9 |
@@ -211,7 +234,7 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 |---|---|---|
 | Ordem dos scripts `marked` → `app.js` | §7.1 | **mantida.** Entra um script inline no `<head>` e o `theme.js` com `defer`, sem relação com os dois |
 | Blocos `title` e `content` | §7.1 | intactos; nenhum bloco novo é necessário |
-| Condição de sessão da navbar | §7.1 | intacta se o seletor ficar dentro da `.nav-user`; muda (sai do `{% if %}`) se o grupo quiser o seletor também no login (§11) |
+| Condição de sessão da navbar | §7.1 | **muda de forma controlada** (✅ decidido): o seletor fica **fora** do `{% if session.get('user_id') %}`; o nome do usuário e o "Sair" continuam **dentro**. O 04 §7.1 passa a listar o seletor como elemento sem condição de sessão |
 | `#label_{{ task_key }}` com `style.color` do JS | §7.2 | o valor escrito pelo JS passa a ser `var(--color-text-subtle)` (opção 3). O ID e o mecanismo não mudam |
 | `#planProgressBar` com `style.width` | §7.2 | intacto (a cor vem do token) |
 | Classes geradas pelo JS (`.chat-bubble.*`, `.alert-*`) | checklist item 10 | precisam de estilo nos **dois** temas; como usam tokens, herdam o escuro |
@@ -230,6 +253,8 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 ## 9. Critérios de aceite
 
 - [ ] **3 modos:** Claro, Escuro e Dispositivo aplicam a paleta certa em todas as 7 telas (login, cadastro, dashboard, tópico/chat, criar plano, ver plano, seminário).
+- [ ] **Seletor em todas as páginas:** o botão de tema aparece **com e sem sessão** (login e cadastro incluídos) e abre o painel com as 3 opções. Quando a [04](04-landing-page.md) entrar, aparece também na landing.
+- [ ] **Backend intacto:** o PR não altera nenhum `.py`.
 - [ ] **Padrão:** sem nada salvo, o tema segue o sistema operacional.
 - [ ] **Persistência:** a escolha sobrevive a recarregar (Ctrl+Shift+R), a navegar entre páginas e a fechar e reabrir o navegador.
 - [ ] **Sem flash:** com Escuro escolhido e o sistema claro (e vice-versa), recarregar não mostra o outro tema nem por um quadro (conferir com a gravação de performance do DevTools ou com a rede em "Slow 3G").
@@ -250,19 +275,18 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 
 Um PR (passo 3 da [ordem](README.md#ordem-de-implementação--decidido)), **frontend (Renzo)**. Depende da [01](01-remover-configurar-ia.md) por causa do espaço na navbar.
 
+**Dependência com a [04](04-landing-page.md) (landing page):** a landing vem **depois** deste PR e depende dele: ela usa os tokens escuros, o script anti-FOUC e o seletor fora da condição de sessão. Por isso este PR não pode deixar o seletor dentro da `.nav-user`, nem colocar o script anti-FOUC num lugar que um template sem sessão não herde.
+
 | Parte | Escopo | Observação |
 |---|---|---|
 | Correções da auditoria (itens 2, 4 a 8) | A | podem ir primeiro, num commit separado, porque não mudam o tema claro |
 | Tokens escuros + `color-scheme` | A | |
-| Script inline + `theme.js` + seletor | B (JS novo) | aprovado pelo grupo ao decidir a funcionalidade |
-| `app.js:170` (e `:118`) | B | depende da escolha da §5.5 |
+| Script inline + `theme.js` + seletor fora da condição de sessão | B (JS novo) | aprovado pelo grupo ao decidir a funcionalidade |
+| `app.js:170` (e `:118`, se a 01 atrasar) | B | ✅ decidido: só o hex vira `var(--color-text-subtle)` (§5.5) |
 | Docs 06, 04, 03 | — | |
 
 ## 11. Em aberto / futuro
 
-- ❓ **Padrão do seletor:** A (popover + radios), B (ciclo) ou C (select). Recomendação: A.
-- ❓ **Seletor também no login e no cadastro?** Exige tirar o seletor de dentro do `{% if session.get('user_id') %}` (`base.html:54`). Não é lógica nova, mas muda a estrutura da navbar. Recomendação: sim, porque o tema vale para todas as páginas.
-- ❓ **Cores inline do `app.js`:** opção 1, 2 ou 3 (§5.5). Recomendação: 3.
-- ❓ **Fallback para navegador sem `popover`:** recomendação: sim, com poucas linhas no `theme.js`.
+- 💡 **Fallback para navegador sem `popover`** (detalhe de implementação, não é decisão do grupo): recomendação: sim, com poucas linhas no `theme.js`. Decidir no PR.
 - **Futuro:** salvar a preferência no banco (coluna em `users` + rota), para valer em outros dispositivos. Registrado no [handoff](../handoff/backend-pendencias.md).
 - **Futuro:** favicon com variante escura (hoje não precisa).
