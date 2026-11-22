@@ -48,7 +48,7 @@ Verificado no código:
 
 - Removendo `#openSettingsBtn`, `#settingsModal` e `#closeSettingsBtn`, nenhuma linha lança exceção. O `DOMContentLoaded` segue e o chat (`:28-84`) e o checklist (`:144-181`) continuam funcionando.
 - **Onde há risco de verdade:** o `onclick` inline de `dashboard.html:17`. Se alguém remover o modal e **esquecer o `#openSettingsBtn2`**, o clique nele gera `TypeError: Cannot read properties of null` (só no clique, sem afetar o resto da página). Os dois precisam sair no mesmo PR.
-- **Ajuste necessário:** nenhum para evitar erro. **Limpeza recomendada (B):** apagar `app.js:4-26`, que vira código morto (o listener de `click` no `window` continuaria rodando a cada clique sem motivo).
+- **Ajuste necessário:** nenhum para evitar erro. **Limpeza (B), ✅ decidida (§4):** apagar `app.js:4-26`, que vira código morto (o listener de `click` no `window` continuaria rodando a cada clique sem motivo).
 
 ### ⚠️ Armadilha 2 — o banner de demo aparece sempre. **Confirmada.**
 
@@ -82,19 +82,31 @@ Verificado no código:
 
 - ✅ **Decidido:** o botão "Configurar IA" sai, porque a chave do Gemini já está vinculada ao sistema (variável de ambiente).
 - ✅ **Decidido:** o espaço liberado na navbar vai para o seletor de tema ([02](02-tema-claro-escuro-dispositivo.md)).
-- ✅ **Decidido:** quem estiver mexendo implementa (o PR toca `app.py`, templates e, opcionalmente, `app.js`).
+- ✅ **Decidido:** quem estiver mexendo implementa (o PR toca `app.py`, templates, `app.js` e o `README.md`).
+- ✅ **Recomendação aprovada pelo Renzo — backend valida no PR** (destino da rota, da função e da coluna; opção C de §5.1):
+  - a rota `POST /settings/api-key` (`update_api_key`, `app.py:137-146`) sai **agora**;
+  - `get_current_user_api_key()` (`app.py:41-47`) passa a ler **só** o `.env` (`GEMINI_API_KEY`);
+  - uma **limpeza única** apaga as chaves salvas (o banco só tem dados de teste);
+  - a coluna `users.gemini_api_key` (`database.py:25`) sai num **PR futuro de banco**.
+- ✅ **Decidido:** no PR de implementação, o `app.js` também muda (escopo B, aprovado):
+  - apagar o código morto do modal, `app.js:4-26`;
+  - reescrever o texto do `app.js:118`, que manda configurar uma chave que não poderá mais ser configurada, e trocar o `style=""` inline dessa linha por uma **classe** (§5.3);
+  - remover o `onclick` inline do `dashboard.html:17` **junto com** o botão `#openSettingsBtn2`, que é o risco real de `TypeError` (Armadilha 1).
+- ✅ **Decidido:** a atualização do `README.md` principal (`README.md:70`, que manda usar o botão "⚙️ Configurar IA") faz **parte deste PR**, com item no checklist (§10) e nos critérios de aceite (§9).
 
 ## 5. Proposta técnica
 
-> 💡 **Proposta — validar com a equipe.**
+> 💡 **Proposta — validar com a equipe**, exceto o que o §4 já marca como decidido.
 
 ### 5.1 Destino da rota, da função e da coluna
+
+> ✅ **Recomendação aprovada pelo Renzo — backend valida no PR:** opção **C**. A tabela fica como registro das alternativas.
 
 | Opção | O que faz | Prós | Contras |
 |---|---|---|---|
 | **A. Remover tudo agora** | apaga a rota, a função passa a ler só o ambiente, `ALTER TABLE users DROP COLUMN gemini_api_key` | código e banco limpos; nenhuma chave em texto puro sobra | **mexe no banco**: o `init_db()` (`database.py:13-98`) só faz `CREATE TABLE IF NOT EXISTS`, então bancos existentes mantêm a coluna até alguém rodar uma migração. `DROP COLUMN` exige SQLite ≥ 3.35 (a máquina de teste tem 3.45.1, o servidor ⚠️ não confirmado). Não existe sistema de migração no projeto |
 | **B. Manter sem uso** | só tira o HTML; rota, função e coluna ficam | zero risco no banco; reversível | **cai na Armadilha 3**: chaves salvas continuam valendo e em texto puro; rota órfã aceitando POST; código morto |
-| **C. Remover a rota e parar de ler a coluna agora; apagar a coluna depois** (recomendada) | apaga a rota; `get_current_user_api_key()` passa a devolver só `os.environ.get("GEMINI_API_KEY", "")` (ou é removida, já que `ai_service.get_gemini_client` já faz esse fallback); um `UPDATE users SET gemini_api_key = ''` único limpa as chaves salvas; a coluna sai num PR de banco futuro | resolve as Armadilhas 2 e 3 e o [handoff §2](../handoff/backend-pendencias.md#2-chave-do-gemini-gravada-em-texto-puro) sem migração de esquema; o PR fica pequeno | a coluna vazia fica no esquema por um tempo; o `UPDATE` de limpeza precisa rodar uma vez (no `init_db` ou à mão) |
+| **C. Remover a rota e parar de ler a coluna agora; apagar a coluna depois** (✅ aprovada pelo Renzo; backend valida) | apaga a rota; `get_current_user_api_key()` passa a devolver só `os.environ.get("GEMINI_API_KEY", "")` (ou é removida, já que `ai_service.get_gemini_client` já faz esse fallback); um `UPDATE users SET gemini_api_key = ''` único limpa as chaves salvas; a coluna sai num PR de banco futuro | resolve as Armadilhas 2 e 3 e o [handoff §2](../handoff/backend-pendencias.md#2-chave-do-gemini-gravada-em-texto-puro) sem migração de esquema; o PR fica pequeno | a coluna vazia fica no esquema por um tempo; o `UPDATE` de limpeza precisa rodar uma vez (no `init_db` ou à mão) |
 
 Detalhes da opção C:
 
@@ -121,7 +133,7 @@ def inject_ai_mode():
 | Lugar | Hoje | Proposta |
 |---|---|---|
 | Banner do dashboard (`dashboard.html:15-18`) | "Modo demonstração ativo" + botão "Configurar chave Gemini" | **"Modo demonstração"** + texto: "A IA não está configurada neste servidor. Explicações, planos e seminários usam conteúdo de exemplo." Sem botão. Visual: o `.notice` atual (âmbar, contraste já aprovado na sprint 01). |
-| Nota no chat (`app.js:118`) | "⚡ Modo Demonstração Didática (Chave Gemini pode ser configurada)" | "Resposta de demonstração: a IA não está disponível no momento." **Muda o `app.js` (B).** Aproveitar para trocar o `style=""` inline por uma classe (por exemplo `.chat-demo-note`, só CSS), o que resolve também a cor `#718096` do [B11](../05-achados-frontend.md) e prepara o tema escuro ([02 §5.5](02-tema-claro-escuro-dispositivo.md#55-cores-inline-do-appjs-b11)). |
+| Nota no chat (`app.js:118`) | "⚡ Modo Demonstração Didática (Chave Gemini pode ser configurada)" | "Resposta de demonstração: a IA não está disponível no momento." **Muda o `app.js` (B), ✅ decidido.** O `style=""` inline sai e entra uma classe (por exemplo `.chat-demo-note`, estilizada só no CSS com tokens), o que resolve também a cor `#718096` do [B11](../05-achados-frontend.md) e prepara o tema escuro ([02 §5.5](02-tema-claro-escuro-dispositivo.md#55-cores-inline-do-appjs-b11)). |
 | Rodapé (`base.html:115`) | "Transparência (RNF06): as respostas, planos e seminários são gerados com apoio de inteligência artificial e devem ser revisados pelo usuário." | Acrescentar: "Quando a IA não está disponível, o StudyIA mostra conteúdo de demonstração e avisa na tela." |
 
 ### 5.4 Limpeza de CSS (A)
@@ -136,9 +148,10 @@ Depois que o HTML sair, ficam sem uso: `.modal-overlay`, `.modal-content`, `.mod
 | **Banco** (`database.py`) | opção C: nenhuma mudança de esquema; um `UPDATE` de limpeza. Opção A: `DROP COLUMN` + migração |
 | **Templates** | `base.html`: remover `:56-59` (botão) e `:69-92` (modal); ajustar o rodapé (`:115`). `dashboard.html`: `:14-19` com a nova condição e sem o `#openSettingsBtn2` |
 | **CSS** | remover o CSS do modal (5.4); ajustar o espaçamento da `.nav-user` sem o botão; subir o `?v=` dos dois `<link>` (`base.html:13-14`, hoje `redesign_v3`) |
-| **JS** (`app.js`, B) | opcional mas recomendado: apagar `:4-26`; trocar o texto (e o inline) de `:118` |
+| **JS** (`app.js`, B) | ✅ decidido: apagar `:4-26`; trocar o texto de `:118` e o inline por classe |
 | **Testes** | o `test_app.py` não usa a rota nem o modal: continua passando. Acrescentar: `POST /settings/api-key` → 404/405; dashboard **sem** o banner com `GEMINI_API_KEY` definida e **com** o banner sem ela; um usuário com `gemini_api_key` preenchida no banco não usa essa chave |
-| **Docs** | `docs/04` (ver §7); `docs/02-rotas.md` (linha da rota); `docs/01-arquitetura.md` ("Chave do Gemini: ordem de resolução"); `docs/05` (B5 deixa de existir; B11 perde a nota do demo se o inline sair); `docs/handoff` (§2 e §9 resolvidos). **`README.md:70` cita o botão** e está fora do que o frontend pode editar: quem tiver permissão precisa atualizar |
+| **Docs** | `docs/04` (ver §7); `docs/02-rotas.md` (linha da rota); `docs/01-arquitetura.md` ("Chave do Gemini: ordem de resolução"); `docs/05` (B5 deixa de existir; B11 perde a nota do demo); `docs/handoff` (§2 e §9 resolvidos) |
+| **README do projeto** | ✅ decidido: `README.md:70` deixa de citar o botão "⚙️ Configurar IA" e passa a dizer que a chave fica **só** no `.env` (sem `.env`, o app roda em modo demonstração). Faz parte **deste PR** |
 
 ## 7. Contratos afetados ([docs/04](../04-contratos-frontend.md))
 
@@ -159,7 +172,8 @@ Nenhum contrato de chat, plano, seminário ou dos textos do `test_app.py` (§7.5
 - **Remover o HTML sem mexer no backend:** banner sempre visível (Armadilha 2) e chaves antigas presas (Armadilha 3). **O PR precisa ter as duas partes.**
 - **Deploy sem `GEMINI_API_KEY`:** o app sobe em demo sem erro. Mitigação: o banner correto, o log no start e um item no checklist de deploy.
 - **Mudança de esquema sem migração:** se o grupo escolher a opção A, combinar como os bancos existentes vão perder a coluna (script único ou recriar o banco).
-- **Texto do `app.js:118`:** se o JS não for alterado, a nota do chat continua mandando "configurar a chave", o que passa a ser impossível. Decidir junto com este PR.
+- **Texto do `app.js:118`:** se o JS não for alterado, a nota do chat continua mandando "configurar a chave", o que passa a ser impossível. Por isso a mudança está ✅ decidida (§4) e é critério de aceite.
+- **`README.md:70` esquecido:** o README continuaria mandando usar um botão que não existe. Está no checklist do PR (§10) e nos critérios de aceite (§9).
 - **Saída do `has_custom_key` com cache de template:** o Flask sem debug guarda templates em cache; reiniciar o servidor ao testar (registrado na sprint 01).
 
 ## 9. Critérios de aceite
@@ -172,7 +186,9 @@ Nenhum contrato de chat, plano, seminário ou dos textos do `test_app.py` (§7.5
 - [ ] Sem `GEMINI_API_KEY`: o dashboard mostra o banner, sem botão, com o texto explicativo; o servidor registra o aviso no log ao iniciar.
 - [ ] Um usuário que tinha `gemini_api_key` preenchida no banco passa a usar a chave do ambiente (ou a coluna está vazia para todos).
 - [ ] O rodapé cita o modo demonstração.
-- [ ] Se o `app.js` foi alterado: a nota do chat não fala mais em configurar a chave e não tem `style=""` inline.
+- [ ] O `app.js` não tem mais o bloco do modal (`:4-26`); a nota de demonstração do chat não fala mais em configurar a chave e usa uma classe, sem `style=""` inline.
+- [ ] O `dashboard.html` não tem mais nenhum `onclick` (`grep -n onclick templates/`).
+- [ ] O `README.md` não cita mais o "Configurar IA" e explica que a chave fica só no `.env`.
 - [ ] `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py` passa.
 - [ ] `docs/04`, `docs/02`, `docs/01` e o handoff atualizados no mesmo PR.
 
@@ -182,16 +198,24 @@ Um PR só (passo 2 da [ordem](README.md#ordem-de-implementação--decidido)). �
 
 | Parte | Escopo | Depende de |
 |---|---|---|
-| Backend: rota, função, `context_processor`, log, limpeza das chaves | C | — |
-| Templates: navbar, modal, banner, rodapé | A/B (a condição do banner é lógica Jinja) | backend no mesmo PR |
-| CSS: remover o modal, ajustar a navbar, `?v=` | A | templates |
-| `app.js:4-26` e `:118` | B | decisão do grupo (§11) |
+| Backend: rota, função, `context_processor`, log, limpeza das chaves (opção C, a validar pelo backend no PR) | C | — |
+| Templates: navbar, modal, banner (sem o `#openSettingsBtn2` e o `onclick` do `dashboard.html:17`), rodapé | A/B (a condição do banner é lógica Jinja) | backend no mesmo PR |
+| CSS: remover o modal, ajustar a navbar, classe da nota de demo do chat, `?v=` | A | templates |
+| `app.js:4-26` (apagar) e `:118` (texto + classe) | B | ✅ decidido (§4) |
+| `README.md:70` | — | ✅ decidido (§4) |
 | Docs: 01, 02, 04, 05, handoff | — | — |
+
+**Checklist do PR:**
+
+- [ ] Rota `update_api_key` removida e `get_current_user_api_key` lendo só o `.env`
+- [ ] Limpeza única das chaves salvas (ou `studyia.db` recriado)
+- [ ] Botão, modal, `#openSettingsBtn2` e o `onclick` removidos
+- [ ] `app.js:4-26` apagado; `app.js:118` com texto novo e classe
+- [ ] `README.md:70` atualizado
+- [ ] CSS do modal removido e `?v=` atualizado
+- [ ] Docs 01, 02, 04, 05 e handoff atualizados
 
 ## 11. Em aberto / futuro
 
-- ❓ **Destino da coluna:** opção A, B ou C (§5.1). Recomendação: C.
-- ❓ **Mexer no `app.js` neste PR?** Recomendação: sim, para apagar `:4-26` e corrigir o texto/inline de `:118`. Sem isso, a nota do chat fica com uma instrução impossível.
 - **Futuro:** detectar o demo "de fato" (chave inválida, cota estourada) e não só a ausência da chave. Depende do [handoff §7 e §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido).
 - **Futuro:** PR de banco para remover a coluna `gemini_api_key` de vez (opção C, segunda etapa).
-- **Fora do escopo do frontend:** atualizar o `README.md:70`.
