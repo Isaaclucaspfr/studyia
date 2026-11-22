@@ -17,6 +17,7 @@ Documentação de apoio ao desenvolvimento do frontend do StudyIA. Ela **não su
 | [06-padroes-visuais.md](06-padroes-visuais.md) | Convenções propostas para o redesign *(PROPOSTA — aguardando aprovação do grupo)* |
 | [handoff/backend-pendencias.md](handoff/backend-pendencias.md) | Pendências para a **equipe de backend** (escopo C) |
 | [sprints/sprint-01-redesign-visual.md](sprints/sprint-01-redesign-visual.md) | Plano da sprint 1 do redesign visual |
+| [features/](features/README.md) | Especificação das próximas funcionalidades (remover "Configurar IA", tema claro/escuro, conteúdo do plano) e a **ordem de implementação** |
 
 ## Legenda de escopo
 

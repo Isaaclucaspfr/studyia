@@ -4,6 +4,12 @@
 >
 > Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depende de rodar o app ou de testar com a API).
 
+> **Novas funcionalidades (especificadas em [docs/features/](../features/README.md)).** Alguns itens abaixo passam a ser tratados dentro delas. Os itens continuam aqui como estão; a especificação de cada funcionalidade diz o que muda:
+>
+> - [01 — Remover "Configurar IA"](../features/01-remover-configurar-ia.md): resolve o **§2** (chave em texto puro) e o **§9** (banner de demo baseado só na chave do banco), e toca o **§7** (aviso no log quando falta `GEMINI_API_KEY`).
+> - [03 — Conteúdo dentro do plano](../features/03-conteudo-do-plano.md): grava `is_simulated` por conteúdo (**§8**), segue o **§15** (sem emojis) e o **§14** (sem "Dia N") no prompt novo, depende do **§11** (JSON do plano sem validação) e acrescenta 2 rotas POST ao **§12** (CSRF). Equipe de backend lidera.
+> - [02 — Tema claro/escuro/dispositivo](../features/02-tema-claro-escuro-dispositivo.md): não toca o backend. **Possibilidade futura:** salvar a preferência de tema no banco (coluna em `users` + rota), para valer em outros dispositivos. Hoje fica só no navegador.
+
 Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado)
 
 ---
