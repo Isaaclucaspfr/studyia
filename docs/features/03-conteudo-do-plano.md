@@ -1,6 +1,6 @@
 # 03 — Conteúdo dentro do plano
 
-> Índice: [features/README.md](README.md) · Base: commit `69c99ab` · Tamanho: grande (3 PRs: 4a, 4b, 4c) · Escopos: **C** (banco, rotas, IA) + **B** (template, `app.js`) + **A** (tela nova) · **Liderança: equipe de backend.**
+> Índice: [features/README.md](README.md) · Base: commit `69c99ab` · Tamanho: grande (3 PRs, nesta ordem de merge: 4a, 4c, 4b) · Escopos: **C** (banco, rotas, IA) + **B** (template, `app.js`) + **A** (tela nova) · **Liderança: equipe de backend.**
 
 ## 1. Objetivo
 
@@ -99,8 +99,10 @@ Transformar cada tarefa do plano de estudos em algo que a pessoa **estuda dentro
 10. **Se a IA falhar:** mostrar o conteúdo do modo demo, **informar** claramente que é conteúdo de demonstração e oferecer o botão "Tentar gerar novamente".
 11. **Planos existentes:** o banco só tem dados de teste; todas as tarefas passam a exigir a leitura do conteúdo. Não é necessário migrar planos antigos.
 12. **Em aberto (desejado):** o seminário usar os conteúdos lidos como base para as perguntas. Ver [§11](#11-em-aberto--futuro).
+13. **Concluir um conteúdo de demonstração CONTA como leitura**, com o aviso de demonstração sempre visível na tela de conteúdo. Motivo: sem isso, ninguém avança no plano sem chave da IA ou numa apresentação offline.
+14. **Ordem dos PRs:** o 4c (trava da conclusão no backend + ajuste do `toggle-task`) é mergeado **antes ou junto** do 4b, **nunca depois**, para não existirem dois jeitos de marcar a tarefa.
 
-✅ **Divisão:** quem estiver mexendo implementa, mas a **equipe de backend lidera** a funcionalidade. 4a backend · 4b frontend (Renzo) · 4c em conjunto ([§10](#10-divisão-em-prs-e-responsáveis)).
+✅ **Divisão:** quem estiver mexendo implementa, mas a **equipe de backend lidera** a funcionalidade. 4a backend · 4c em conjunto · 4b frontend (Renzo), nesta ordem de merge ([§10](#10-divisão-em-prs-e-responsáveis)).
 
 ## 5. Proposta técnica
 
@@ -222,7 +224,7 @@ return render(row)                           # 'ready' ou 'failed'
 - **Não desmarca:** não existe rota que volte `read_at` para `NULL`; o `toggle-task` sai (§5.8).
 - **Limite honesto:** o servidor não tem como provar que a pessoa *leu* até o fim. O que ele garante é "o conteúdo existia e foi entregue antes da conclusão". O "até o fim" vem da posição do botão (só no fim do texto). Exigir tempo mínimo ou rolagem seria regra nova, não decidida.
 - **Regenerar depois de concluir:** mantém o `read_at` (decisão 5: a tarefa fica sempre marcada).
-- ❓ **Concluir conteúdo de demonstração conta?** Não decidido. Ver [§11](#11-em-aberto--futuro).
+- ✅ **Concluir conteúdo de demonstração conta como leitura** (decisão 13). O `complete` aceita `status = 'ready'` **com `is_simulated` 0 ou 1**; a regra não olha o `is_simulated`. O aviso de demonstração e o botão "Tentar gerar novamente" continuam visíveis na tela de conteúdo, inclusive depois de concluída. Motivo: sem isso, ninguém avança no plano sem chave da IA ou numa apresentação offline.
 
 ### 5.5 IA: `generate_task_content` em `ai_service.py`
 
@@ -246,6 +248,8 @@ def generate_task_content(topic_title, topic_type, file_text, plan_title, goal, 
 ```
 palavras_alvo = limitar(minutos_da_tarefa × 100, piso = 350, teto = 1800)
 ```
+
+> ⚠️ **Palpite a calibrar com testes reais.** O fator × 100, o piso de 350 e o teto de 1800 são estimativas de quem escreveu o doc, não medições. Ajustar depois de gerar conteúdos de verdade com a chave da IA e cronometrar a leitura.
 
 - **Por que × 100:** a leitura de estudo em português fica em torno de 120 a 150 palavras por minuto ⚠️ (estimativa, a calibrar). Usar 100 deixa cerca de um quarto do tempo para pausas e anotações, já que a tarefa nem sempre é só leitura ("Anotação dos termos principais").
 - **Piso de 350 palavras:** o mínimo para as 4 partes obrigatórias (objetivo, explicação, exemplo, resumo). Uma tarefa de 5 minutos ganha um texto curto, mas completo. É o "sem sacrificar a qualidade mínima".
@@ -280,9 +284,17 @@ palavras_alvo = limitar(minutos_da_tarefa × 100, piso = 350, teto = 1800)
 
 ### 5.6 Segurança
 
-- **XSS (B2) é pré-requisito do 4b, não opcional.** O conteúdo é Markdown gerado pela IA e, no modo arquivo, pode ecoar trechos do documento enviado. Um PDF com `<img src=x onerror=…>` vira HTML executável se passar pelo `marked.parse()` sem sanitização (`app.js:38`) ou por um `| safe` (como em `study_topic.html:81`). E, diferente do chat, o conteúdo fica **salvo** e é reaberto (XSS armazenado). Opções para o PR do B2 (decisão do grupo):
-  - **cliente:** DOMPurify com versão fixa depois do `marked` (CDN nova; resolve o chat junto);
-  - **servidor:** renderizar Markdown no Python com um sanitizador (`markdown` + `nh3` ou `bleach`; dependências novas no `requirements.txt`).
+- **XSS (B2) é pré-requisito do 4b, não opcional.** O conteúdo é Markdown gerado pela IA e, no modo arquivo, pode ecoar trechos do documento enviado. Um PDF com `<img src=x onerror=…>` vira HTML executável se passar pelo `marked.parse()` sem sanitização (`app.js:38`, `:112`) ou por um `| safe` (como em `study_topic.html:81`). E, diferente do chat, o conteúdo fica **salvo** e é reaberto (XSS armazenado).
+- 💡 **Proposta (única) para o PR do B2: DOMPurify com versão fixa dentro de `static/vendor/`.**
+  - **Arquivo:** `static/vendor/dompurify/<versão>/purify.min.js` (≈ 30 KB), servido pelo próprio Flask. **Não é CDN nova:** funciona **offline**, na apresentação, e segue o mesmo padrão de vendor da landing ([04 §5.3](04-landing-page.md#53-gsap-e-threejs-só-na-landing-versões-fixas-em-staticvendor)).
+  - **Versão:** fixar uma versão estável da linha 3.x publicada há **pelo menos 2 semanas** no dia do PR. Em 22/11/2026, isso é a **3.4.17** (12/10/2026); a 3.4.18 é de 14/11 e a 3.5.0 saiu em 22/11/2026, novas demais. Licença: `MPL-2.0 OR Apache-2.0` (conferida no registro do npm).
+  - **Onde:** no `base.html`, logo depois do `marked` (`base.html:119`) e antes do `app.js` (`:120`); a ordem `marked` → `app.js` do contrato se mantém. No `app.js`, `marked.parse(raw)` vira `DOMPurify.sanitize(marked.parse(raw))` em `:38` e `:112`. Mudar o JS é escopo B, aprovado como parte do B2.
+  - **`| safe` do `study_topic.html:81`:** sai, ou passa pelo mesmo caminho do `data-raw`. O PR do B2 decide qual.
+  - **Resolve o chat junto** (o mesmo `marked.parse` é usado no histórico e nas mensagens novas).
+  - 💡 Aproveitar o PR para vendorizar também o `marked` com versão fixa (o `base.html:119` usa `marked` sem versão, [B10](../05-achados-frontend.md)). Sem isso, o chat continua dependendo de CDN na apresentação offline.
+- **Alternativas consideradas (descartadas como proposta):**
+  - **Servidor:** renderizar o Markdown no Python com um sanitizador (`markdown` + `nh3` ou `bleach`). Exige dependências novas no `requirements.txt`, muda o contrato `.markdown-content[data-raw]` (o HTML chegaria pronto) e precisaria ser feito também no chat. Mais seguro em tese, mas maior e fora do padrão atual do app.
+  - **DOMPurify por CDN:** CDN nova e não funciona offline.
 - A tela de conteúdo **nunca** usa `| safe` no conteúdo bruto.
 - **Isolamento:** toda consulta filtra por `user_id`. Teste obrigatório: o usuário B não abre, não conclui e não regenera conteúdo do plano do usuário A.
 - **`regenerate` só com `is_simulated = 1`:** impede que alguém regenere em loop um conteúdo bom e gaste cota da API.
@@ -297,7 +309,7 @@ palavras_alvo = limitar(minutos_da_tarefa × 100, piso = 350, teto = 1800)
 | Voltar | `.back-link` "Voltar ao plano" (padrão das outras telas) |
 | Cabeçalho | `.meta-label` "Sessão N · Tarefa M de K"; título = texto da tarefa; `.meta-line` com o ícone `clock` e os minutos previstos; tema do dia como subtítulo |
 | Estado "gerando…" | `.empty-state` com "Gerando o conteúdo desta tarefa. Isso pode levar alguns segundos." e indicação de que a página atualiza sozinha. Animação só se respeitar `prefers-reduced-motion`. Cruzar com o [B4](../05-achados-frontend.md): no clique em "Ver conteúdo", o link não dá sinal nenhum enquanto o servidor gera (opção A de §5.3); resolver junto com o B4 (JS) |
-| Aviso de demonstração | `.notice` (o mesmo âmbar do dashboard, AA aprovado) com "Conteúdo de demonstração: a IA não respondeu desta vez." + botão **"Tentar gerar novamente"** (`<form method="POST">` para `regenerate`) |
+| Aviso de demonstração | `.notice` (o mesmo âmbar do dashboard, AA aprovado) com "Conteúdo de demonstração: a IA não respondeu desta vez." + botão **"Tentar gerar novamente"** (`<form method="POST">` para `regenerate`). Continua visível **depois** de concluída (decisão 13: concluir o demo conta como leitura) |
 | Falha (`failed`) | `.alert-danger` + "Tentar gerar novamente" |
 | Leitura | `<article>` com a tipografia de leitura da sprint 01: `--text-base` (16 px), `--leading-relaxed` (1,6), largura `--measure` (68ch) (`tokens.css:116`, `:128`, `:133`). Os estilos de Markdown hoje escopados em `.chat-bubble.assistant` (`style.css:1068-1131`) passam a valer também para uma classe de leitura (por exemplo `.prose`), **agrupando seletores**, sem mudar a bolha do chat (contrato) |
 | Concluir | no fim do texto: `<form method="POST">` para `complete` com o botão primário **"Concluí a leitura"** |
@@ -326,7 +338,12 @@ palavras_alvo = limitar(minutos_da_tarefa × 100, piso = 350, teto = 1800)
 - `#planProgressBar` e `#planProgressText` deixam de ser atualizados por JS. A conclusão acontece na tela de conteúdo, por form, e o plano é recarregado quando a pessoa volta, então a barra já vem certa do servidor.
 - Nada no `app.js` depende de outro trecho desse bloco; chat e Markdown (`:28-142`) não mudam.
 
-**Janela de convivência:** entre o merge do 4b (tela de conteúdo no ar) e o do 4c (checkbox ainda clicável), existem **dois** jeitos de marcar uma tarefa, e o `toggle-task` recalcula o progresso só pelo `completed_tasks_json`, ignorando o `read_at`. 💡 Mergear o 4b e o 4c em sequência, sem apresentação no meio; ou, se o 4a já fizer o `view_plan` derivar `completed_tasks` do `read_at`, o checkbox antigo deixa de "grudar" ao recarregar e a inconsistência fica só visual.
+**Ordem de merge (✅ decidido, decisão 14): o 4c entra antes ou junto do 4b, nunca depois.**
+
+- **Por quê:** se o 4b (tela de conteúdo com "Concluí a leitura") entrasse antes do 4c, o checkbox antigo continuaria clicável e existiriam **dois** jeitos de marcar uma tarefa. O `toggle-task` recalcula o progresso só pelo `completed_tasks_json`, ignorando o `read_at` (`app.py:591-603`), então os dois caminhos dariam números diferentes.
+- **Sequência:** 4a (rotas e regra no backend) → 4c (trava: `toggle-task` removido ou restrito, checkbox vira indicador, sai o bloco `app.js:144-181`) → 4b (tela de conteúdo e link "Ver conteúdo →").
+- **Entre o 4c e o 4b**, ninguém consegue concluir uma tarefa pela interface (zero jeitos, em vez de dois). Isso é aceitável porque o banco só tem dados de teste (decisão 11), mas pede: 💡 mergear os dois **juntos** (o 4b rebaseado sobre o 4c e mergeado logo em seguida) ou, no mínimo, **sem apresentação no meio**.
+- **O 4c não depende do 4b:** o teste que substitui o passo 8 (`test_app.py:110-116`) usa as rotas do 4a por URL (`GET` do conteúdo + `POST complete`), sem precisar do template final.
 
 ### 5.9 Testes que o `test_app.py` deve ganhar
 
@@ -361,10 +378,10 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
 | **Backend** (`app.py`) | helper de tarefas do plano; helper de progresso; 3 rotas novas; `view_plan` passa a derivar `completed_tasks` do `read_at` e a enviar o estado de cada tarefa (para o indicador e o link); remover `toggle_task` | 4a (rotas, helpers), 4c (remover `toggle_task`) |
 | **IA** (`ai_service.py`) | `generate_task_content` + fallback | 4a |
 | **Deploy** | `--timeout` do gunicorn no `Procfile` (se a opção A de §5.3 for mantida) | 4a |
-| **Templates** | novo `task_content.html`; `plan_view.html`: estrutura do item da tarefa, indicador, link, texto do `:42` | 4b (tela e link), 4c (indicador no lugar do checkbox) |
-| **CSS** | tela de leitura (`.prose` agrupada com o Markdown do chat), estados (gerando, demo, concluído), indicador, `?v=` | 4b, 4c |
+| **Templates** | novo `task_content.html`; `plan_view.html`: estrutura do item da tarefa, indicador, link, texto do `:42` | 4c (indicador no lugar do checkbox), 4b (tela e link) |
+| **CSS** | tela de leitura (`.prose` agrupada com o Markdown do chat), estados (gerando, demo, concluído), indicador, `?v=` | 4c (indicador), 4b (tela) |
 | **JS** (`app.js`) | remover `:144-181` | 4c |
-| **Segurança** | correção do B2 antes do 4b | PR próprio |
+| **Segurança** | correção do B2 (DOMPurify em `static/vendor/`, §5.6) antes do 4b | PR próprio |
 | **Testes** | §5.9 | 4a (backend), 4c (troca do passo 8) |
 | **Docs** | `docs/04` (§7); `docs/02-rotas.md` (3 rotas, `toggle-task` sai); `docs/01-arquitetura.md` (tabela nova, diagrama do plano); `docs/03-frontend-inventario.md` (template novo, fetch #2 sai); `docs/06` (componentes de leitura e indicador); `docs/05` (B3/B11 do checklist resolvidos) | cada PR atualiza o que tocou |
 
@@ -393,7 +410,7 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
 - **Fidelidade no modo arquivo:** a IA pode completar com conhecimento externo, apesar do prompt. O teste 13 cobre o prompt, não o comportamento do modelo. ⚠️ Validar com uma chave real.
 - **XSS armazenado:** sem o B2 resolvido, o 4b não pode ir para a `main`.
 - **`task_key` duplicada** por `day_number` repetido (§5.1).
-- **Janela de convivência** entre o 4b e o 4c (§5.8).
+- **Ordem dos PRs invertida:** se o 4b entrar antes do 4c, existem dois jeitos de marcar a tarefa (§5.8). A ordem 4a → 4c → 4b está ✅ decidida; o revisor do 4b confere que o 4c já está na `main` ou no mesmo merge.
 - **"Ler até o fim" não é verificável** no servidor (§5.4). Deixar isso claro na apresentação do projeto.
 - **Timestamps em UTC** em "Concluída em…" (B8).
 - **Fallback que parece real:** o conteúdo de demonstração precisa do aviso **na tela de conteúdo**, não só no dashboard (RNF06; o `is_simulated` desta funcionalidade é persistido, ao contrário do plano, [handoff §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido)).
@@ -408,6 +425,7 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
 - [ ] O tamanho acompanha os minutos da tarefa (curto para 5–6 min, longo para 18 min), respeitando o piso e o teto.
 - [ ] Num plano de arquivo, o conteúdo usa só o documento; o fallback mostra trecho do documento.
 - [ ] Com a IA indisponível: aviso de demonstração + "Tentar gerar novamente", que substitui o conteúdo quando a IA volta.
+- [ ] Concluir um conteúdo de demonstração conta como leitura (o progresso sobe), e o aviso de demonstração continua visível depois de concluída.
 - [ ] "Concluí a leitura" fica no fim do texto; depois de clicado, a tarefa fica concluída para sempre e o conteúdo continua acessível.
 - [ ] O indicador de conclusão não é focável, não parece clicável e é anunciado ("Concluída" / "Não concluída").
 - [ ] O progresso conta só as tarefas com leitura concluída, no plano e na lista do tópico.
@@ -421,6 +439,8 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
 
 ✅ Quem estiver mexendo implementa; a **equipe de backend lidera** a funcionalidade.
 
+✅ **Ordem de merge:** **4a → 4c → 4b**, com o 4c **antes ou junto** do 4b, nunca depois (decisão 14, §5.8). Os títulos abaixo seguem essa ordem.
+
 ### PR 4a — Backend
 
 - **Responsável:** equipe de backend.
@@ -429,20 +449,25 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
 - **Depende de:** passo 2 da ordem ([01](01-remover-configurar-ia.md)) estar na `main` (as duas mexem em `app.py`, e a 01 define como a chave é lida).
 - **Aceite:** todos os testes do backend passam; as rotas respondem por URL direta com isolamento e idempotência; nenhuma tela existente muda de comportamento.
 
+### PR 4c — Trava da conclusão (antes ou junto do 4b)
+
+- **Responsável:** definir em conjunto (backend trava a conclusão e ajusta o `toggle-task`; frontend troca o checkbox e o JS).
+- **Entra:**
+  - **backend:** o `toggle-task` sai (opção A de §5.8, recomendada) ou fica restrito (opção C); depois deste PR, a única forma de concluir é o `complete` do 4a, validado no servidor;
+  - **frontend:** checkbox → indicador no `plan_view.html`; remover o bloco `app.js:144-181`; CSS do indicador;
+  - **testes:** trocar o passo 8 do `test_app.py` (`:110-116`) por "abrir conteúdo → concluir → progresso > 0", pelas rotas do 4a; teste 8 de §5.9;
+  - **docs:** atualizar o 04 (§7.2, §7.4) e o 05 (B3 e B11 do checklist).
+- **Depende de:** 4a. **Não** depende do 4b.
+- **Merge:** **antes ou junto** do 4b, nunca depois (decisão 14). Entre o 4c e o 4b, ninguém conclui tarefas pela interface; por isso, 💡 mergear os dois em sequência, sem apresentação no meio.
+- **Aceite:** não existe forma de marcar ou desmarcar fora do `complete`; o indicador cumpre os requisitos de §5.7; nenhum erro no console no plano; `test_app.py` passando.
+
 ### PR 4b — Tela de conteúdo
 
 - **Responsável:** Renzo (frontend).
-- **Entra:** `task_content.html` com todos os estados (§5.7); estilos de leitura agrupados com o Markdown do chat; botão "Ver conteúdo →" no card do plano; texto do `plan_view.html:42`; docs 03, 04 e 06.
-- **Não entra:** a troca do checkbox pelo indicador (4c).
-- **Depende de:** 4a (rotas e dados); [02](02-tema-claro-escuro-dispositivo.md) (tokens escuros); **correção do B2**.
+- **Entra:** `task_content.html` com todos os estados (§5.7), inclusive o aviso de demonstração depois de concluída; estilos de leitura agrupados com o Markdown do chat; link "Ver conteúdo →" no card do plano (ao lado do indicador do 4c); texto do `plan_view.html:42`; docs 03, 04 e 06.
+- **Não entra:** a troca do checkbox pelo indicador (já feita no 4c).
+- **Depende de:** **4a** (rotas e dados) e **4c** (trava da conclusão; o 4c entra antes ou no mesmo merge); [02](02-tema-claro-escuro-dispositivo.md) (tokens escuros); **correção do B2** (DOMPurify em `static/vendor/`, §5.6).
 - **Aceite:** os critérios de UX de §9; telas em 375, 768 e 1440 px nos dois temas; teclado e leitor de tela; contratos do 04 conferidos; `test_app.py` passando.
-
-### PR 4c — Regra do indicador de conclusão
-
-- **Responsável:** definir em conjunto (backend remove a rota; frontend troca o checkbox e o JS).
-- **Entra:** checkbox → indicador no `plan_view.html`; remover o bloco `app.js:144-181` e a rota `toggle_task`; trocar o passo 8 do `test_app.py`; teste 8 de §5.9; CSS do indicador; atualizar o 04 (§7.2, §7.4) e o 05 (B3 e B11 do checklist).
-- **Depende de:** 4a e 4b.
-- **Aceite:** não existe forma de marcar ou desmarcar fora do "Concluí a leitura"; o indicador cumpre os requisitos de §5.7; nenhum erro no console no plano; `test_app.py` passando.
 
 ## 11. Em aberto / futuro
 
@@ -451,11 +476,10 @@ O passo 8 do teste atual (`test_app.py:110-116`, `toggle-task`) é substituído 
   - **Impacto:** backend (1 consulta em `create_seminar`, `app.py:624-665`, e o prompt); nenhum contrato de frontend muda. Opcional na tela: "Perguntas baseadas em N conteúdos lidos".
   - **Pontos a decidir:** o seminário é por **tópico** (`create_seminar` recebe `topic_id`) e um tópico pode ter vários planos: usar todos os conteúdos lidos, só os do plano mais recente, ou passar o `plan_id` quando o seminário é aberto pelo CTA do plano (`plan_view.html:94`)? E o que fazer quando nada foi lido (cair no comportamento atual)?
   - **Esforço estimado:** pequeno a médio, cerca de 1 PR de backend (meio dia a 1 dia de trabalho), **depois** do 4a. Risco principal: o tamanho do prompt (vários conteúdos de até 1800 palavras); exige um limite e uma regra de corte.
-- ❓ **Concluir conteúdo de demonstração conta como leitura?** Se não contar, sem chave da IA ninguém avança no plano (inclusive numa apresentação offline). 💡 Recomendação: contar, mantendo o aviso de demonstração visível.
-- ❓ **Modo de geração** (§5.3): A síncrona (recomendada) × B thread × C fetch.
-- ❓ **Destino de `completed_tasks_json` e `progress_percent`** (§5.2): recomendação A, manter sincronizados.
-- ❓ **`toggle-task`** (§5.8): recomendação A, remover.
-- ❓ **Fator de tamanho** (× 100 palavras/min, piso 350, teto 1800): calibrar com conteúdo real.
+- ❓ **Modo de geração** (§5.3), para a equipe de backend validar: A síncrona (recomendada) × B thread × C fetch. Inclui o `--timeout` do gunicorn no `Procfile`.
+- ❓ **Destino de `completed_tasks_json` e `progress_percent`** (§5.2), para a equipe de backend validar: recomendação A, manter sincronizados.
+- ❓ **Ajuste do `toggle-task` no 4c** (§5.8), para a equipe validar: recomendação A, remover (a alternativa é C, restringir). A **ordem** do 4c já está ✅ decidida; só falta escolher a forma.
+- ⚠️ **Fator de tamanho** (× 100 palavras/min, piso 350, teto 1800): palpite a calibrar com testes reais (§5.5).
 - **Futuro:** minutos por tarefa no esquema do plano (`"tasks": [{"text": …, "minutes": …}]`). Muda o `plan_json` e o template (`{{ task }}` deixa de ser string); fica para quando o [handoff §11](../handoff/backend-pendencias.md#11-json-da-ia-sem-validação) for tratado.
 - **Futuro:** "Gerar outra versão" para conteúdo **não** demonstrativo (não decidido; hoje a decisão 10 só prevê o retry para o demo).
 - **Futuro:** escolher o trecho relevante do documento por tarefa, para arquivos acima de 30 mil caracteres.
