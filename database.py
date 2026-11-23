@@ -94,6 +94,11 @@ def init_db():
     );
     """)
 
+    # Limpeza das chaves do Gemini salvas pela interface antiga (docs/features/01, opção C).
+    # A chave agora vem só do .env; a coluna sai num PR futuro de banco.
+    # Idempotente: depois da 1ª execução não encontra mais linhas.
+    cursor.execute("UPDATE users SET gemini_api_key = '' WHERE gemini_api_key IS NOT NULL AND gemini_api_key != ''")
+
     conn.commit()
     conn.close()
 
