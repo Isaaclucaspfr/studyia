@@ -196,7 +196,9 @@ svg.icon { display: inline-block; }
   color: var(--color-text);
 }
 
-/* Rótulo do botão "Configurar IA": só ícone abaixo de 640 px, nome acessível mantido */
+/* Rótulo de botão da navbar: só ícone abaixo de 640 px, nome acessível mantido.
+   Sem uso desde a retirada do "Configurar IA" (features/01, §5.4); fica para o
+   seletor de tema (features/02). */
 .nav-btn-label {
   position: absolute;
   width: 1px;
@@ -205,10 +207,6 @@ svg.icon { display: inline-block; }
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
-}
-.nav-settings-btn {
-  width: var(--touch-min);
-  padding-inline: 0;
 }
 
 @media (min-width: 640px) {
@@ -224,10 +222,6 @@ svg.icon { display: inline-block; }
     margin: 0;
     overflow: visible;
     clip: auto;
-  }
-  .nav-settings-btn {
-    width: auto;
-    padding-inline: var(--space-3);
   }
 }
 
@@ -1131,65 +1125,14 @@ select.form-control {
   border: 1px solid var(--color-border);
 }
 
-/* --------------------------------------------------------------------------
-   Modal (#settingsModal é o overlay: display:none aqui; o app.js põe flex)
-   -------------------------------------------------------------------------- */
-
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-4);
-  background-color: var(--color-overlay);
-  transition: opacity var(--duration-base) var(--ease-out);
-}
-
-.modal-content {
-  width: 100%;
-  max-width: 32rem;
-  max-height: calc(100dvh - 2 * var(--space-4));
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-scrollbar) transparent;
-  padding: var(--space-6);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-overlay);
-  transition: transform var(--duration-base) var(--ease-out);
-}
-
-/* Entrada do modal (M2, D6). O app.js troca o display de none para flex; o
-   @starting-style dá o estado inicial dessa 1ª renderização. O overlay faz o fade
-   (e leva o card junto); o card só cresce de 0,97. Saída instantânea. */
-@starting-style {
-  .modal-overlay { opacity: 0; }
-  .modal-content { transform: scale(0.97); }
-}
-
-.modal-title {
-  margin-bottom: var(--space-2);
-  font-size: var(--text-lg);
-  font-weight: var(--weight-bold);
-  line-height: var(--leading-tight);
-  color: var(--color-text);
-}
-
-.modal-text {
-  margin-bottom: var(--space-5);
-  font-size: var(--text-ui);
-  color: var(--color-text-secondary);
-}
-
-.modal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  margin-top: var(--space-6);
+/* Nota de demonstração (features/01, §5.3): o app.js a acrescenta ao fim da bolha
+   quando a resposta é simulada. Substitui o style="" inline (B11). */
+.chat-bubble.assistant .chat-demo-note {
+  margin-top: var(--space-2);
+  font-size: var(--text-xs);
+  font-style: italic;
+  line-height: var(--leading-snug);
+  color: var(--color-text-subtle);
 }
 
 /* ==========================================================================
@@ -1511,15 +1454,15 @@ h3.card-title { font-size: var(--text-base); }
 }
 
 /* --------------------------------------------------------------------------
-   Aviso (DB1, A8): banner do modo de demonstração — âmbar AA
+   Aviso (DB1, A8): banner do modo de demonstração — âmbar AA.
+   Título + explicação, sem botão (features/01, §5.3).
    -------------------------------------------------------------------------- */
 
 .notice {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2) var(--space-3);
-  padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4);
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--text-ui);
   line-height: var(--leading-snug);
   color: var(--color-warning-text);
@@ -1532,14 +1475,20 @@ h3.card-title { font-size: var(--text-base); }
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  flex: 1 1 auto;
   font-weight: var(--weight-semibold);
 }
 
-.notice .btn { flex: none; }
+.notice-desc {
+  margin: 0;
+  max-width: 60ch;
+  text-wrap: pretty;
+}
 
 @media (min-width: 1024px) {
-  .notice { flex: none; }
+  .notice {
+    flex: none;
+    max-width: 24rem;
+  }
 }
 
 /* --------------------------------------------------------------------------
