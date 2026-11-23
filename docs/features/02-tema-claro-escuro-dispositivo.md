@@ -1,6 +1,12 @@
 # 02 — Tema claro / escuro / dispositivo
 
 > Índice: [features/README.md](README.md) · Base: commit `69c99ab` · Tamanho: médio (1 PR) · Escopos: **A** (tokens, CSS, markup) + **B** (um JS novo e, se aprovado, 3 linhas do `app.js`) · **Não toca o backend.**
+>
+> **Atualização depois da [01](01-remover-configurar-ia.md) (implementada na branch `feat/remover-configurar-ia`):**
+> - **Tokens do modal ficam para este PR (decisão do Renzo):** `--color-overlay`, `--shadow-overlay` e `--z-modal` (`tokens.css`) ficaram **sem uso** com a saída do modal. **Remover aqui**, junto com a reorganização dos tokens, em vez de criar valores escuros para eles.
+> - O `?v=` do CSS já está em `redesign_v4`: o próximo é **`redesign_v5`**.
+> - O item 9 da auditoria (`app.js:118`) já foi resolvido pela 01: a nota usa a classe `.chat-demo-note` com `var(--color-text-subtle)`. A cor inline do checklist, antes `app.js:170`, agora está em **`app.js:146`**.
+> - O ícone `i-settings` saiu do sprite; o `.nav-btn-label` (só ícone abaixo de 640 px) ficou no `style.css` para o seletor reaproveitar.
 
 ## 1. Objetivo
 
@@ -31,7 +37,7 @@ Cores que **não** passam pelos tokens semânticos, ou tokens que não fariam se
 |---|---|---|---|---|---|
 | 1 | `tokens.css:13` | `color-scheme: light` | selects, input de arquivo, barras de rolagem e o autofill continuam claros | `light` no tema claro, `dark` no escuro (§5.3) | A |
 | 2 | `tokens.css:103` | `--color-code-bg: var(--neutral-900)` (aponta para o **primitivo**, `#17201C`) | o bloco de código fica igual à superfície escura (1,0:1): some | valor escuro próprio (`#0A0E0C`, §5.2) | A |
-| 3 | `tokens.css:102`, `:161` | `--color-overlay` e `--shadow-overlay` com `rgb(23 32 28 / …)` literal | só o modal usa; o modal sai na [01](01-remover-configurar-ia.md) | nada, se a 01 entrar antes; senão, valor escuro | A |
+| 3 | `tokens.css:102`, `:161` | `--color-overlay` e `--shadow-overlay` com `rgb(23 32 28 / …)` literal | só o modal usa; o modal sai na [01](01-remover-configurar-ia.md) | ✅ a 01 entrou: **remover os tokens neste PR** (junto com o `--z-modal`) | A |
 | 4 | `tokens.css:202-288` | aliases `--chakra-*`/`--gray-*` com valores claros | não quebram nada hoje (sem uso), mas seriam uma armadilha para quem os usar depois | remover no mesmo PR (a sprint 01 já previa) | A |
 | 5 | `style.css:458` | `.btn-ghost:active` com `var(--accent-100)` (primitivo) | ao pressionar, o fundo pisca `#D3E6E0` (claro) sob texto claro: 1,08:1 | trocar por um token semântico (ex.: `--color-accent-soft-active`) | A |
 | 6 | `style.css:459` | `.btn-danger-outline:active` com `var(--danger-100)` (primitivo) | mesmo problema, em vermelho claro | idem (`--color-danger-soft-active`) | A |
@@ -223,7 +229,7 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 | **Backend** | **nada** (decisão do grupo) |
 | **Banco** | nada |
 | **Templates** | `base.html`: script inline no `<head>` antes do `:13`; `<script src="theme.js" defer>`; o seletor na navbar, **fora** do `{% if session.get('user_id') %}` (`:54`), no espaço de `:56-59` que a [01](01-remover-configurar-ia.md) libera; 3 ícones novos no sprite; opcional `<meta name="theme-color">`. Com isso o seletor aparece também no `login.html`, no `register.html` e no futuro `landing.html` ([04](04-landing-page.md)) **sem mexer nesses templates**, porque todos estendem o `base.html`. Nenhum outro template muda |
-| **CSS** | `tokens.css`: `color-scheme` e o bloco escuro (duas vezes); remover aliases `--chakra-*`/`--gray-*`. `style.css`: itens 5 a 8 da auditoria; estilos do seletor e do painel; subir o `?v=` (próximo: `redesign_v4`) |
+| **CSS** | `tokens.css`: `color-scheme` e o bloco escuro (duas vezes); remover aliases `--chakra-*`/`--gray-*` e os tokens sem uso do modal (`--color-overlay`, `--shadow-overlay`, `--z-modal`). `style.css`: itens 5 a 8 da auditoria; estilos do seletor e do painel; subir o `?v=` (próximo: `redesign_v5`) |
 | **JS** | novo `static/js/theme.js`; `app.js:170` (e `:118`, se a 01 não resolver) com a opção 3 |
 | **Testes** | o `test_app.py` não é afetado (o tema não muda HTML de resposta, só um atributo aplicado no navegador). Teste manual: §9 |
 | **Docs** | `docs/06-padroes-visuais.md` (tokens escuros, seletor, estados); `docs/04` (novo `theme.js`, `data-theme`, ordem dos scripts); `docs/03-frontend-inventario.md` (novo JS) |

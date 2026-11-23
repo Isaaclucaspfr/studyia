@@ -11,7 +11,7 @@
 > - [02 — Tema claro/escuro/dispositivo](../features/02-tema-claro-escuro-dispositivo.md): não toca o backend. **Possibilidade futura:** salvar a preferência de tema no banco (coluna em `users` + rota), para valer em outros dispositivos. Hoje fica só no navegador.
 > - [04 — Landing page](../features/04-landing-page.md): mudança **pequena** na rota `/` (`index`, `app.py:53-57`). Sem sessão, ela passa a renderizar `landing.html` em vez de redirecionar ao login (só a linha `:57` muda) e ganha 2 testes novos; nenhum teste existente acessa a `/`. Precisa do ok da equipe de backend no PR da landing. **Possibilidade futura:** cache longo para `static/vendor/` (caminhos versionados) no lugar do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy.
 
-Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado)
+Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado) · [16](#16-gemini-citado-como-fonte-mesmo-no-modo-demonstração)
 
 ---
 
@@ -22,6 +22,8 @@
 - **Sugestão (opcional):** ler o histórico antes do `INSERT` ou não reanexar a pergunta.
 
 ### 2. Chave do Gemini gravada em texto puro
+> 🟡 **Parcialmente resolvido** na [feature 01](../features/01-remover-configurar-ia.md) (branch `feat/remover-configurar-ia`): a rota `update_api_key` saiu, a chave vem só do `.env` e o `init_db()` apaga as chaves já salvas. **Falta:** remover a coluna `users.gemini_api_key` num PR futuro de banco.
+
 - **Onde:** `app.py:140-143` e `database.py:25` (`users.gemini_api_key`)
 - **O que acontece:** ✅ a chave colada no modal "Configurar IA" é salva sem criptografia.
 - **Impacto na tela:** nenhum direto. O risco é de vazamento de credencial de terceiros (RNF04, RNF05) se o arquivo `studyia.db` for copiado ou exposto.
@@ -52,10 +54,14 @@
 - **Sugestão (opcional):** testar com uma chave real e registrar no README quais modelos foram validados.
 
 ### 7. Fallback silencioso, só com `print()`
+> 🟡 **Tocado** na [feature 01](../features/01-remover-configurar-ia.md) (branch `feat/remover-configurar-ia`): o servidor registra um `WARNING` no log ao iniciar sem `GEMINI_API_KEY`. Os outros casos (chave inválida, rede, modelo, JSON) continuam só com `print()`.
+
 - **Onde:** `ai_service.py:20`, `:66`, `:140`, `:143`, `:230`, `:316`, `:412`
 - **O que acontece:** ✅ chave inválida, rede fora, modelo inexistente ou JSON inválido vão parar no console do servidor e o app devolve o conteúdo de demonstração.
 - **Impacto na tela:** o usuário recebe conteúdo genérico apresentado como se fosse da IA (RNF06, transparência).
 - **Sugestão (opcional):** usar `logging` e propagar o motivo para a camada web (ver o item 8).
+- **Evidência (feature 01):** ✅ testado pelo Renzo em 2026-11-23 com uma chave **inválida**: o banner do dashboard some (esperado); no chat, a resposta vem genérica **com** a nota "Resposta de demonstração"; mas a **visão geral do tópico** foi gerada com o conteúdo genérico do fallback **sem nenhum aviso na tela**, e a faixa do tópico ainda diz "impulsionados pelo Google Gemini". Nada aparece no log além do `print()`.
+- **Prioridade: 🔴 alta antes da apresentação.** O usuário vê conteúdo genérico achando que é da IA (RNF06).
 
 ### 8. `is_simulated` descartado ou não persistido
 - **Onde:**
@@ -67,8 +73,12 @@
 - **O que acontece:** ✅ só o chat ao vivo sabe se a resposta é de demonstração, e essa informação some ao recarregar.
 - **Impacto na tela:** o frontend não consegue mostrar de forma consistente "este conteúdo é de demonstração" em planos, seminários, notas e histórico (RNF06).
 - **Sugestão (opcional):** persistir um booleano por mensagem, plano e seminário, ou ao menos repassar o valor aos templates.
+- **Evidência (feature 01):** ✅ testado pelo Renzo em 2026-11-23 com uma chave **inválida**: o banner do dashboard some (esperado); no chat, a resposta vem genérica **com** a nota "Resposta de demonstração"; mas a **visão geral do tópico** foi gerada com o conteúdo genérico do fallback **sem nenhum aviso na tela**, e a faixa do tópico ainda diz "impulsionados pelo Google Gemini". Só o chat avisa porque é o único lugar em que o `is_simulated` chega à tela (no JSON do `send_message`); a visão geral, o plano e o seminário descartam o valor. Sem chave nenhuma, o banner `ai_demo_mode` cobre o caso; com chave inválida, não.
+- **Prioridade: 🔴 alta antes da apresentação.** O usuário vê conteúdo genérico achando que é da IA (RNF06).
 
 ### 9. Banner de demo considera só a chave do banco
+> ✅ **Resolvido** na [feature 01](../features/01-remover-configurar-ia.md) (branch `feat/remover-configurar-ia`): o `has_custom_key` saiu e o banner usa `ai_demo_mode` (`context_processor`), verdadeiro quando não há `GEMINI_API_KEY` no ambiente. **Limite conhecido:** chave inválida, modelo inexistente ou rede fora ainda caem no demo sem banner (depende dos itens 7 e 8).
+
 - **Onde:** `app.py:181-182` (`has_custom_key`); o template usa o valor em `dashboard.html:20`
 - **O que acontece:** ✅ o banner "⚡ Modo Demonstração Ativo" aparece quando o usuário não salvou uma chave pela interface, **mesmo que exista `GEMINI_API_KEY` no `.env`**. E não aparece quando a chave salva é inválida.
 - **Impacto na tela:** aviso errado nos dois sentidos (RNF06).
@@ -111,13 +121,19 @@
 - **Impacto na tela:** a sprint 01 trocou todos os emojis da interface por ícones SVG com `aria-hidden` (achado A6, decisão D11). Os emojis no conteúdo do chat destoam do resto e são lidos em voz alta pelos leitores de tela ("foguete", "bússola").
 - **Sugestão (opcional):** remover os emojis do fallback e do modelo de seções do prompt, e pedir ao Gemini que não use emojis.
 
+### 16. Gemini citado como fonte mesmo no modo demonstração
+- **Onde:** `templates/study_topic.html:53` ("fundamentação didática e esclarecimento contínuo de dúvidas impulsionados pelo Google Gemini"); o mesmo padrão em `plan_create.html:68` ("O Gemini criará um cronograma…")
+- **O que acontece:** ✅ o texto é fixo no template. Aparece igual com a IA real, sem chave e com chave inválida (visto na prática no teste da feature 01, junto com a evidência dos itens 7 e 8).
+- **Impacto na tela:** pendência de **transparência (RNF06)**: no modo demonstração, a tela atribui ao Gemini um conteúdo que é de exemplo.
+- **Sugestão (opcional):** condicionar o texto ao modo efetivo. Com `ai_demo_mode` já dá para cobrir o caso "sem chave"; o caso "chave inválida" depende do `is_simulated` por conteúdo (item 8). A mudança no template é lógica Jinja e fica para o PR que resolver o item 8. Registrado em [features/01 §11](../features/01-remover-configurar-ia.md#11-em-aberto--futuro).
+
 ---
 
 ## O que o frontend precisa de vocês
 
 Itens que destravam o trabalho visual. Nenhum deles é urgente para a sprint 01, mas eles definem o que o redesign consegue exibir.
 
-1. **Expor o modo da IA para os templates** (itens 8 e 9): um `is_simulated` por mensagem, plano e seminário, e um indicador global do modo efetivo (por exemplo, via `context_processor`). Com isso, o aviso de demonstração fica consistente em todas as telas.
+1. **Expor o modo da IA para os templates** (itens 8 e 9): um `is_simulated` por mensagem, plano e seminário, e um indicador global do modo efetivo (por exemplo, via `context_processor`). Com isso, o aviso de demonstração fica consistente em todas as telas. *(O indicador global por ausência de chave, `ai_demo_mode`, entrou na feature 01; falta o `is_simulated` por conteúdo.)*
 2. **Fuso horário dos timestamps:** hoje o template recebe UTC como string e a mensagem nova usa a hora local do navegador ([05-achados B8](../05-achados-frontend.md)). Preciso saber se vocês vão converter (por exemplo, para `America/Sao_Paulo`) ou se o frontend deve converter.
 3. **Erros dentro do layout:** o 413 (item 10) e os erros de validação (itens 5 e 11) voltando como `flash` + redirect, para aparecerem nos alertas já estilizados.
 4. **Rotas JSON respondendo JSON quando a sessão expira** (por exemplo, 401 com `{"error": "..."}` em vez de redirect HTML). Assim o JS consegue mostrar "sessão expirada" (ver [02-rotas.md](../02-rotas.md#login_required-e-as-rotas-json)).

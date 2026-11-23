@@ -8,10 +8,10 @@ Todos os 7 templates de página fazem `{% extends "base.html" %}` e preenchem **
 
 | Template | O que mostra | Variáveis do backend | Rota |
 |---|---|---|---|
-| `base.html` | `<head>` (CSS, fontes, Lucide); navbar (`:18-35`) com marca, "⚙️ Configurar IA", nome e "Sair"; modal da chave Gemini (`:38-60`); flashes (`:63-73`); `<main class="container">` (`:76-78`); rodapé de transparência RNF06 (`:81-84`); scripts (`:87-93`) | `session.user_id`, `session.name`, `get_flashed_messages(with_categories=true)`; `url_for`: `dashboard`, `login`, `logout`, `update_api_key`, `static` | — |
+| `base.html` | `<head>` (CSS, fontes, Lucide); navbar (`:18-35`) com marca, nome e "Sair" (o "Configurar IA" e o modal da chave saíram na feature 01); flashes (`:63-73`); `<main class="container">` (`:76-78`); rodapé de transparência RNF06 (`:81-84`); scripts (`:87-93`) | `session.user_id`, `session.name`, `get_flashed_messages(with_categories=true)`; `url_for`: `dashboard`, `login`, `logout`, `static`; `ai_demo_mode` (global) | — |
 | `login.html` | card centralizado com o form de login e link para cadastro | — | `login` |
 | `register.html` | card centralizado com o form de cadastro e link para login | — | `register` |
-| `dashboard.html` | cabeçalho + banner "Modo Demonstração" (`:20-25`); 3 estatísticas (`:30-62`); cards "Pesquisar Assunto" (`:67-94`) e "Estudo de Arquivo" (`:97-124`); histórico (`:128-185`) com "Abrir Estudo" e excluir | `topics[]` (`id`, `title`, `topic_type`, `file_name`, `created_at`, `plans_count`, `seminars_count`), `total_topics`, `total_plans`, `total_seminars`, `avg_score` (ou `None`), `has_custom_key` | `dashboard` |
+| `dashboard.html` | cabeçalho + banner "Modo Demonstração" (`:20-25`); 3 estatísticas (`:30-62`); cards "Pesquisar Assunto" (`:67-94`) e "Estudo de Arquivo" (`:97-124`); histórico (`:128-185`) com "Abrir Estudo" e excluir | `topics[]` (`id`, `title`, `topic_type`, `file_name`, `created_at`, `plans_count`, `seminars_count`), `total_topics`, `total_plans`, `total_seminars`, `avg_score` (ou `None`); o banner usa `ai_demo_mode` (global, no lugar do antigo `has_custom_key`) | `dashboard` |
 | `study_topic.html` | "← Voltar"; título + badge de modo; botões Exportar / Gerar Plano / Iniciar Seminário (`:28-40`); `.ai-notice` de modo (`:45-51`); grid de 2 colunas (`:54`): chat (`:57-92`) e coluna lateral com planos (`:98-132`) e seminários (`:135-169`) | `topic` (`id`, `title`, `topic_type`, `file_name`, `created_at`), `messages[]` (`sender`, `content`, `created_at`), `plans[]` (`id`, `level`, `daily_minutes`, `progress_percent`), `seminars[]` (`id`, `is_completed`, `score`) | `view_topic` |
 | `plan_create.html` | form de preferências (F07): objetivo, nível, minutos/dia, dias/semana, prazo; aviso de IA; Cancelar / Gerar | `topic` (`id`, `title`) | `create_plan` (GET) |
 | `plan_view.html` | "← Voltar"; título, nível e overview; "Reajustar Preferências"; card de progresso (`:33-45`); um card por dia com checkboxes (`:49-90`); CTA de seminário (`:92-102`) | `plan` (`id`, `topic_id`, `topic_title`, `level`, `daily_minutes`, `days_per_week`, `progress_percent`), `plan_data` (JSON do plano), `completed_tasks` (lista de `task_key`) | `view_plan` |
@@ -36,7 +36,7 @@ Só existem dois arquivos.
 | Chat | `:372-490` | `.chat-window`, `.chat-messages`, `.message-row(.user)`, `.avatar-circle(.assistant/.user)`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble(.assistant/.user)` + estilos de Markdown dentro de `.chat-bubble.assistant`, `.chat-input-area` |
 | Progresso | `:493-506` | `.progress-bar-container`, `.progress-bar-fill` |
 | Aviso de IA | `:509-520` | `.ai-notice` |
-| Modal | `:523-542` | `.modal-overlay` (`display:none` por padrão), `.modal-content` |
+| ~~Modal~~ | — | removido na feature 01 |
 | Responsivo | `:545-549` | **única media query**, `@media (max-width: 768px)`: `.grid-2` em 1 coluna, navbar em coluna, `.chat-bubble` com max-width 95% |
 
 **Não há** regras para `.chat-bubble.typing` nem `.chat-bubble.error`, embora o JS gere essas classes.
@@ -45,7 +45,7 @@ Só existem dois arquivos.
 
 | Bloco | Linhas | O que faz |
 |---|---|---|
-| 1. Modal da chave | `:4-26` | `#openSettingsBtn` abre e `#closeSettingsBtn` fecha o `#settingsModal` via `style.display`; um clique no próprio overlay também fecha |
+| ~~1. Modal da chave~~ | — | removido na feature 01 (o bloco `:4-26` foi apagado; as linhas abaixo são anteriores a essa mudança) |
 | 2. Markdown | `:33-40` | Para cada `.markdown-content`, troca o `innerHTML` por `marked.parse(data-raw)` |
 | 3. Chat | `:28-31`, `:42-142` | Submit do `#chatForm` → fetch → `appendBubble()` (`:86-130`) monta a bolha; `escapeHTML()` (`:132-142`) é usado só no indicador "digitando" ou sem `marked` |
 | 4. Checklist do plano | `:144-181` | `change` em `.plan-task-checkbox` → fetch → atualiza a barra, o texto do % e o label |

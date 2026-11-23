@@ -92,12 +92,12 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | KPIs | `.stats`, `.stat`, `.stat-label`, `.stat-value`, `.stat-empty` |
 | Progresso | `.progress-bar-container` (+ `.progress-lg`), `.progress-bar-fill`, `.progress-card`, `.progress-summary`, `.progress-label`, `.progress-value`, `.progress-foot` |
 | Tarefa | `.task-list`, `.task-item` (o `<label>`), `.plan-task-checkbox` (contrato), `.task-text` (+ `.is-done`), `.plan-days`, `.plan-day-header`, `.cta-strip` |
-| Chat | `.chat-window`, `.chat-header`, `.chat-title`, `.chat-count`, `.chat-messages`, `.message-row`, `.avatar-circle`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble.user/.assistant/.typing/.error`, `.chat-input-area` (estrutura da bolha é contrato) |
+| Chat | `.chat-window`, `.chat-header`, `.chat-title`, `.chat-count`, `.chat-messages`, `.message-row`, `.avatar-circle`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble.user/.assistant/.typing/.error`, `.chat-demo-note`, `.chat-input-area` (estrutura da bolha é contrato) |
 | Seminário | `.score-panel` + `.score--high/mid/low` (≥ 70 / 50–69 / < 50, D2), `.score-head`, `.score-title`, `.score-summary`, `.score-box`, `.score-value`, `.score-label`, `.score-insights`, `.insight` (+ `--positive`, `--review`), `.question-list`, `.question-head`, `.question-title`, `.choices`, `.choice` (+ `.is-selected`, `.is-readonly`, `.is-editable`), `.choice-input`, `.choice-text`, `.feedback` (+ `--correct`, `--partial`, `--incorrect`) |
-| Modal | `.modal-overlay` (`#settingsModal`, `display:none` no CSS), `.modal-content`, `.modal-title`, `.modal-text`, `.modal-actions` |
+| ~~Modal~~ | removido na feature 01 (o histórico do git guarda o CSS). Os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` ficaram sem uso |
 | Auth | `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer` |
 | Telas | `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.site-footer` |
-| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-user`, `.nav-settings-btn`, `.nav-btn-label`, `.user-badge`, `.user-name` |
+| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-user`, `.nav-btn-label` (sem uso; reservado para o seletor de tema), `.user-badge`, `.user-name` |
 | Grade | `.container`, `.grid-2`, `.grid-3` |
 | Ícone e acessibilidade | `.icon` (+ `-sm`, `-lg`), `.icon-sprite`, `.sr-only` |
 
@@ -145,7 +145,7 @@ Novos estilos vão **sempre** para classes no CSS. Os 183 `style=""` originais v
 | Caso | Por quê |
 |---|---|
 | `style="width: {{ … }}%"` em `.progress-bar-fill` (`plan_view.html`, `study_topic.html`) | valor dinâmico vindo do banco. O `#planProgressBar` ainda é **atualizado pelo JS via `style.width`** (contrato) |
-| `style.display` no `#settingsModal` | escrito pelo JS (contrato); o CSS só define o estado inicial `display:none` |
+| ~~`style.display` no `#settingsModal`~~ | removido na feature 01 |
 | `style.textDecoration` / `style.color` em `#label_<task_key>` | escrito pelo JS (`app.js:167-175`). O inline vence a classe, então, **depois do primeiro clique**, a cor do JS (`#94a3b8`, 2,45:1) prevalece sobre o CSS. Alinhar exige mudar o JS (B11) |
 | HTML com `style` gerado no JS (`app.js:118`, nota de demo no chat) | só muda junto com o JS (B11) |
 
@@ -159,4 +159,4 @@ SVG inline num sprite no topo do `base.html`, traço de 1,5 px na tela, sempre `
 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>
 ```
 
-Ícones: `settings`, `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`. Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).
+Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`. Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).
