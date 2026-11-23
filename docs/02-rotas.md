@@ -2,13 +2,14 @@
 
 Todas as rotas estão em `app.py`. A coluna **Endpoint** traz o nome usado em `url_for(...)` nos templates (é o nome da função Python). "IA síncrona" significa que a requisição fica bloqueada até a IA, ou o fallback, responder.
 
+> **Feature 01 (2026-11-22):** a rota `POST /settings/api-key` (`update_api_key`) foi removida e hoje responde 404. A chave do Gemini vem só do `.env` ([features/01](features/01-remover-configurar-ia.md)). Os números de linha do `app.py` abaixo são anteriores a essa mudança.
+
 | Método | URL | Endpoint | Linha | Recebe | Retorna | Quem consome |
 |---|---|---|---|---|---|---|
 | GET | `/` | `index` | `app.py:53` | — | redirect → `dashboard` (logado) ou `login` | acesso direto |
 | GET, POST | `/register` | `register` | `app.py:59` | form: `name`, `username`, `email`, `password`, `confirm_password` | HTML `register.html` (GET ou erro, com flash) · redirect → `dashboard` | `register.html` |
 | GET, POST | `/login` | `login` | `app.py:108` | form: `login_input` (usuário **ou** e-mail), `password` | HTML `login.html` · redirect → `dashboard` | `login.html` |
 | GET | `/logout` | `logout` | `app.py:131` | — | redirect → `login` | link "Sair" em `base.html:32` |
-| POST | `/settings/api-key` | `update_api_key` | `app.py:137` | form: `gemini_api_key` | redirect → `request.referrer` (ou `dashboard`) | modal em `base.html:45` |
 | GET | `/dashboard` | `dashboard` | `app.py:152` | — | HTML `dashboard.html` | navbar, redirects |
 | POST | `/topic/new-subject` | `new_subject` | `app.py:199` | form: `title` (obrigatório), `initial_question` | redirect → `view_topic` · **IA síncrona** | `dashboard.html:79` |
 | GET | `/topic/<id>/export` | `export_topic` | `app.py:249` | — | download `text/markdown` | `study_topic.html:29` |

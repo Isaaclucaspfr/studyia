@@ -129,17 +129,20 @@ A correção no fallback (`ai_service.py:414-474`) compara os **2 primeiros cara
 
 ## Chave do Gemini: ordem de resolução
 
-`get_current_user_api_key()` (`app.py:41-47`) e depois `get_gemini_client()` (`ai_service.py:12-21`):
+Desde a [feature 01](features/01-remover-configurar-ia.md), a chave vem **só** do ambiente. `get_current_user_api_key()` (`app.py:45-48`) e depois `get_gemini_client()` (`ai_service.py:12-21`):
 
-1. `users.gemini_api_key` do usuário logado, gravada pelo modal "Configurar IA" (`app.py:137-146`).
-2. Se estiver vazia, usa a variável de ambiente `GEMINI_API_KEY` (`.env`).
-3. Se também estiver vazia, o cliente vale `None` e o app usa o **fallback**.
+1. Usa a variável de ambiente `GEMINI_API_KEY` (`.env` ou variável do servidor).
+2. Se estiver vazia, o cliente vale `None` e o app usa o **fallback**.
+
+- A coluna `users.gemini_api_key` **não é mais lida nem gravada**. O `init_db()` limpa as chaves que tinham sido salvas pela interface antiga; a coluna sai num PR futuro de banco.
+- O modo demonstração efetivo é exposto a todos os templates como `ai_demo_mode` (`context_processor` `inject_ai_mode`, `app.py:50-53`), e o servidor registra um `WARNING` no log ao iniciar sem `GEMINI_API_KEY`.
+- Limite conhecido: `ai_demo_mode` só detecta a **ausência** da chave. Chave inválida, modelo inexistente ou rede fora continuam caindo no demo sem banner (ver a tabela abaixo).
 
 ## Quando o app cai no fallback (modo demo)
 
 | Situação | Onde | Aviso |
 |---|---|---|
-| Nenhuma chave disponível | `ai_service.py:13-15` | nenhum |
+| Nenhuma chave disponível | `ai_service.py:13-15` | banner "Modo demonstração" no dashboard + `WARNING` no log ao iniciar |
 | Erro ao importar `google.genai` ou criar o cliente | `ai_service.py:16-21` | `print` no console |
 | Os 3 modelos (`gemini-3.5-flash-lite`, `gemini-3.5-flash`, `gemini-3.8-flash`) lançam exceção | `ai_service.py:57`, `:131`, `:219`, `:305`, `:402` | `print` no console |
 | A resposta não é JSON válido (plano, seminário, avaliação) | `json.loads` dentro do `try` | `print` no console |
@@ -150,7 +153,7 @@ Em todos esses casos a queda é **silenciosa** para o usuário. ⚠️ não conf
 
 | Tabela | Colunas | Relações |
 |---|---|---|
-| `users` (`:18-28`) | `id` PK, `name`, `username` UNIQUE, `email` UNIQUE, `password_hash` (werkzeug), `gemini_api_key` DEFAULT `''`, `created_at` | — |
+| `users` (`:18-28`) | `id` PK, `name`, `username` UNIQUE, `email` UNIQUE, `password_hash` (werkzeug), `gemini_api_key` DEFAULT `''` (sem uso desde a feature 01; sai num PR de banco), `created_at` | — |
 | `study_topics` (`:31-44`) | `id`, `user_id`, `title`, `topic_type` CHECK(`'subject'`,`'file'`), `file_name`, `file_path`, `extracted_text`, `created_at`, `updated_at` | `user_id` → `users` ON DELETE CASCADE |
 | `chat_messages` (`:47-56`) | `id`, `topic_id`, `sender` CHECK(`'user'`,`'assistant'`), `content`, `created_at` | `topic_id` → `study_topics` CASCADE |
 | `study_plans` (`:59-77`) | `id`, `topic_id`, `user_id`, `goal`, `level`, `daily_minutes`, `days_per_week`, `deadline`, `plan_json`, `completed_tasks_json` DEFAULT `'[]'`, `progress_percent`, `created_at`, `updated_at` | `topic_id` → `study_topics` CASCADE; `user_id` → `users` CASCADE |

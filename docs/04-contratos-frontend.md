@@ -14,11 +14,12 @@
   - Renomear ou remover esses blocos quebra todas as páginas. **Não existe** bloco `head`/`scripts`/`styles`. Criar um novo é permitido, desde que os dois atuais continuem.
 - [ ] **Ordem dos scripts no fim do `<body>`** (`base.html:87-88`): primeiro `marked`, depois `app.js`. O `app.js` usa `window.marked` no `DOMContentLoaded` (`app.js:37`, `:111`). Não mova o `app.js` para o `<head>` sem `defer` e não inverta a ordem.
 - [ ] **Flashes** (`base.html:63-73`): o loop precisa continuar gerando `class="alert alert-{{ category }}"`. O backend usa exatamente as categorias **`success`, `danger`, `warning` e `info`** (`flash(..., "<categoria>")` em todo o `app.py`). Se renomear as classes do CSS, mantenha esses 4 sufixos ou faça o mapeamento no template.
-- [ ] **Condição de sessão:** o botão "⚙️ Configurar IA", o nome do usuário, o "Sair" (`base.html:24`) e o modal inteiro (`base.html:38`) só existem com `{% if session.get('user_id') %}`. Mantenha a condição: o modal faz POST para uma rota protegida.
+- [ ] **Condição de sessão:** o nome do usuário e o "Sair" (`base.html:54`) só existem com `{% if session.get('user_id') %}`. Mantenha a condição. (O botão "Configurar IA" e o modal da chave saíram na [feature 01](features/01-remover-configurar-ia.md).)
+- [ ] **`ai_demo_mode`** (variável global, `context_processor` em `app.py`): `True` quando não há `GEMINI_API_KEY` no ambiente. Controla o banner "Modo demonstração" do `dashboard.html`. Está disponível em **todos** os templates.
 - [ ] **Link da marca** (`base.html:19`): vai para `dashboard` se houver sessão, senão para `login`.
 - [ ] **Nomes de endpoint em `url_for`** são os nomes das funções Python do `app.py`. Um erro de digitação gera `BuildError` e **derruba a página inteira**:
 
-  `index`, `register`, `login`, `logout`, `update_api_key`, `dashboard`, `new_subject`, `export_topic`, `upload_file`, `delete_topic`, `view_topic`, `send_message`¹, `create_plan`, `view_plan`, `toggle_task`¹, `create_seminar`, `view_seminar`, `submit_seminar`, `static`.
+  `index`, `register`, `login`, `logout`, `dashboard`, `new_subject`, `export_topic`, `upload_file`, `delete_topic`, `view_topic`, `send_message`¹, `create_plan`, `view_plan`, `toggle_task`¹, `create_seminar`, `view_seminar`, `submit_seminar`, `static`.
 
   ¹ Hoje não são chamados via `url_for`: o `app.js` monta a URL na mão (`/topic/${id}/message`, `/plan/${id}/toggle-task`). Por isso, **o formato dessas duas URLs também é contrato**.
 - [ ] **Parâmetros do `url_for`:** `topic_id=` (`view_topic`, `export_topic`, `delete_topic`, `create_plan`, `create_seminar`), `plan_id=` (`view_plan`) e `seminar_id=` (`view_seminar`, `submit_seminar`).
@@ -29,10 +30,6 @@
 
 | Seletor | Onde está | Uso no JS | O que não pode mudar |
 |---|---|---|---|
-| `#openSettingsBtn` | `base.html:26` | click → `settingsModal.style.display='flex'` (`app.js:5`, `:9-13`) | o ID |
-| `#settingsModal` | `base.html:39` | `style.display` alterna entre `'flex'` e `'none'`; um clique **no próprio elemento** fecha (`app.js:22-26`) | o ID; precisa ser o **overlay externo**, com o conteúdo como filho; o CSS precisa manter `display:none` por padrão (`style.css:524`), e a centralização depende de `display:flex` com `align-items`/`justify-content` |
-| `#closeSettingsBtn` | `base.html:54` | click → fecha (`app.js:15-19`) | o ID; precisa ter `type="button"`, senão submete o form da chave |
-| `#openSettingsBtn2` | `dashboard.html:23` | `onclick` inline: `document.getElementById('settingsModal').style.display='flex'` | o `onclick` depende de `#settingsModal` |
 | `.markdown-content` + `data-raw` | `study_topic.html:77` | `innerHTML = marked.parse(data-raw)` (`app.js:34-40`) | a classe e o atributo `data-raw="{{ msg.content \| e }}"`; o conteúdo interno do elemento é **substituído** pelo JS |
 | `#chatForm` + `data-topic-id` | `study_topic.html:85` | submit com `preventDefault`; o ID do tópico vem de `dataset.topicId` (`app.js:29`, `:46-51`) | o ID e o atributo `data-topic-id="{{ topic.id }}"`; o form **não tem `action`**, então sem o JS ele faria GET na própria página |
 | `#chatInput` | `study_topic.html:86` | `.value` lido e limpo (`app.js:30`, `:48`, `:55`) | o ID; **não tem `name`** e não precisa (vai via JSON) |
@@ -59,7 +56,7 @@ A mesma estrutura é gerada **em dois lugares**: no Jinja, para o histórico (`s
 
 - No Jinja, `{tipo}` é o próprio `msg.sender` (`user` ou `assistant`), mais `markdown-content` e `data-raw`.
 - No JS, `{tipo}` pode ser `user`, `assistant`, `assistant typing` ou `assistant error` (`app.js:54`, `:59`, `:73`, `:75`, `:79`). A bolha do JS **não** recebe `markdown-content`: ela já é renderizada direto.
-- Quando `is_simulated` é verdadeiro, o JS acrescenta dentro da bolha um `<div style="...">⚡ Modo Demonstração Didática…</div>` com estilo inline (`app.js:117-119`).
+- Quando `is_simulated` é verdadeiro, o JS acrescenta ao fim da bolha um `<div class="chat-demo-note">Resposta de demonstração: a IA não está disponível no momento.</div>` (`app.js:95-97`). A classe `.chat-demo-note` precisa continuar estilizada no CSS (sem `style=""` inline desde a [feature 01](features/01-remover-configurar-ia.md)).
 
 ---
 
@@ -69,7 +66,6 @@ A mesma estrutura é gerada **em dois lugares**: no Jinja, para o histórico (`s
 |---|---|---|---|---|
 | Login | `login.html:18` | `POST url_for('login')` | `login_input`, `password` | `login_input` aceita usuário **ou** e-mail (`app.py:111-117`) |
 | Cadastro | `register.html:18` | `POST url_for('register')` | `name`, `username`, `email`, `password`, `confirm_password` | backend exige senha ≥ 6 e senhas iguais (`app.py:72-78`) |
-| Chave Gemini | `base.html:45` | `POST url_for('update_api_key')` | `gemini_api_key` | valor vazio **apaga** a chave salva (`app.py:140-143`) |
 | Novo assunto | `dashboard.html:79` | `POST url_for('new_subject')` | `title`, `initial_question` | `title` vazio → flash + volta ao dashboard |
 | Upload | `dashboard.html:109` | `POST url_for('upload_file')` | `document` (file), `custom_title` | **`enctype="multipart/form-data"` obrigatório**; `accept=".pdf,.txt,.md"` é só uma dica, quem valida é o backend |
 | Plano | `plan_create.html:24` | `POST url_for('create_plan', topic_id=…)` | `goal`, `level`, `daily_minutes`, `days_per_week`, `deadline` | `daily_minutes` e `days_per_week` passam por **`int()`**: os `value` dos `<option>` precisam ser números (`plan_create.html:44-47`, `:56-58`). `level` aparece como "Nível {{ level }}" (valores atuais: `Iniciante`, `Intermediário`, `Avançado`, `:35-37`) |
@@ -83,7 +79,7 @@ As rotas abaixo só aceitam `POST`. Transformar o botão em `<a href>` gera **40
 
 - `delete_topic` (excluir estudo)
 - `create_seminar` (gerar seminário, nos 4 lugares)
-- `new_subject`, `upload_file`, `submit_seminar`, `update_api_key`
+- `new_subject`, `upload_file`, `submit_seminar`
 
 Podem ser links (`GET`): `create_plan` (abre o form), `view_topic`, `view_plan`, `view_seminar`, `export_topic`, `logout`, `dashboard`, `login`, `register`.
 
@@ -138,10 +134,18 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 1. [ ] O template continua com `{% extends "base.html" %}` e o conteúdo está dentro de `{% block content %}`.
 2. [ ] Nenhum ID da [tabela 7.2](#72-ids-e-classes-usados-pelo-appjs) foi renomeado, removido ou duplicado, e os atributos `data-*` continuam no mesmo elemento.
 3. [ ] Todo `<input>`, `<select>` e `<textarea>` mantém o `name` da [tabela 7.3](#73-atributos-name-lidos-pelo-flask), e os `value` numéricos do plano continuam numéricos.
-4. [ ] Os forms de `delete_topic`, `create_seminar`, `new_subject`, `upload_file`, `submit_seminar` e `update_api_key` continuam `method="POST"`, e o upload mantém o `enctype="multipart/form-data"`.
+4. [ ] Os forms de `delete_topic`, `create_seminar`, `new_subject`, `upload_file` e `submit_seminar` continuam `method="POST"`, e o upload mantém o `enctype="multipart/form-data"`.
 5. [ ] Os `url_for(...)` usam exatamente os nomes de endpoint listados em 7.1.
 6. [ ] Se mexeu na bolha de chat do Jinja (`study_topic.html:67-81`), a estrutura bate com a do `appendBubble` (`app.js:86-130`), e o `data-raw` continua no elemento `.markdown-content`.
 7. [ ] A fórmula da `task_key` e o loop de tarefas (`plan_view.html:66-86`) estão intactos.
 8. [ ] Os textos da [tabela 7.5](#75-textos-verificados-pelo-test_apppy) continuam presentes.
-9. [ ] O `#chatMessages` continua com altura limitada e `overflow-y:auto`, e o `#settingsModal` continua oculto por padrão e centralizado com `display:flex`.
-10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.alert-success/-danger/-warning/-info`.
+9. [ ] O `#chatMessages` continua com altura limitada e `overflow-y:auto`.
+10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.chat-demo-note`, `.alert-success/-danger/-warning/-info`.
+
+---
+
+## Histórico de mudanças nos contratos
+
+| Data | Mudança | Origem |
+|---|---|---|
+| 2026-11-22 | **Removidos:** `#openSettingsBtn`, `#settingsModal`, `#closeSettingsBtn`, `#openSettingsBtn2` (e o `onclick` inline), o form "Chave Gemini" (`gemini_api_key`), o endpoint `update_api_key` (rota `POST /settings/api-key`) e o item 9 do checklist sobre o modal. **Adicionados:** a variável global `ai_demo_mode` (no lugar do `has_custom_key`) e a classe `.chat-demo-note` gerada pelo `app.js`. | [feature 01](features/01-remover-configurar-ia.md) |

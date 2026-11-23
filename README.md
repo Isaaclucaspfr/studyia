@@ -63,11 +63,11 @@ pip install -r requirements.txt
 ```
 
 ### 3. Configurar a Chave da API Gemini (Opcional)
-Você pode adicionar sua chave do Google AI Studio no arquivo `.env`:
+A chave do Google AI Studio fica **só** no arquivo `.env` (ou na variável de ambiente `GEMINI_API_KEY` do servidor):
 ```env
 GEMINI_API_KEY=AIzaSy...
 ```
-*Nota: Caso não configure no `.env`, você pode inserir sua chave diretamente na interface web através do botão **"⚙️ Configurar IA"** ou testar a aplicação no **Modo de Demonstração Didática** integrado.*
+*Nota: a interface web não pede nem guarda chave. Sem `GEMINI_API_KEY`, a aplicação roda no **Modo de Demonstração**: o painel mostra um aviso, as respostas usam conteúdo de exemplo e o servidor registra um alerta no log ao iniciar.*
 
 ### 4. Executar os Testes Automatizados
 ```bash

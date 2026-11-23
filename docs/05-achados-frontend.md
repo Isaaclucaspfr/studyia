@@ -85,6 +85,7 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Impacto:** cada aviso tem um visual diferente. O contraste do banner é **3,36:1** (`#dd6b20` sobre `#fffff0`), abaixo do mínimo AA de 4,5:1 para texto normal.
 - **Requisito:** RNF06.
 - **Limite do escopo:** a **aparência** do banner e do rodapé é A. **Quando** o aviso aparece depende do backend (`has_custom_key`, `is_simulated`, ver C). A nota do chat está dentro do JS (B).
+- **Atualização ([feature 01](features/01-remover-configurar-ia.md), 2026-11-22):** o banner passou a depender de `ai_demo_mode` (sem `GEMINI_API_KEY` no ambiente), não tem mais botão e explica o que é o modo demonstração; a nota do chat usa a classe `.chat-demo-note` (tokens, sem inline) e o rodapé cita o modo demonstração.
 
 ---
 
@@ -115,8 +116,12 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Requisito:** RNF03.
 - **Por que não é só visual:** exige JS para desabilitar o botão e trocar o rótulo no submit, o que impede o reenvio.
 - **Candidato a entrar no redesign se o grupo aprovar.** O estilo do estado "carregando" pode ser preparado no CSS (A) e ficar pronto para quando o JS for aprovado.
+- **Evidência (2026-11-23, teste do Renzo com a chave real do Gemini, durante a [feature 01](features/01-remover-configurar-ia.md)):** ✅ confirmada na prática. A geração com a IA real demora vários segundos e **cada clique extra no botão cria um plano duplicado**.
+- **Prioridade: 🔴 alta — próximo PR sugerido.** Não corrigido no PR da feature 01.
 
-### B5. Modal sem acessibilidade ✅
+### B5. Modal sem acessibilidade ✅ — deixou de existir
+> **[Feature 01](features/01-remover-configurar-ia.md) (2026-11-22):** o modal da chave foi removido (HTML, JS e CSS). Não há mais modal no projeto; o registro abaixo fica como histórico e vale de referência se um modal voltar.
+
 - **Onde:** `base.html:39-59` e `app.js:4-26`. Faltam `role="dialog"`, `aria-modal` e `aria-labelledby`; o foco não vai para o modal nem fica preso nele; Esc não fecha; o foco não volta ao botão ao fechar.
 - **Impacto:** quem navega por teclado ou usa leitor de tela fica perdido atrás do overlay.
 - **Requisito:** RNF10.
@@ -155,9 +160,9 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 ### B11. Duplicações ✅
 - **Bolha de chat em Jinja e em JS:** `study_topic.html:67-81` e `app.js:86-130`.
 - **Form "gerar seminário" repetido 4×:** `study_topic.html:35`, `:138`, `plan_view.html:97` e `seminar_view.html:29`.
-- **Dois jeitos de abrir o modal:** listener em `app.js:9-13` e `onclick` inline em `dashboard.html:23`.
+- ~~**Dois jeitos de abrir o modal:** listener em `app.js:9-13` e `onclick` inline em `dashboard.html:23`.~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o modal, o listener e o `onclick` saíram.
 - **Estilo da tarefa concluída** definido no template (`plan_view.html:81`, `gray-400`) e no JS (`app.js:167-175`, `#94a3b8` / `inherit`).
-- **Aviso de demo** como HTML inline dentro do JS (`app.js:118`).
+- ~~**Aviso de demo** como HTML inline dentro do JS (`app.js:118`).~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o JS gera só `<div class="chat-demo-note">`, e o estilo (com tokens, incluindo a antiga cor `#718096`) fica no CSS.
 - **Impacto:** risco de as duas versões divergirem num redesign parcial.
 - **Por que não é só visual:** unificar mexe no JS ou cria macros Jinja usadas por várias telas. A macro do form de seminário é só markup, então é **candidata ao redesign se o grupo aprovar**.
 

@@ -1,6 +1,8 @@
 # 01 — Remover "Configurar IA"
 
 > Índice: [features/README.md](README.md) · Base: commit `69c99ab` · Tamanho: pequeno (1 PR) · Escopos: **A + B + C**
+>
+> **Status:** ✅ implementado na branch `feat/remover-configurar-ia`. Ver [§12](#12-registro-da-implementação).
 
 ## 1. Objetivo
 
@@ -126,6 +128,7 @@ def inject_ai_mode():
 
 - `dashboard.html:14` troca `{% if not has_custom_key %}` por `{% if ai_demo_mode %}`, e o `has_custom_key` sai de `app.py:180-182` e `:192`.
 - **Limite conhecido:** isso só detecta "não há chave". Chave inválida, modelo inexistente ([handoff §6](../handoff/backend-pendencias.md#6-nomes-dos-modelos-gemini-a-confirmar)) ou rede fora continuam caindo no demo sem banner. Para esses casos, o caminho é o `is_simulated` por conteúdo ([handoff §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido)); a [03](03-conteudo-do-plano.md) já grava `is_simulated` para o conteúdo das tarefas.
+- **Evidência do limite (pós-implementação):** testado pelo Renzo em 2026-11-23 com uma chave **inválida**: o banner do dashboard some (esperado); no chat, a resposta vem genérica **com** a nota "Resposta de demonstração"; mas a **visão geral do tópico** foi gerada com o conteúdo genérico do fallback **sem nenhum aviso na tela**, e a faixa do tópico ainda diz "impulsionados pelo Google Gemini". Ou seja, **com chave inválida, só o chat avisa**; a visão geral, o plano e o seminário não avisam, porque o `is_simulated` não chega à tela ([handoff §7 e §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido), prioridade alta antes da apresentação). Fora do escopo deste PR.
 - **Log no start:** se `GEMINI_API_KEY` estiver vazia, `app.logger.warning("GEMINI_API_KEY não definida: o StudyIA vai rodar em modo demonstração")` logo depois do `load_dotenv()`. Quem faz o deploy vê o problema no log, e não só quem abre o dashboard.
 
 ### 5.3 Textos de transparência (RNF06)
@@ -178,19 +181,19 @@ Nenhum contrato de chat, plano, seminário ou dos textos do `test_app.py` (§7.5
 
 ## 9. Critérios de aceite
 
-- [ ] Não existe "Configurar IA" na navbar em 375, 768 e 1440 px.
-- [ ] Não existe `#settingsModal`, `#openSettingsBtn`, `#openSettingsBtn2` nem `#closeSettingsBtn` em nenhuma página (`grep` no `templates/`).
-- [ ] O console do navegador não mostra erros no dashboard, no tópico (chat) e no plano (checklist). Enviar uma mensagem no chat e marcar uma tarefa continuam funcionando.
-- [ ] `POST /settings/api-key` não grava nada (404 ou 405).
-- [ ] Com `GEMINI_API_KEY` definida: o dashboard **não** mostra o banner de demonstração.
-- [ ] Sem `GEMINI_API_KEY`: o dashboard mostra o banner, sem botão, com o texto explicativo; o servidor registra o aviso no log ao iniciar.
-- [ ] Um usuário que tinha `gemini_api_key` preenchida no banco passa a usar a chave do ambiente (ou a coluna está vazia para todos).
-- [ ] O rodapé cita o modo demonstração.
-- [ ] O `app.js` não tem mais o bloco do modal (`:4-26`); a nota de demonstração do chat não fala mais em configurar a chave e usa uma classe, sem `style=""` inline.
-- [ ] O `dashboard.html` não tem mais nenhum `onclick` (`grep -n onclick templates/`).
-- [ ] O `README.md` não cita mais o "Configurar IA" e explica que a chave fica só no `.env`.
-- [ ] `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py` passa.
-- [ ] `docs/04`, `docs/02`, `docs/01` e o handoff atualizados no mesmo PR.
+- [x] Não existe "Configurar IA" na navbar em 375, 768 e 1440 px.
+- [x] Não existe `#settingsModal`, `#openSettingsBtn`, `#openSettingsBtn2` nem `#closeSettingsBtn` em nenhuma página (`grep` no `templates/`).
+- [x] O console do navegador não mostra erros no dashboard, no tópico (chat) e no plano (checklist). Enviar uma mensagem no chat e marcar uma tarefa continuam funcionando.
+- [x] `POST /settings/api-key` não grava nada (404 ou 405).
+- [x] Com `GEMINI_API_KEY` definida: o dashboard **não** mostra o banner de demonstração.
+- [x] Sem `GEMINI_API_KEY`: o dashboard mostra o banner, sem botão, com o texto explicativo; o servidor registra o aviso no log ao iniciar.
+- [x] Um usuário que tinha `gemini_api_key` preenchida no banco passa a usar a chave do ambiente (ou a coluna está vazia para todos).
+- [x] O rodapé cita o modo demonstração.
+- [x] O `app.js` não tem mais o bloco do modal (`:4-26`); a nota de demonstração do chat não fala mais em configurar a chave e usa uma classe, sem `style=""` inline.
+- [x] O `dashboard.html` não tem mais nenhum `onclick` (`grep -n onclick templates/`).
+- [x] O `README.md` não cita mais o "Configurar IA" e explica que a chave fica só no `.env`.
+- [x] `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py` passa.
+- [x] `docs/04`, `docs/02`, `docs/01` e o handoff atualizados no mesmo PR.
 
 ## 10. Divisão em PRs e responsáveis
 
@@ -207,15 +210,30 @@ Um PR só (passo 2 da [ordem](README.md#ordem-de-implementação--decidido)). �
 
 **Checklist do PR:**
 
-- [ ] Rota `update_api_key` removida e `get_current_user_api_key` lendo só o `.env`
-- [ ] Limpeza única das chaves salvas (ou `studyia.db` recriado)
-- [ ] Botão, modal, `#openSettingsBtn2` e o `onclick` removidos
-- [ ] `app.js:4-26` apagado; `app.js:118` com texto novo e classe
-- [ ] `README.md:70` atualizado
-- [ ] CSS do modal removido e `?v=` atualizado
-- [ ] Docs 01, 02, 04, 05 e handoff atualizados
+- [x] Rota `update_api_key` removida e `get_current_user_api_key` lendo só o `.env`
+- [x] Limpeza única das chaves salvas (ou `studyia.db` recriado)
+- [x] Botão, modal, `#openSettingsBtn2` e o `onclick` removidos
+- [x] `app.js:4-26` apagado; `app.js:118` com texto novo e classe
+- [x] `README.md:70` atualizado
+- [x] CSS do modal removido e `?v=` atualizado
+- [x] Docs 01, 02, 04, 05 e handoff atualizados
 
 ## 11. Em aberto / futuro
 
 - **Futuro:** detectar o demo "de fato" (chave inválida, cota estourada) e não só a ausência da chave. Depende do [handoff §7 e §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido).
 - **Futuro:** PR de banco para remover a coluna `gemini_api_key` de vez (opção C, segunda etapa).
+- **Pendência (backend, 🔴 alta antes da apresentação):** com chave inválida, só o chat avisa que a resposta é de demonstração. Visão geral, plano e seminário mostram o fallback sem aviso (§5.2, evidência de 2026-11-23). Depende do [handoff §7 e §8](../handoff/backend-pendencias.md#8-is_simulated-descartado-ou-não-persistido).
+- **Pendência de transparência (RNF06):** `study_topic.html:53` diz "impulsionados pelo Google Gemini" mesmo no modo demonstração (e `plan_create.html:68`, "O Gemini criará…"). Texto fixo no template; condicioná-lo é lógica Jinja e depende do `is_simulated` para cobrir a chave inválida. Ver [handoff §16](../handoff/backend-pendencias.md#16-gemini-citado-como-fonte-mesmo-no-modo-demonstração). Não alterado neste PR.
+- **Pendência (frontend B, 🔴 prioridade alta — próximo PR sugerido):** [B4](../05-achados-frontend.md#b4-sem-estado-de-carregamento-e-sem-proteção-contra-clique-duplo-) confirmada com a chave real: cada clique extra durante a geração cria um plano duplicado.
+
+## 12. Registro da implementação
+
+Branch `feat/remover-configurar-ia` (a partir da `main` em `23cb2b1`), 2026-11-22.
+
+- **Limpeza das chaves (§5.1, opção C):** o `UPDATE` ficou no `database.init_db()`, com `WHERE gemini_api_key != ''`. Roda a cada start, mas depois da 1ª vez não encontra linhas (nenhum código grava mais a coluna). Sai junto com a coluna no PR de banco.
+- **`get_current_user_api_key()`** foi mantida (só lê o ambiente) para não mexer nas 5 chamadas nem no `ai_service.py`.
+- **`?v=`:** CSS `redesign_v3` → `redesign_v4`; o `app.js` também ganhou um `?v=` novo (`sem_modal_v1`), porque o arquivo mudou.
+- **CSS:** saíram o bloco do modal e o `.nav-settings-btn`; o `.nav-btn-label` ficou (recomendação do §5.4). O banner `.notice` virou título + explicação, sem botão. Nova classe `.chat-demo-note`.
+- **Sem uso, decididos na revisão (2026-11-23):** o ícone `i-settings` saiu do sprite do `base.html`; os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` ficam para o PR do tema ([02](02-tema-claro-escuro-dispositivo.md), registrado lá).
+- **Docs fora da lista do §6, atualizados por consistência:** `docs/03-frontend-inventario.md` e `docs/06-padroes-visuais.md`.
+- **Verificação:** `test_app.py` com 6 testes novos (classe `RemoverConfigurarIATestCase`); navegador (Playwright) com e sem `GEMINI_API_KEY`: sem erros no console, chat, checklist, seminário, upload e exclusão funcionando, banner só sem a chave, `POST /settings/api-key` → 404.
