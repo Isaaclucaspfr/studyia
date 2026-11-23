@@ -11,10 +11,10 @@
         </p>
     </div>
 
-    {% if not has_custom_key %}
+    {% if ai_demo_mode %}
     <div class="notice">
-        <span class="notice-text"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo demonstração ativo</span>
-        <button class="btn btn-secondary btn-sm" id="openSettingsBtn2" onclick="document.getElementById('settingsModal').style.display='flex'">Configurar chave Gemini</button>
+        <span class="notice-text"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-info"></use></svg> Modo demonstração</span>
+        <p class="notice-desc">A IA não está configurada neste servidor. Explicações, planos e seminários usam conteúdo de exemplo.</p>
     </div>
     {% endif %}
 </div>
