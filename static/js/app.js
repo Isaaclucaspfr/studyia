@@ -1,30 +1,6 @@
 // StudyIA - Frontend Interactivity
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Configurações do Modal de API Key
-    const settingsBtn = document.getElementById('openSettingsBtn');
-    const settingsModal = document.getElementById('settingsModal');
-    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-
-    if (settingsBtn && settingsModal) {
-        settingsBtn.addEventListener('click', () => {
-            settingsModal.style.display = 'flex';
-        });
-    }
-
-    if (closeSettingsBtn && settingsModal) {
-        closeSettingsBtn.addEventListener('click', () => {
-            settingsModal.style.display = 'none';
-        });
-    }
-
-    // Fechar ao clicar fora do modal
-    window.addEventListener('click', (e) => {
-        if (e.target === settingsModal) {
-            settingsModal.style.display = 'none';
-        }
-    });
-
     // Chat Interativo com o Assistente (F03 / F06)
     const chatForm = document.getElementById('chatForm');
     const chatInput = document.getElementById('chatInput');
@@ -115,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         if (isSimulated && !isUser && !isTyping) {
-            formatted += `<div style="margin-top: 6px; font-size: 0.72rem; color: #718096; font-style: italic;">⚡ Modo Demonstração Didática (Chave Gemini pode ser configurada)</div>`;
+            formatted += `<div class="chat-demo-note">Resposta de demonstração: a IA não está disponível no momento.</div>`;
         }
 
         bubble.innerHTML = formatted;
