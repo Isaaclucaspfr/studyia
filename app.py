@@ -18,6 +18,10 @@ import ai_service
 load_dotenv()
 
 app = Flask(__name__)
+
+if not os.environ.get("GEMINI_API_KEY"):
+    app.logger.warning("GEMINI_API_KEY não definida: o StudyIA vai rodar em modo demonstração")
+
 app.secret_key = os.environ.get("SECRET_KEY", "studyia_secret_una_2026")
 
 UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'uploads')
@@ -39,12 +43,14 @@ def login_required(f):
     return decorated_function
 
 def get_current_user_api_key():
-    conn = database.get_db_connection()
-    user = conn.execute("SELECT gemini_api_key FROM users WHERE id = ?", (session.get('user_id'),)).fetchone()
-    conn.close()
-    if user and user['gemini_api_key']:
-        return user['gemini_api_key'].strip()
+    # A chave do Gemini vem só do ambiente (.env). A coluna users.gemini_api_key
+    # não é mais lida e sai num PR futuro de banco (docs/features/01, opção C).
     return os.environ.get("GEMINI_API_KEY", "")
+
+@app.context_processor
+def inject_ai_mode():
+    # Modo demonstração efetivo, disponível em todos os templates
+    return {"ai_demo_mode": not os.environ.get("GEMINI_API_KEY")}
 
 # ----------------------------------------------------
 # ROTAS DE AUTENTICAÇÃO (F01 / RNF04 / RNF05)
@@ -134,17 +140,6 @@ def logout():
     flash("Sua sessão foi encerrada com segurança.", "info")
     return redirect(url_for('login'))
 
-@app.route('/settings/api-key', methods=['POST'])
-@login_required
-def update_api_key():
-    api_key = request.form.get('gemini_api_key', '').strip()
-    conn = database.get_db_connection()
-    conn.execute("UPDATE users SET gemini_api_key = ? WHERE id = ?", (api_key, session['user_id']))
-    conn.commit()
-    conn.close()
-    flash("Chave da API Gemini atualizada com sucesso!", "success")
-    return redirect(request.referrer or url_for('dashboard'))
-
 # ----------------------------------------------------
 # DASHBOARD E HISTÓRICO (F02, F04, F05)
 # ----------------------------------------------------
@@ -177,9 +172,6 @@ def dashboard():
     total_seminars = seminar_stats['total_seminars'] or 0
     avg_score = round(seminar_stats['avg_score'], 1) if seminar_stats['avg_score'] is not None else None
 
-    # Verifica status da API Key
-    user = conn.execute("SELECT gemini_api_key FROM users WHERE id = ?", (user_id,)).fetchone()
-    has_custom_key = bool(user['gemini_api_key'] if user else False)
     conn.close()
 
     return render_template(
@@ -188,8 +180,7 @@ def dashboard():
         total_topics=total_topics,
         total_plans=total_plans,
         total_seminars=total_seminars,
-        avg_score=avg_score,
-        has_custom_key=has_custom_key
+        avg_score=avg_score
     )
 
 # ----------------------------------------------------
