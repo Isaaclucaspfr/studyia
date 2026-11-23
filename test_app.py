@@ -135,5 +135,101 @@ class StudyIATestCase(unittest.TestCase):
         conn.close()
         print("\n✅ Todos os testes automatizados do StudyIA passaram com 100% de sucesso!")
 
+
+class RemoverConfigurarIATestCase(unittest.TestCase):
+    """Funcionalidade 01 (docs/features/01-remover-configurar-ia.md): a chave do
+    Gemini vem só do ambiente e a interface não pede mais chave."""
+
+    def setUp(self):
+        import os
+        app.config['TESTING'] = True
+        self._env_key = os.environ.get('GEMINI_API_KEY')
+        os.environ['GEMINI_API_KEY'] = ''
+        self.client = app.test_client()
+        database.init_db()
+
+        conn = database.get_db_connection()
+        conn.execute("DELETE FROM users WHERE username = 'alunochave'")
+        conn.commit()
+        conn.close()
+
+        self.client.post('/register', data={
+            'name': 'Aluno Chave',
+            'username': 'alunochave',
+            'email': f'chave_{time.time_ns()}@teste.com',
+            'password': 'senha123teste',
+            'confirm_password': 'senha123teste'
+        }, follow_redirects=True)
+
+        conn = database.get_db_connection()
+        self.user_id = conn.execute("SELECT id FROM users WHERE username = 'alunochave'").fetchone()['id']
+        conn.close()
+
+    def tearDown(self):
+        import os
+        if self._env_key is None:
+            os.environ.pop('GEMINI_API_KEY', None)
+        else:
+            os.environ['GEMINI_API_KEY'] = self._env_key
+
+    def test_rota_da_chave_removida(self):
+        res = self.client.post('/settings/api-key', data={'gemini_api_key': 'AIzaSyTESTE'})
+        self.assertIn(res.status_code, (404, 405))
+
+        conn = database.get_db_connection()
+        saved = conn.execute("SELECT gemini_api_key FROM users WHERE id = ?", (self.user_id,)).fetchone()
+        conn.close()
+        self.assertEqual(saved['gemini_api_key'] or '', '')
+
+    def test_html_sem_modal_e_sem_botao(self):
+        res = self.client.get('/dashboard')
+        self.assertEqual(res.status_code, 200)
+        for trecho in (b'settingsModal', b'openSettingsBtn', b'closeSettingsBtn',
+                       b'gemini_api_key', b'Configurar IA', b'onclick'):
+            self.assertNotIn(trecho, res.data)
+
+    def test_banner_sem_chave_no_ambiente(self):
+        import os
+        os.environ['GEMINI_API_KEY'] = ''
+        res = self.client.get('/dashboard')
+        self.assertIn('Modo demonstração'.encode('utf-8'), res.data)
+        self.assertIn('A IA não está configurada neste servidor'.encode('utf-8'), res.data)
+
+    def test_banner_some_com_chave_no_ambiente(self):
+        import os
+        os.environ['GEMINI_API_KEY'] = 'chave-de-teste'
+        res = self.client.get('/dashboard')
+        self.assertEqual(res.status_code, 200)
+        self.assertNotIn('A IA não está configurada neste servidor'.encode('utf-8'), res.data)
+
+    def test_chave_do_banco_nao_e_usada(self):
+        import os
+        from flask import session
+        from app import get_current_user_api_key
+
+        conn = database.get_db_connection()
+        conn.execute("UPDATE users SET gemini_api_key = 'chave-antiga-do-banco' WHERE id = ?", (self.user_id,))
+        conn.commit()
+        conn.close()
+
+        os.environ['GEMINI_API_KEY'] = 'chave-do-ambiente'
+        with app.test_request_context():
+            session['user_id'] = self.user_id
+            self.assertEqual(get_current_user_api_key(), 'chave-do-ambiente')
+
+    def test_limpeza_das_chaves_salvas(self):
+        conn = database.get_db_connection()
+        conn.execute("UPDATE users SET gemini_api_key = 'chave-antiga-do-banco' WHERE id = ?", (self.user_id,))
+        conn.commit()
+        conn.close()
+
+        database.init_db()
+
+        conn = database.get_db_connection()
+        restantes = conn.execute("SELECT COUNT(*) FROM users WHERE gemini_api_key != ''").fetchone()[0]
+        conn.close()
+        self.assertEqual(restantes, 0)
+
+
 if __name__ == '__main__':
     unittest.main()
