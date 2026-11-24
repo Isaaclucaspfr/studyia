@@ -51,7 +51,7 @@ Mostrar uma página de apresentação curta a quem chega ao StudyIA **sem sessã
 1. Um visitante **sem sessão** abre `/` e vê a landing (não é mais redirecionado ao login).
 2. A landing é **curta**, uma rolagem em desktop e poucas no celular: hero com a cena 3D e a proposta de valor, "Como funciona" em 3 passos, chamada final e rodapé.
 3. Há sempre dois caminhos visíveis: **"Criar conta"** (ação principal, vai para `register`) e **"Entrar"** (vai para `login`).
-4. A navbar mostra a marca e o **seletor de tema** ([02](02-tema-claro-escuro-dispositivo.md)), e a landing aparece no tema escolhido.
+4. ~~A navbar mostra a marca e o **seletor de tema** ([02](02-tema-claro-escuro-dispositivo.md)), e a landing aparece no tema escolhido.~~ ⚠️ substituído: a landing é **sempre escura** e **sem seletor** (decisão 1 do rebrand, §4).
 5. Quem **já está logado** e abre `/` vai direto para o dashboard, como hoje.
 6. **Sem WebGL, com movimento reduzido, no celular ou sem JavaScript**, a página continua completa e legível, com uma ilustração estática no lugar da cena.
 7. **Sem internet** (apresentação offline), a landing abre e anima, porque GSAP e Three.js vêm de `static/vendor/`.
@@ -62,7 +62,7 @@ Mostrar uma página de apresentação curta a quem chega ao StudyIA **sem sessã
 - ✅ **Decidido:** uma landing page **curta**, mostrada **antes** da tela de login, para visitantes **sem sessão**.
 - ✅ **Decidido:** animações com **GSAP** e **Three.js**.
 - ✅ **Decidido:** quem já está logado continua indo **direto para o dashboard**.
-- ✅ **Decidido:** o **seletor de tema** ([02](02-tema-claro-escuro-dispositivo.md), decisão "onde aparece") aparece também na landing.
+- ~~✅ **Decidido:** o **seletor de tema** ([02](02-tema-claro-escuro-dispositivo.md), decisão "onde aparece") aparece também na landing.~~ ⚠️ substituído em 24/11/2026: landing sempre escura, sem seletor (decisão 1 do rebrand, abaixo).
 
 ✅ **Aprovado pelo Renzo** (eram 💡 propostas deste doc):
 
@@ -75,6 +75,22 @@ Mostrar uma página de apresentação curta a quem chega ao StudyIA **sem sessã
 7. **Logout** continua indo para o **login** (`app.py:135`), sem mudança extra no backend (§5.1).
 
 ⚠️ **Continua dependendo do ok da equipe de backend:** a mudança da rota `/` (`app.py:57`, §5.1). É a única linha de Python do PR da landing.
+
+### ✅ Decidido pelo grupo depois da especificação (rebrand azul, 24/11/2026)
+
+Estas decisões vieram com o [rebrand azul](../06-padroes-visuais.md#8-identidade-azul-rebrand) (PR `feat/rebrand-azul`) e **substituem** o que for diferente nas seções abaixo. Onde o texto antigo conflita, ele foi marcado com "⚠️ substituído".
+
+1. ✅ **Landing SEMPRE ESCURA, sem seletor de tema.** Ela usa os tokens do tema escuro, qualquer que seja a escolha salva ou o sistema, e o seletor não aparece nela. Muda, só para a landing, a decisão "onde aparece" da [02 §4](02-tema-claro-escuro-dispositivo.md#4-decisões-do-grupo) (o seletor continua no login, no cadastro e nas telas logadas). A escolha salva no navegador não é alterada pela landing.
+2. ✅ **Páginas separadas:** landing (`/`), login e cadastro, cada uma com o seu template. A landing não embute o formulário de login.
+3. ✅ **Cena 3D: o cérebro do logo no centro, com 6 conceitos orbitando como satélites:** livro, chapéu de formatura, lâmpada, gráfico de crescimento, camadas e notebook. Substitui a ideia "Caderno quieto em 3D" do §5.5. A ilustração estática (celular, sem WebGL, movimento reduzido, sem JS) é a mesma composição parada.
+4. ✅ **4 benefícios, só na landing** (substituem os 3 do §5.4, parte 2):
+   - "Inteligência Artificial para estudar melhor"
+   - "Conteúdo amplo e organizado" (no lugar de "confiável", que contradiz o aviso de transparência do RNF06: a IA pode errar e o conteúdo deve ser revisado)
+   - "Estudos estruturados por temas"
+   - "Conhecimento na prática"
+5. ✅ **Inter nos títulos da landing** (variável, peso 500, tracking ≈ −0,04em). O corpo de texto continua na Atkinson Hyperlegible Next. O arquivo da Inter vai em `static/vendor/fonts/` (OFL, sem CDN), com nome de família próprio, separado do subconjunto do wordmark (`Inter Wordmark`, só "StudyIA", que entrou no rebrand).
+6. ✅ **Login e cadastro com o layout dividido da referência** (painel da marca de um lado, formulário do outro), **olho de mostrar senha** e o **rodapé RNF06**, **sem os benefícios** (que ficam só na landing). É o PR 3 da sequência até 01/12 (rebrand → correções rápidas → login/cadastro → landing).
+   - 🔍 **Em análise:** o painel do login com o **cérebro pequeno em SVG** × **sem ele**. Decidir com os dois screenshots no PR 3.
 
 ## 5. Proposta técnica
 
@@ -165,7 +181,7 @@ Curta, com 5 partes. Os textos são ponto de partida, em sentence case e sem emo
 | # | Parte | Conteúdo | Componentes |
 |---|---|---|---|
 | 1 | **Hero** | `<h1>` com a proposta de valor (ex.: "Estude qualquer assunto com um plano feito para você"); 1 frase de apoio (ex.: "Escolha um tema ou envie seu material. O StudyIA explica, organiza um plano de estudos com tarefas e testa o que você aprendeu."; mesma regra do passo 2, abaixo); CTAs **"Criar conta"** (`btn-primary`, `url_for('register')`) e **"Já tenho conta"** (`btn-secondary`, `url_for('login')`); ao lado (desktop) ou abaixo (celular), a cena 3D ou a ilustração estática | tokens de tipografia; `.btn` da sprint 01 |
-| 2 | **Proposta de valor** | 3 benefícios curtos, sem cards genéricos de ícone + título + parágrafo: fiel ao seu material (modo arquivo), no seu tempo (minutos por dia), com transparência sobre o uso de IA (RNF06) | lista simples com ícones do sprite |
+| 2 | **Proposta de valor** | ⚠️ substituído: **4 benefícios** (decisão 4 do rebrand, §4). Texto original: 3 benefícios curtos, sem cards genéricos de ícone + título + parágrafo: fiel ao seu material (modo arquivo), no seu tempo (minutos por dia), com transparência sobre o uso de IA (RNF06) | lista simples com ícones do sprite |
 | 3 | **Como funciona** | 3 passos numerados: **1. Assunto ou arquivo** → **2. Plano de estudos com tarefas** (vira "Plano com conteúdo" depois do 4b) → **3. Mini seminário com nota** | `<ol>` semântica; revelação suave com GSAP (§5.7) |
 | 4 | **Chamada final** | 1 frase + os mesmos 2 CTAs | — |
 | 5 | **Rodapé** | o rodapé RNF06 herdado do `base.html` (`:113-116`) | — |
@@ -174,6 +190,8 @@ Curta, com 5 partes. Os textos são ponto de partida, em sentence case e sem emo
 - **Nada de seções extras** (depoimentos, preços, FAQ, logos): o projeto é acadêmico e a landing é curta por decisão.
 
 ### 5.5 Cena Three.js: "Caderno quieto" em 3D
+
+> ⚠️ **Substituído (rebrand, 24/11/2026):** a cena passa a ser o **cérebro do logo em 3D com 6 conceitos orbitando como satélites** (decisão 3 do rebrand, §4), na paleta azul escura. Continuam valendo as regras de desempenho (§5.6), de acessibilidade (§5.7), a interação mínima e a ilustração estática equivalente. O texto abaixo fica como registro da proposta original.
 
 **Ideia:** pontos soltos (conceitos) flutuam devagar e, aos poucos, **assentam-se sobre as linhas pautadas de um caderno**, ligando-se em pequenos grupos por traços finos. A cena conta o que o app faz (do caos à organização) sem ilustrar literalmente "IA".
 
@@ -218,6 +236,8 @@ Curta, com 5 partes. Os textos são ponto de partida, em sentence case e sem emo
 - **Nada piscando** mais de 3 vezes por segundo; nenhuma animação passa de ~1 s na entrada.
 
 ### 5.8 Dois temas
+
+> ⚠️ **Substituído (rebrand, 24/11/2026):** a landing é **sempre escura** e **sem seletor** (decisão 1 do rebrand, §4). Na prática: o `landing.html` força os tokens escuros só nele (por exemplo, `data-theme="dark"` fixo no próprio template ou uma classe de escopo; a forma exata fica para o PR 4, sem tocar na chave `studyia-theme` do `localStorage`). A cena não precisa reagir à troca de tema. O texto abaixo fica como registro.
 
 - A landing usa **só os tokens semânticos**, então herda o claro e o escuro da [02](02-tema-claro-escuro-dispositivo.md) sem CSS próprio por tema.
 - **A cena reage ao tema:** o `landing.js` lê as cores dos tokens com `getComputedStyle(document.documentElement)` e as relê quando o tema muda: `MutationObserver` no atributo `data-theme` do `<html>` (escolha manual) + `matchMedia('(prefers-color-scheme: dark)')` com o evento `change` (modo Dispositivo). Depois de trocar as cores dos materiais, basta 1 quadro renderizado, mesmo com o loop pausado.
@@ -286,8 +306,9 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 - [ ] **Sem JavaScript:** todo o texto e os CTAs aparecem e funcionam.
 - [ ] **Celular (< 768 px):** o Three.js não é baixado; fica a ilustração estática.
 - [ ] **Sem rolagem horizontal** em 375 px (e em 768 e 1440 px).
-- [ ] **Dois temas:** Claro, Escuro e Dispositivo aplicam-se à landing, inclusive às cores da cena, e o **seletor de tema** aparece na navbar.
-- [ ] **AA** nos dois temas; canvas e SVG com `aria-hidden="true"`; CTAs com ≥ 44 px e foco visível.
+- [ ] ~~**Dois temas:** Claro, Escuro e Dispositivo aplicam-se à landing, inclusive às cores da cena, e o **seletor de tema** aparece na navbar.~~ ⚠️ substituído: **landing sempre escura**, com qualquer escolha de tema e com o sistema claro; **sem seletor** na navbar dela; a escolha salva continua valendo ao ir para o login.
+- [ ] **4 benefícios** com os textos da decisão 4 do rebrand; títulos em **Inter**; cena com o **cérebro e os 6 satélites**.
+- [ ] **AA** no tema escuro (o único da landing); canvas e SVG com `aria-hidden="true"`; CTAs com ≥ 44 px e foco visível.
 - [ ] **Lighthouse (modo celular, app rodando local, aba anônima; meta ✅ aprovada pelo Renzo, decisão 3):** **Desempenho ≥ 90**, **Acessibilidade ≥ 95**, **CLS = 0**.
 - [ ] **Passo 2** diz "Plano de estudos com tarefas" enquanto o 4b não estiver na `main` (decisão 5).
 - [ ] **Logout** continua levando ao login (decisão 7).

@@ -63,7 +63,7 @@ Cores que **não** passam pelos tokens semânticos, ou tokens que não fariam se
 ## 3. Como deve funcionar
 
 1. Na primeira visita, o tema é **Dispositivo**: claro ou escuro conforme o sistema operacional.
-2. Na navbar, no lugar do antigo "Configurar IA", há um botão de tema de 44 px, **em todas as páginas**: com sessão (dashboard, tópico, plano, seminário) e sem sessão (login, cadastro e a landing page da [04](04-landing-page.md)). Ele mostra o ícone do tema em uso e, a partir de 640 px, o rótulo "Tema".
+2. Na navbar, no lugar do antigo "Configurar IA", há um botão de tema de 44 px, **em todas as páginas**: com sessão (dashboard, tópico, plano, seminário) e sem sessão (login e cadastro; a landing page da [04](04-landing-page.md) é sempre escura e não tem seletor, atualizado em 24/11/2026). Ele mostra o ícone do tema em uso e, a partir de 640 px, o rótulo "Tema".
 3. A pessoa clica no botão, que abre um painel com **Claro**, **Escuro** e **Dispositivo**, e escolhe uma opção. A troca é imediata, sem recarregar a página.
 4. A escolha fica salva no navegador. Recarregar, mudar de página, fechar e abrir de novo: o tema continua o escolhido, **sem piscar** o tema errado durante o carregamento.
 5. Com **Dispositivo**, se o sistema trocar de claro para escuro (por exemplo, no horário automático), a página acompanha na hora, sem recarregar.
@@ -79,6 +79,7 @@ Cores que **não** passam pelos tokens semânticos, ou tokens que não fariam se
 - ✅ **Decidido:** o seletor fica na navbar, no espaço liberado pelo "Configurar IA" ([01](01-remover-configurar-ia.md)).
 - ✅ **Decidido (padrão do seletor):** um **botão de 44 × 44 px** que abre um **painel** com as 3 opções (Claro, Escuro, Dispositivo). É a opção A de §5.6.
 - ✅ **Decidido (onde aparece):** o seletor fica **fora** do `{% if session.get('user_id') %}` (`base.html:54`) e aparece também no **login**, no **cadastro** e na **landing page** ([04](04-landing-page.md)). O nome do usuário e o "Sair" continuam dentro da condição.
+  - ⚠️ **Atualizado em 24/11/2026 (rebrand azul):** a **landing page é sempre escura e não tem seletor de tema** ([04 §4](04-landing-page.md#4-decisões-do-grupo), decisão 1 do rebrand). O seletor continua no login, no cadastro e em todas as telas logadas. A landing não lê nem grava a chave `studyia-theme`: quem sai dela para o login encontra o tema que tinha escolhido.
 - ✅ **Decidido (cores inline do `app.js`):** trocar **só os hex** por `var(--color-text-subtle)`, sem mudar nenhuma lógica. É uma mudança puramente estética, a opção 3 de §5.5.
 
 ## 5. Proposta técnica
@@ -261,7 +262,7 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 ## 9. Critérios de aceite
 
 - [x] **3 modos:** Claro, Escuro e Dispositivo aplicam a paleta certa em todas as 7 telas (login, cadastro, dashboard, tópico/chat, criar plano, ver plano, seminário).
-- [x] **Seletor em todas as páginas:** o botão de tema aparece **com e sem sessão** (login e cadastro incluídos) e abre o painel com as 3 opções. Quando a [04](04-landing-page.md) entrar, aparece também na landing.
+- [x] **Seletor em todas as páginas:** o botão de tema aparece **com e sem sessão** (login e cadastro incluídos) e abre o painel com as 3 opções. ~~Quando a [04](04-landing-page.md) entrar, aparece também na landing.~~ A landing é sempre escura, sem seletor (atualizado em 24/11/2026).
 - [x] **Backend intacto:** o PR não altera nenhum `.py`.
 - [x] **Padrão:** sem nada salvo, o tema segue o sistema operacional.
 - [x] **Persistência:** a escolha sobrevive a recarregar (Ctrl+Shift+R), a navegar entre páginas e a fechar e reabrir o navegador.
