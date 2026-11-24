@@ -162,10 +162,15 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Bolha de chat em Jinja e em JS:** `study_topic.html:67-81` e `app.js:86-130`.
 - **Form "gerar seminário" repetido 4×:** `study_topic.html:35`, `:138`, `plan_view.html:97` e `seminar_view.html:29`.
 - ~~**Dois jeitos de abrir o modal:** listener em `app.js:9-13` e `onclick` inline em `dashboard.html:23`.~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o modal, o listener e o `onclick` saíram.
-- **Estilo da tarefa concluída** definido no template (`plan_view.html:81`, `gray-400`) e no JS (`app.js:167-175`, `#94a3b8` / `inherit`).
+- **Estilo da tarefa concluída** definido no template (`.task-text.is-done` no CSS) e no JS (`app.js:144-149`, inline). ~~A cor do JS era fixa (`#94a3b8`, 2,45:1, igual nos dois temas).~~ **Cores inline resolvidas na [feature 02](features/02-tema-claro-escuro-dispositivo.md):** o JS escreve `var(--color-text-subtle)`, o mesmo token do CSS, então a cor é a mesma antes e depois do clique e segue o tema (5,3:1 no claro, 5,7:1 no escuro, na superfície). **Continua** a duplicação do mecanismo (classe no template × inline no JS); unificar exige mudar o JS.
 - ~~**Aviso de demo** como HTML inline dentro do JS (`app.js:118`).~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o JS gera só `<div class="chat-demo-note">`, e o estilo (com tokens, incluindo a antiga cor `#718096`) fica no CSS.
 - **Impacto:** risco de as duas versões divergirem num redesign parcial.
 - **Por que não é só visual:** unificar mexe no JS ou cria macros Jinja usadas por várias telas. A macro do form de seminário é só markup, então é **candidata ao redesign se o grupo aprovar**.
+
+### B12. Progresso "10%" × "10.0%" ✅
+- **Onde:** `app.py:594` (`round(…, 1)` devolve sempre `float`) e a coluna `progress_percent REAL` (`database.py:71`); na tela, `plan_view.html:36` e `study_topic.html:123` (`{{ plan.progress_percent }}%`, o Jinja imprime `10.0`) × `app.js:141` (`` `${data.progress_percent}%` ``, o JSON chega como o número `10`). A nota do seminário tem o mesmo padrão (`95.0%` no painel, no badge e no flash).
+- **Impacto:** ao marcar uma tarefa, o progresso vira "10%"; ao recarregar, a mesma informação aparece como "10.0%". O ".0" também pesa nos números grandes do painel ("20.0%", "95.0%"). Visto na revisão da [feature 02](features/02-tema-claro-escuro-dispositivo.md) (23/11/2026); existe igual na `main`.
+- **Por que não é só visual:** a formatação vem do tipo do dado. Pode ser resolvida no backend (devolver inteiro quando não há fração, ou já formatado) ou no template com um filtro de formatação (lógica Jinja, categoria B), sempre igual ao que o JS escreve. Registrado no [handoff, item 18](handoff/backend-pendencias.md#18-percentuais-sempre-com-uma-casa-decimal-100).
 
 ---
 
