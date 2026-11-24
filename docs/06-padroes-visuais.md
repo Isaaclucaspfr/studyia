@@ -1,14 +1,16 @@
 # 06 — Padrões visuais
 
 > **Status: aguardando aprovação do grupo.** Implementado na [sprint 01](sprints/sprint-01-redesign-visual.md) (branch `feat/redesign-visual`, 17/11/2026). Depois do merge do PR, este arquivo vira a referência visual do StudyIA. As decisões que levaram a cada valor (D1–D40) estão no [registro da sprint](sprints/sprint-01-redesign-visual.md#registro-de-decisões).
+>
+> **Rebrand azul (24/11/2026, branch `feat/rebrand-azul`):** a identidade verde-petróleo "Caderno quieto" foi trocada pela identidade azul tecnológica, com logo novo. Mudaram os **valores** dos tokens, o logo, o favicon e o botão primário (gradiente); os nomes dos tokens, os componentes e o comportamento continuam os mesmos. Detalhes em [§8](#8-identidade-azul-rebrand).
 
 ## Princípios
 
 - **Mesmo stack:** HTML + Jinja + CSS puro + o `app.js` existente. **Sem React, sem Tailwind, sem build step, sem npm.** Ícones em SVG inline (sprite no `base.html`), sem biblioteca.
-- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `tema_v3`).
+- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `rebrand_v1`; o favicon também leva `?v=`).
 - **Nenhum contrato de [04-contratos-frontend.md](04-contratos-frontend.md) é quebrado.** As classes usadas pelo JS ou geradas pelo backend continuam existindo.
 - **Inspiração:** a anatomia de componentes do shadcn/ui (estrutura simples, variantes por modificador, estados explícitos), feita **em CSS puro**.
-- **Direção "Caderno quieto" (D1):** app de estudos calmo e legível. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro. Superfícies com borda de 1 px e sem sombra em repouso; sombra só no que flutua (o painel do tema). Sem gradiente, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone.
+- **Direção (D1, com a identidade azul do rebrand):** app de estudos calmo e legível, com cara de tecnologia **só onde a marca aparece**. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro (neutros levemente azulados). Superfícies com borda de 1 px e sem sombra em repouso; sombra só no que flutua (o painel do tema). **Um único gradiente:** o do botão primário (decisão do grupo no rebrand). Fora dele: sem gradiente, sem brilho/glow, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone. O "tecnológico" fica no logo e, depois, na cena 3D da landing.
 - **Componentes usam só tokens semânticos** (`--color-*`, `--space-*`, `--text-*`, `--radius-*`, `--duration-*`). Nenhuma cor literal em template, CSS de componente ou JS. Primitivos (`--neutral-*`, `--accent-*`…) também não: eles só têm o valor claro e quebram o tema escuro (ver [§7](#7-temas-claro-e-escuro)).
 - **Dois temas** (feature 02): claro e escuro, com os mesmos tokens semânticos. Toda cor nova precisa de valor nos dois ([§7](#7-temas-claro-e-escuro)).
 
@@ -20,38 +22,44 @@ Primitivos em escalas (`--neutral-*`, `--accent-*`, `--success-*`, `--warning-*`
 
 | Token | Claro | Escuro | Uso | Contraste (claro · escuro) |
 |---|---|---|---|---|
-| `--color-bg` | `#F5F6F4` | `#111714` | fundo da página, área do chat | — |
-| `--color-surface` | `#FFFFFF` | `#18201C` | cards, campos, bolha da IA, navbar | — |
-| `--color-surface-muted` | `#EDEFEC` | `#222B27` | badges neutros, aviso de transparência, desabilitado, hover neutro | — |
-| `--color-surface-raised` / `-hover` | `#FFFFFF` / `#EDEFEC` | `#1E2723` / `#252F2A` | o que flutua sobre a página (painel do tema) e o hover dentro dele | sutil por cima: 5,3 / 4,6 · 5,2 / 4,7 |
-| `--color-border` | `#E2E5E1` | `#2E3833` | bordas de card e divisórias | — |
-| `--color-border-strong` | `#C5CBC6` | `#3E4A44` | botão secundário, alternativa, painel flutuante | — |
-| `--color-border-input` | `#868F89` | `#727D77` | borda de campo, checkbox, radio | 3,3 · 3,9 (não-texto) |
-| `--color-text` | `#17201C` | `#E6EBE8` | tinta | 16,7 · 13,8 (na superfície) |
-| `--color-text-secondary` | `#55605A` | `#AAB4AE` | texto de apoio | 6,6 · 7,8 |
-| `--color-text-subtle` | `#646E68` | `#8E9993` | placeholder, hora, desabilitado, tarefa concluída | 5,3 · 5,7 (4,6 · 4,9 no muted) |
-| `--color-text-inverse` | `#FFFFFF` | `#111714` | texto sobre fundo invertido | — |
-| `--color-accent` | `#1E6B5C` | `#5DB8A2` | botão primário, progresso, foco, bolha do usuário | texto por cima 6,3 · 7,2 |
-| `--color-accent-hover` / `-active` | `#18584B` / `#124538` | `#77C7B3` / `#8FD3C2` | hover / pressionado (no escuro clareia) | 8,3 · 8,7 / — · 10,0 |
-| `--color-on-accent` | `#FFFFFF` | `#0B1F1A` | texto e ✓ sobre o acento | ver acento |
-| `--color-link` / `--color-focus` | `#1E6B5C` | `#5DB8A2` | links / anel de foco | 6,3 · 7,0 |
-| `--color-accent-soft` | `#EAF3F0` | `#173029` | alternativa marcada, fundo de hover | acento por cima — · 5,9 |
-| `--color-accent-soft-active` | `#D3E6E0` | `#1F4037` | pressionado do contorno e do fantasma | acento por cima — · 4,8 |
-| `--color-accent-soft-border` | `#A9CFC3` | `#2F6356` | borda da alternativa marcada | — |
-| `--color-success` / `-text` / `-soft` / `-border` | `#237A4B` / `#1A5E39` / `#EBF5EF` / `#A8D1B8` | `#6CC793` / `#86D3A5` / `#15281D` / `#2E5A40` | concluído, nota alta | texto/soft 7,0 · 8,8 |
-| `--color-warning` / `-text` / `-soft` / `-border` | `#B57A10` / `#8A5A00` / `#FFF6DB` / `#EBD38A` | `#D9A945` / `#E9C46F` / `#2A2313` / `#5C4A1F` | pendente, nota média, aviso de demo | texto/soft 5,5 · 9,3; `warning` só gráfico no claro (3,7) |
-| `--color-danger` / `-text` / `-soft` / `-border` | `#B42318` / `#912018` / `#FDF0EE` / `#EDABA2` | `#F08A7E` / `#F3A59B` / `#301B18` / `#6B3630` | "Sair", excluir, erro, nota baixa | 6,6 · 6,9; texto/soft 7,8 · 8,2 |
-| `--color-danger-soft-active` | `#F8D7D2` | `#40231F` | pressionado do "Sair" e do excluir | — · 5,9 |
-| `--color-selection` | `#D3E6E0` | `#24493F` | `::selection` | tinta por cima 12,8 · 8,3 |
-| `--color-scrollbar` | `#C5CBC6` | `#3E4A44` | polegar das barras de rolagem | — |
-| `--color-code-bg` / `-text` | `#17201C` / `#F5F6F4` | `#0A0E0C` / `#E6EBE8` | bloco de código no chat (no escuro, mais fundo que a página) | — · 16,1 |
-| `--icon-select-arrow` | SVG com traço `#55605A` | SVG com traço `#AAB4AE` | seta do `<select>` (imagem; o `<select>` não aceita `::before`) | 7,8 no escuro |
+| `--color-bg` | `#F4F7FB` | `#00152B` | fundo da página, área do chat | — |
+| `--color-surface` | `#FFFFFF` | `#061E39` | cards, campos, bolha da IA, navbar | — |
+| `--color-surface-muted` | `#E9EFF6` | `#102D4D` | badges neutros, aviso de transparência, desabilitado, hover neutro | — |
+| `--color-surface-raised` / `-hover` | `#FFFFFF` / `#E9EFF6` | `#0B2645` / `#133353` | o que flutua sobre a página (painel do tema) e o hover dentro dele | sutil por cima: 5,5 / 4,8 · 5,9 / 5,0 |
+| `--color-border` | `#DCE3EC` | `#18385B` | bordas de card, divisórias, trilho da barra de progresso | — |
+| `--color-border-strong` | `#C1CCDA` | `#24486F` | botão secundário, alternativa, painel flutuante, separador do logo | — |
+| `--color-border-input` | `#7D8CA1` | `#5C84AF` | borda de campo, checkbox, radio | 3,4 · 4,3 (não-texto) |
+| `--color-text` | `#0B1A2E` | `#E8F1FB` | tinta | 17,5 · 14,7 (na superfície) |
+| `--color-text-secondary` | `#475A71` | `#A8BDD5` | texto de apoio | 7,1 · 8,7 |
+| `--color-text-subtle` | `#596A80` | `#8CA4C0` | placeholder, hora, desabilitado, tarefa concluída | 5,5 · 6,5 (4,8 · 5,4 no muted) |
+| `--color-text-inverse` | `#FFFFFF` | `#00152B` | texto sobre fundo invertido | — |
+| `--color-accent` | `#0B5FCC` | `#38D1FF` | progresso, foco, checkbox e radio marcados, links, contorno, fantasma, "IA" e cérebro do logo | texto por cima 6,0 · 10,3 |
+| `--color-accent-hover` / `-active` | `#0A50AD` / `#08418E` | `#6ADDFF` / `#93E7FF` | hover / pressionado (no escuro clareia) | 7,6 · 11,7 / 9,7 · 13,2 |
+| `--color-on-accent` | `#FFFFFF` | `#00152B` | texto e ✓ sobre o acento | ver acento |
+| `--color-link` / `--color-focus` | `#0B5FCC` | `#38D1FF` | links / anel de foco | 6,0 · 9,4 |
+| `--color-accent-soft` | `#EAF2FE` | `#072F4B` | alternativa marcada, fundo de hover | acento por cima 5,3 · 7,7 |
+| `--color-accent-soft-active` | `#D3E4FC` | `#0C3C5E` | pressionado do contorno e do fantasma | acento por cima 4,6 · 6,4 |
+| `--color-accent-soft-border` | `#A7C9F5` | `#1C5F86` | borda da alternativa marcada e do botão de contorno | — |
+| `--color-primary` | `#0B5FCC` | igual | **novo (rebrand):** bolha do usuário (chapada) e cor de fundo de reserva do botão primário | branco por cima 6,0 |
+| `--color-on-primary` | `#FFFFFF` | igual | **novo:** texto do botão primário e da bolha do usuário | ver gradiente |
+| `--gradient-primary` (`-hover`, `-active`) | `135deg, #0874D9 → #1F4FD1` (hover `#0767C2 → #1A44B5`, pressionado `#065AA8 → #163A9C`) | igual | **novo:** fundo do `.btn-primary`. O único gradiente da interface | branco no ponto mais claro: 4,7 (hover 5,6, pressionado 6,9); no mais escuro: 6,8 |
+| `--color-success` / `-text` / `-soft` / `-border` | `#18794E` / `#105C3A` / `#EAF6F0` / `#A5D5BD` | `#4FD39C` / `#80E2B8` / `#06292A` / `#1E5E50` | concluído, nota alta | cor/superfície 5,4 · 8,9; texto/soft 7,2 · 9,9 |
+| `--color-warning` / `-text` / `-soft` / `-border` | `#B26E00` / `#8A5300` / `#FFF5DB` / `#EECF89` | `#F2B649` / `#F7CC78` / `#2A2410` / `#5E4A1C` | pendente, nota média, aviso de demo | texto/soft 5,8 · 10,2; `warning` só gráfico no claro (4,1) |
+| `--color-danger` / `-text` / `-soft` / `-border` | `#C0262D` / `#9B1B21` / `#FDEFEF` / `#F0AEB1` | `#FF8A8F` / `#FFA9AC` / `#311626` / `#6E2F45` | "Sair", excluir, erro, nota baixa | 5,9 · 7,4; texto/soft 7,3 · 9,0 |
+| `--color-danger-soft-active` | `#FBE2E3` | `#432033` | pressionado do "Sair" e do excluir | "Sair" por cima 4,8 · 6,2 |
+| `--color-selection` | `#D3E4FC` | `#12406A` | `::selection` | tinta por cima 13,5 · 9,4 |
+| `--color-scrollbar` | `#C1CCDA` | `#24486F` | polegar das barras de rolagem | — |
+| `--color-code-bg` / `-text` | `#0B1A2E` / `#F4F7FB` | `#000C1A` / `#E8F1FB` | bloco de código no chat (no escuro, mais fundo que a página) | 16,3 · 17,2 |
+| `--icon-select-arrow` | SVG com traço `#475A71` | SVG com traço `#A8BDD5` | seta do `<select>` (imagem; o `<select>` não aceita `::before`) | 7,1 · 8,7 |
+
+Primitivos novos no rebrand: `--accent-400` (início do gradiente), `--accent-450` e `--accent-550` (inícios do hover e do pressionado) e a escala `--electric-500/600/700` (fim do gradiente). A sombra flutuante do claro passou a usar a tinta azul (`rgb(11 26 46 / …)`).
 
 **Removidos na feature 02:** os aliases `--chakra-*` (66) e `--gray-*` (4), sem uso desde a sprint 01, e os tokens do modal (`--color-overlay`, `--shadow-overlay`, `--z-modal`), sem uso desde a feature 01.
 
 ### Tipografia
 
-- **Família:** Atkinson Hyperlegible Next (Google Fonts, 400/600/700) com fallback `system-ui`. Algarismos proporcionais por padrão; números que alinham usam `font-variant-numeric: tabular-nums`.
+- **Família:** Atkinson Hyperlegible Next (Google Fonts, 400/600/700) com fallback `system-ui`. É a fonte de **todo** o texto do app.
+- **Wordmark do logo (rebrand):** Inter 600, −0,03em (`--font-brand`, `--tracking-brand`), num subconjunto local só com os 7 glifos de "StudyIA" (`static/vendor/fonts/inter-wordmark-600.woff2`, 1,3 KB, licença em `Inter-OFL.txt`, pré-carregado no `base.html`). A família se chama `"Inter Wordmark"` para não colidir com a Inter completa dos títulos da landing (PR 4). Sem a fonte, o wordmark cai na Atkinson. Algarismos proporcionais por padrão; números que alinham usam `font-variant-numeric: tabular-nums`.
 - **Escala:** `--text-xs` 12 (badge) · `--text-sm` 13 (metadados, botão pequeno, dica) · `--text-ui` 14 (interface) · `--text-base` 16 (leitura, campos, h3) · `--text-lg` 20 (h2) · `--text-xl` 24 (h1, KPI) · `--text-2xl` 36 (nota).
 - **Altura de linha:** 1,2 títulos · 1,35 rótulos · 1,5 interface · 1,6 leitura. Títulos com `-0.015em` e `text-wrap: balance`.
 - **Caixa:** sentence case em tudo (títulos, botões, rótulos, badges), exceto os textos da [tabela 7.5](04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) e nomes próprios.
@@ -105,7 +113,7 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | ~~Modal~~ | removido na feature 01 (o histórico do git guarda o CSS). Os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` saíram na feature 02 |
 | Auth | `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer` |
 | Telas | `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.site-footer` |
-| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-actions` (seletor + `.nav-user`), `.nav-user`, `.nav-btn-label` (rótulo que some abaixo de 640 px), `.user-badge`, `.user-name` |
+| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `.brand-mark-node`), `.brand-name` (+ `.brand-name-accent`, o "IA"), `.brand-sep` (separador vertical, ≥ 640 px), `.brand-badge`, `.nav-actions` (seletor + `.nav-user`), `.nav-user`, `.nav-btn-label` (rótulo que some abaixo de 640 px), `.user-badge`, `.user-name` |
 | Seletor de tema | `.theme-switch` (só aparece com a classe `js` no `<html>`), `.theme-toggle` (+ `.theme-icon--light/--dark/--system`), `.theme-menu` (`[popover]`), `.theme-options`, `.theme-option` (+ `-input`, `-text`, `-hint`, `-check`), `.theme-switching` (no `<html>` durante a troca). Detalhes no [§7](#seletor-de-tema) |
 | Grade | `.container`, `.grid-2`, `.grid-3` |
 | Ícone e acessibilidade | `.icon` (+ `-sm`, `-lg`), `.icon-sprite`, `.sr-only` |
@@ -169,7 +177,7 @@ SVG inline num sprite no topo do `base.html`, traço de 1,5 px na tela, sempre `
 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>
 ```
 
-Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`, `sun`, `moon`, `monitor` (os 3 últimos do seletor de tema). Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).
+Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`, `sun`, `moon`, `monitor` (os 3 últimos do seletor de tema). Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (versão simplificada do cérebro: um traço por hemisfério, em ciano `#38D1FF` sobre um quadrado marinho `#00152B`; funciona nas abas claras e escuras). O `i-book` continua no sprite: é o ícone de "Tópicos de estudo" e do estado vazio, não a marca.
 
 ## 7. Temas (claro e escuro)
 
@@ -188,10 +196,11 @@ Os componentes não sabem qual tema está ativo. Eles leem só tokens semântico
 
 | | Claro | Escuro |
 |---|---|---|
-| Fundo · superfície · muted | `#F5F6F4` · `#FFFFFF` · `#EDEFEC` | `#111714` · `#18201C` · `#222B27` |
-| Elevação (o que flutua) | igual à superfície, separada pela sombra | `#1E2723`, um tom acima dos cards (a sombra quase não aparece no escuro) |
-| Tinta | `#17201C` | `#E6EBE8` |
-| Acento | `#1E6B5C`, texto branco por cima; hover **escurece** | `#5DB8A2`, texto escuro (`#0B1F1A`) por cima; hover **clareia** |
+| Fundo · superfície · muted | `#F4F7FB` · `#FFFFFF` · `#E9EFF6` | `#00152B` · `#061E39` · `#102D4D` |
+| Elevação (o que flutua) | igual à superfície, separada pela sombra | `#0B2645`, um tom acima dos cards (a sombra quase não aparece no escuro) |
+| Tinta | `#0B1A2E` | `#E8F1FB` |
+| Acento | azul `#0B5FCC`, texto branco por cima; hover **escurece** | ciano `#38D1FF`, texto marinho (`#00152B`) por cima; hover **clareia** |
+| Botão primário e bolha do usuário | gradiente `#0874D9 → #1F4FD1` / azul `#0B5FCC`, texto branco | **iguais ao claro** (azul com texto branco, como na referência) |
 | Estados (sucesso, atenção, perigo) | tinta escura sobre fundo suave claro | tinta clara sobre fundo suave escuro, mesma lógica |
 | Código no chat | bloco escuro na página clara | bloco **mais escuro** que a página, para não sumir |
 | `color-scheme` | `light` | `dark` (controles nativos e barras de rolagem escuros) |
@@ -249,3 +258,38 @@ Exemplo:
 /* style.css */
 .mark-highlight { background-color: var(--color-highlight); }
 ```
+
+## 8. Identidade azul (rebrand)
+
+Entrou no PR `feat/rebrand-azul` (24/11/2026), a partir da referência de tela de login aprovada pelo grupo. **✅ Aprovado pelo Renzo em 24/11/2026:** a paleta dos dois temas, o logo com circuito, o favicon (versão simplificada com um traço por hemisfério), o wordmark em Inter 600 com −0,03em e o gradiente de 135° do botão primário. Testado no navegador nos temas Claro, Escuro e Dispositivo, com o favicon conferido numa aba real. É a primeira de 4 entregas até a apresentação (rebrand → correções rápidas → login/cadastro → landing), para que as telas novas já nasçam com a identidade.
+
+### Da referência para os tokens
+
+A referência foi usada como **direção**, não como valores exatos: vários pares dela reprovam no AA.
+
+| Referência | Uso na referência | Problema | Como ficou |
+|---|---|---|---|
+| `#00152B` marinho | fundo | nenhum (branco por cima: 18,4) | `--color-bg` do escuro, **sem ajuste** |
+| `#102D4D` | fundo de campo | nenhum | `--color-surface-muted` do escuro, **sem ajuste**. Os campos continuam na `--color-surface` (`#061E39`), um tom abaixo, para o campo não se confundir com o badge e o desabilitado |
+| borda azul clara | borda de campo | — | `--color-border-input` `#5C84AF` (4,3:1, não-texto) |
+| `#00CFFF` ciano | destaques, ícones | branco por cima: **1,8** | acento do escuro `#38D1FF` (um pouco mais claro), **com texto marinho por cima** (10,3). No claro o ciano não tem contraste sobre branco (1,8), então o acento claro é o azul `#0B5FCC` |
+| `#007BFF` azul elétrico | botões, gradiente | branco por cima: **4,0** | gradiente `#0874D9 → #1F4FD1`: o início é um azul mais profundo e puxado para o ciano (4,7) e o fim, o azul elétrico escurecido (6,8). Mesmo botão nos dois temas |
+| branco | texto | ofusca em leitura longa | tinta `#E8F1FB` (16,1 no fundo) |
+
+O tema claro é a mesma família em versão clara: neutros levemente azulados, tinta marinho `#0B1A2E` (o fundo do escuro, clareado só o bastante para ler) e o azul `#0B5FCC` como acento. As cores de estado (sucesso, atenção, perigo) e a escala de nota (D2) continuam semânticas, com tons levemente ajustados para conviver com o azul.
+
+### Logo
+
+- **Marca:** cérebro visto de cima, em linhas (traço de 1,5 px em 24 px), com trilhas de circuito saindo da fissura central e terminando em 4 nós cheios: a rede neural. Na cor do acento: azul no claro, ciano no escuro. SVG inline no `base.html` (`.brand-mark`), sem `<rect>` de fundo.
+- **Wordmark:** "Study" na tinta + "IA" no acento, em Inter 600 com −0,03em (5,9:1 no claro, 9,4:1 no escuro).
+- **Separador + "Projeto A3":** linha vertical de 1 px (`--color-border-strong`) e o texto secundário em 13 px. Os dois somem abaixo de 640 px, como o selo já fazia (D13).
+- **Favicon:** versão simplificada (um traço por hemisfério, 2 nós), ciano sobre um quadrado marinho, legível em 16 px nas abas claras e escuras. É o único lugar com hex fora do `tokens.css`: um SVG avulso não lê variáveis CSS.
+- **Fonte do wordmark:** a Inter foi escolhida para o wordmark (e não a Atkinson) porque a Atkinson Next não tem serifa no "I" maiúsculo, então não ganha em legibilidade no "IA", e a Inter amarra o logo aos títulos da landing (PR 4).
+
+### Regras
+
+- O **gradiente é exclusivo do `.btn-primary`**. Nada de gradiente em card, fundo, texto ou borda; nada de brilho/glow em lugar nenhum.
+- O botão primário e a bolha do usuário **não mudam com o tema** (`--color-primary*`, `--gradient-primary*` só no `:root`, fora dos blocos 4a/4b). O resto do acento muda: azul no claro, ciano no escuro.
+- O `.btn-primary` usa `background-origin: border-box`, para o gradiente cobrir a borda transparente do `.btn`, e o desabilitado zera o `background-image`.
+- O hover e o pressionado do primário trocam o gradiente sem transição (gradiente não interpola). A escala de pressão (.98) continua.
+
