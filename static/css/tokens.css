@@ -1,12 +1,19 @@
 /* ==========================================================================
    StudyIA — Design tokens ("Caderno quieto", Sprint 01 · D1)
    Carregado ANTES do style.css (base.html). Ordem do arquivo:
-     1. Primitivos (escalas de cor)
+     1. Primitivos (escalas de cor, só do tema claro)
      2. Tokens semânticos (o que os componentes usam)
      3. Tipografia, espaço, raio, sombra, layout, movimento
-     4. Aliases de compatibilidade (--chakra-* e --gray-*)
-   Componentes novos usam SÓ os tokens semânticos (seção 2 em diante).
-   Contrastes WCAG medidos estão no doc da sprint (Fase 2).
+     4. Tema escuro (features/02): os mesmos semânticos com valores escuros
+   (Os aliases --chakra-* e --gray-* saíram na features/02: sem uso desde a sprint 01.)
+   Componentes usam SÓ os tokens semânticos (seção 2 em diante). Usar um
+   primitivo direto num componente quebra o tema escuro.
+   Contrastes WCAG medidos: doc da sprint 01 (claro) e features/02 (escuro).
+
+   Como o tema é escolhido (features/02, §5.1):
+     sem data-theme no <html>  → segue o sistema (@media prefers-color-scheme)
+     data-theme="light"        → claro, ignorando o sistema
+     data-theme="dark"         → escuro, ignorando o sistema
    ========================================================================== */
 
 :root {
@@ -76,6 +83,7 @@
   --color-accent-hover:       var(--accent-600);
   --color-accent-active:      var(--accent-700);
   --color-accent-soft:        var(--accent-50);
+  --color-accent-soft-active: var(--accent-100);  /* pressionado do contorno e do fantasma */
   --color-accent-soft-border: var(--accent-200);
   --color-on-accent:          var(--neutral-0);
   --color-link:               var(--accent-500);
@@ -94,14 +102,18 @@
   --color-danger:         var(--danger-500);
   --color-danger-text:    var(--danger-700);
   --color-danger-soft:    var(--danger-50);
+  --color-danger-soft-active: var(--danger-100); /* pressionado do "Sair" e do excluir */
   --color-danger-border:  var(--danger-200);
 
   --color-selection:      var(--accent-100);   /* ::selection; tinta por cima: 12,8:1 */
   --color-scrollbar:      var(--neutral-300);  /* polegar das barras de rolagem */
 
-  --color-overlay:        rgb(23 32 28 / 0.5);
   --color-code-bg:        var(--neutral-900);
   --color-code-text:      var(--neutral-50);
+
+  /* Seta do <select>: o <select> não aceita ::before, então a seta é uma imagem
+     com a cor do texto secundário escrita dentro (uma por tema). */
+  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355605A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
   /* ---------- 3. Tipografia ---------- */
 
@@ -152,13 +164,15 @@
   --radius-xs:   4px;   /* checkbox */
   --radius-sm:   6px;   /* controles: botão, campo */
   --radius-md:   8px;   /* cards, alertas, avisos */
-  --radius-lg:   12px;  /* modal (superfície flutuante) */
+  --radius-lg:   12px;  /* reservado para superfície flutuante grande */
   --radius-full: 9999px;/* só badges */
 
   /* ---------- Sombra (D1: nada em repouso) ---------- */
 
-  --shadow-none:    none;
-  --shadow-overlay: 0 16px 40px -12px rgb(23 32 28 / 0.28), 0 2px 6px rgb(23 32 28 / 0.08);
+  --shadow-none:     none;
+  /* Só o que flutua sobre a página (painel do tema). No escuro a sombra fica mais
+     densa e a separação vem também da borda (seção 4). */
+  --shadow-floating: 0 12px 32px -12px rgb(23 32 28 / 0.24), 0 2px 6px rgb(23 32 28 / 0.08);
 
   /* ---------- Layout e controles ---------- */
 
@@ -187,107 +201,138 @@
   --bp-xl: 1280px;
 
   --z-nav:   50;
-  --z-modal: 100;
 
   /* ---------- Movimento ---------- */
 
   --duration-instant: 100ms; /* pressionar */
   --duration-fast:    150ms; /* cor, borda */
-  --duration-base:    200ms; /* modal, barra de progresso */
+  --duration-base:    200ms; /* barra de progresso, entrada de mensagem */
   --duration-slow:    300ms;
 
   --ease-out:    cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-
-  /* ---------- 4. Aliases de compatibilidade ----------
-     Os estilos inline dos templates ainda usam --chakra-* (Fase 3 migra).
-     Cada alias aponta para a paleta nova, então o inline já herda a D1.
-     Roxo e azul viram o acento único (D3). Sombras viram "none" (D1).
-     Cinzas 400/500 usados como texto foram escurecidos para AA.        */
-
-  --chakra-colors-transparent: transparent;
-  --chakra-colors-black: #000;
-  --chakra-colors-white: #fff;
-
-  --chakra-colors-gray-50:  var(--neutral-50);
-  --chakra-colors-gray-100: var(--neutral-100);
-  --chakra-colors-gray-200: var(--neutral-200);
-  --chakra-colors-gray-300: var(--neutral-300);
-  --chakra-colors-gray-400: var(--neutral-500); /* usado como texto (hora, tarefa concluída) */
-  --chakra-colors-gray-500: var(--neutral-500);
-  --chakra-colors-gray-600: var(--neutral-600);
-  --chakra-colors-gray-700: var(--neutral-700);
-  --chakra-colors-gray-800: var(--neutral-800);
-  --chakra-colors-gray-900: var(--neutral-900);
-
-  --chakra-colors-teal-50:  var(--accent-50);
-  --chakra-colors-teal-100: var(--accent-100);
-  --chakra-colors-teal-200: var(--accent-200);
-  --chakra-colors-teal-300: var(--accent-300);
-  --chakra-colors-teal-400: var(--accent-500); /* gradiente achatado */
-  --chakra-colors-teal-500: var(--accent-500);
-  --chakra-colors-teal-600: var(--accent-600);
-  --chakra-colors-teal-700: var(--accent-700);
-  --chakra-colors-teal-800: var(--accent-800);
-
-  --chakra-colors-purple-50:  var(--accent-50);
-  --chakra-colors-purple-100: var(--accent-100);
-  --chakra-colors-purple-200: var(--accent-200);
-  --chakra-colors-purple-300: var(--accent-300); /* era indefinida (A1) */
-  --chakra-colors-purple-500: var(--accent-500);
-  --chakra-colors-purple-600: var(--accent-600);
-  --chakra-colors-purple-700: var(--accent-700);
-
-  --chakra-colors-blue-50:  var(--accent-50);
-  --chakra-colors-blue-100: var(--accent-100);
-  --chakra-colors-blue-500: var(--accent-500);
-  --chakra-colors-blue-600: var(--accent-600);
-
-  --chakra-colors-green-50:  var(--success-50);
-  --chakra-colors-green-100: var(--success-100);
-  --chakra-colors-green-500: var(--success-500);
-  --chakra-colors-green-600: var(--success-700);
-
-  --chakra-colors-yellow-50:  var(--warning-50);
-  --chakra-colors-yellow-100: var(--warning-100);
-  --chakra-colors-yellow-500: var(--warning-500);
-  --chakra-colors-orange-50:  var(--warning-50);
-  --chakra-colors-orange-100: var(--warning-100);
-  --chakra-colors-orange-500: var(--warning-700); /* usado como texto */
-
-  --chakra-colors-red-50:  var(--danger-50);
-  --chakra-colors-red-100: var(--danger-100);
-  --chakra-colors-red-200: var(--danger-200); /* era indefinida (A1) */
-  --chakra-colors-red-500: var(--danger-500);
-  --chakra-colors-red-600: var(--danger-700);
-
-  --chakra-fonts-heading: var(--font-sans);
-  --chakra-fonts-body:    var(--font-sans);
-
-  --chakra-radii-none: 0;
-  --chakra-radii-sm:   0.125rem;
-  --chakra-radii-base: var(--radius-xs);
-  --chakra-radii-md:   var(--radius-sm);
-  --chakra-radii-lg:   var(--radius-md);
-  --chakra-radii-xl:   var(--radius-md);
-  --chakra-radii-2xl:  var(--radius-md);
-  --chakra-radii-3xl:  var(--radius-md);
-  --chakra-radii-full: var(--radius-full);
-
-  --chakra-shadows-xs:      none;
-  --chakra-shadows-sm:      none;
-  --chakra-shadows-base:    none;
-  --chakra-shadows-md:      none;
-  --chakra-shadows-lg:      none;
-  --chakra-shadows-outline: 0 0 0 2px var(--color-focus);
-
-  /* Variáveis usadas no base.html que nunca foram definidas (A1) */
-  --gray-200: var(--neutral-200);
-  --gray-500: var(--neutral-500);
-  --gray-600: var(--neutral-600);
-  --gray-900: var(--neutral-900);
 }
 
 @media (min-width: 640px) {
   :root { --gutter: 1.5rem; }
+}
+
+/* ---------- 4. Tema escuro (features/02) ----------
+   "Caderno quieto" à noite: neutros esverdeados escuros e o acento clareado.
+   Só os tokens semânticos mudam; os componentes não sabem qual tema está ativo.
+   No escuro, a hierarquia vem da diferença entre fundo e superfície e da borda
+   (D1: superfícies sem sombra em repouso).
+
+   ATENÇÃO: o bloco aparece DUAS vezes, idêntico (sem build step não há como
+   evitar sem light-dark(), descartado no doc 02 §5.2). Mudou um valor aqui?
+   Mude o mesmo valor no outro bloco. */
+
+/* 4a. Sem escolha salva ("Dispositivo"): segue o sistema operacional.
+   MANTER IGUAL AO BLOCO 4b. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+
+    --color-bg:             #111714;
+    --color-surface:        #18201C;
+    --color-surface-muted:  #222B27;
+    --color-border:         #2E3833;
+    --color-border-strong:  #3E4A44;
+    --color-border-input:   #727D77;  /* 3,9:1 na superfície (não-texto) */
+
+    --color-text:           #E6EBE8;  /* 15,1 fundo · 13,8 superfície */
+    --color-text-secondary: #AAB4AE;  /* 8,5 · 7,8 · 6,8 muted */
+    --color-text-subtle:    #8E9993;  /* 6,2 · 5,7 · 4,9 muted */
+    --color-text-inverse:   #111714;
+
+    --color-accent:             #5DB8A2;  /* 7,0 como texto na superfície */
+    --color-accent-hover:       #77C7B3;  /* on-accent por cima: 8,7 */
+    --color-accent-active:      #8FD3C2;  /* on-accent por cima: 10,0 */
+    --color-accent-soft:        #173029;  /* texto por cima: 11,7 · acento: 5,9 */
+    --color-accent-soft-active: #1F4037;  /* acento por cima: 4,8 */
+    --color-accent-soft-border: #2F6356;
+    --color-on-accent:          #0B1F1A;  /* 7,2 sobre o acento */
+    --color-link:               #5DB8A2;
+    --color-focus:              #5DB8A2;  /* 7,0 superfície · 7,7 fundo */
+
+    --color-success:        #6CC793;  /* 8,1 na superfície (nota alta, ícones) */
+    --color-success-text:   #86D3A5;  /* 8,8 sobre o soft */
+    --color-success-soft:   #15281D;
+    --color-success-border: #2E5A40;
+
+    --color-warning:        #D9A945;  /* 7,7 na superfície */
+    --color-warning-text:   #E9C46F;  /* 9,3 sobre o soft */
+    --color-warning-soft:   #2A2313;
+    --color-warning-border: #5C4A1F;
+
+    --color-danger:             #F08A7E;  /* "Sair": 6,9 na superfície */
+    --color-danger-text:        #F3A59B;  /* 8,2 sobre o soft */
+    --color-danger-soft:        #301B18;
+    --color-danger-soft-active: #40231F;  /* "Sair" pressionado: 5,9 */
+    --color-danger-border:      #6B3630;
+
+    --color-selection:      #24493F;  /* texto por cima: 8,3 */
+    --color-scrollbar:      #3E4A44;
+
+    --color-code-bg:        #0A0E0C;  /* mais fundo que a página: o bloco não some */
+    --color-code-text:      #E6EBE8;  /* 16,1 */
+
+    --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AAB4AE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+
+    --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
+  }
+}
+
+/* 4b. Escuro escolhido no seletor (data-theme="dark" no <html>).
+   MANTER IGUAL AO BLOCO 4a. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg:             #111714;
+  --color-surface:        #18201C;
+  --color-surface-muted:  #222B27;
+  --color-border:         #2E3833;
+  --color-border-strong:  #3E4A44;
+  --color-border-input:   #727D77;  /* 3,9:1 na superfície (não-texto) */
+
+  --color-text:           #E6EBE8;  /* 15,1 fundo · 13,8 superfície */
+  --color-text-secondary: #AAB4AE;  /* 8,5 · 7,8 · 6,8 muted */
+  --color-text-subtle:    #8E9993;  /* 6,2 · 5,7 · 4,9 muted */
+  --color-text-inverse:   #111714;
+
+  --color-accent:             #5DB8A2;  /* 7,0 como texto na superfície */
+  --color-accent-hover:       #77C7B3;  /* on-accent por cima: 8,7 */
+  --color-accent-active:      #8FD3C2;  /* on-accent por cima: 10,0 */
+  --color-accent-soft:        #173029;  /* texto por cima: 11,7 · acento: 5,9 */
+  --color-accent-soft-active: #1F4037;  /* acento por cima: 4,8 */
+  --color-accent-soft-border: #2F6356;
+  --color-on-accent:          #0B1F1A;  /* 7,2 sobre o acento */
+  --color-link:               #5DB8A2;
+  --color-focus:              #5DB8A2;  /* 7,0 superfície · 7,7 fundo */
+
+  --color-success:        #6CC793;  /* 8,1 na superfície (nota alta, ícones) */
+  --color-success-text:   #86D3A5;  /* 8,8 sobre o soft */
+  --color-success-soft:   #15281D;
+  --color-success-border: #2E5A40;
+
+  --color-warning:        #D9A945;  /* 7,7 na superfície */
+  --color-warning-text:   #E9C46F;  /* 9,3 sobre o soft */
+  --color-warning-soft:   #2A2313;
+  --color-warning-border: #5C4A1F;
+
+  --color-danger:             #F08A7E;  /* "Sair": 6,9 na superfície */
+  --color-danger-text:        #F3A59B;  /* 8,2 sobre o soft */
+  --color-danger-soft:        #301B18;
+  --color-danger-soft-active: #40231F;  /* "Sair" pressionado: 5,9 */
+  --color-danger-border:      #6B3630;
+
+  --color-selection:      #24493F;  /* texto por cima: 8,3 */
+  --color-scrollbar:      #3E4A44;
+
+  --color-code-bg:        #0A0E0C;  /* mais fundo que a página: o bloco não some */
+  --color-code-text:      #E6EBE8;  /* 16,1 */
+
+  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AAB4AE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+
+  --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
 }
