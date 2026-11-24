@@ -613,6 +613,32 @@ svg.icon { display: inline-block; }
   border-color: transparent;
 }
 
+/* Carregando (B4): o forms.js (ou o app.js, no chat) põe aria-busy no form e
+   aria-disabled no botão, e troca o rótulo por .btn-spinner + texto.
+   Usa o visual do desabilitado acima, com cursor de "aguarde" no lugar do "proibido".
+   O anel é currentColor (texto sutil): segue o tema sem token próprio. */
+form[aria-busy="true"] .btn[aria-disabled="true"] {
+  cursor: progress;
+}
+
+.btn-spinner {
+  flex: none;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent; /* 3/4 de anel: lê como "carregando" mesmo parado */
+  border-radius: var(--radius-full);
+}
+
+/* Gira só para quem não pediu menos movimento; parado, o anel continua visível. */
+@media (prefers-reduced-motion: no-preference) {
+  .btn-spinner { animation: btn-spin 0.8s linear infinite; }
+}
+
+@keyframes btn-spin {
+  to { transform: rotate(1turn); }
+}
+
 /* Primário: a ação principal, com o único gradiente da interface (rebrand).
    Texto branco nos dois temas: 4,7:1 no ponto mais claro do gradiente.
    background-origin: border-box faz o gradiente cobrir também a borda
