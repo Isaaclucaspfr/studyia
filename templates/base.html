@@ -4,14 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}StudyIA — Assistente Inteligente de Estudos{% endblock %}</title>
+    <!-- Tema (features/02), anti-flash. TEM que ficar aqui: inline, no <head> e ANTES
+         de qualquer <link> de CSS, para o atributo estar no <html> antes da primeira
+         pintura. Fora daqui (ou num arquivo com defer), o tema errado pisca ao carregar.
+         Só lê a escolha salva e marca o <html>; o resto está no static/js/theme.js. -->
+    <script>
+        (function () {
+            try {
+                // "light" ou "dark" salvos: aplica. Nada salvo ou "system": o CSS segue o sistema.
+                var tema = localStorage.getItem("studyia-theme");
+                if (tema === "light" || tema === "dark") document.documentElement.setAttribute("data-theme", tema);
+            } catch (e) {} // localStorage bloqueado (modo privado, cookies desligados): segue o sistema
+            // Avisa o CSS que há JavaScript: só assim o seletor de tema aparece.
+            document.documentElement.classList.add("js");
+        })();
+    </script>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
     <!-- Google Fonts: Atkinson Hyperlegible Next (D1) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Tokens antes dos componentes -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=redesign_v4">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=redesign_v4">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=tema_v2">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=tema_v2">
+    <!-- Seletor de tema (features/02). Independente do app.js: um não usa nada do outro -->
+    <script src="{{ url_for('static', filename='js/theme.js') }}?v=tema_v1" defer></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -40,6 +57,9 @@
         <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
         <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
         <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.6 3.2 17a2 2 0 0 0 1.7 3h14.2a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4M12 16.75v.01"/></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.75"/><path d="M12 3.5v1.75M12 18.75v1.75M3.5 12h1.75M18.75 12h1.75M6 6l1.25 1.25M16.75 16.75 18 18M6 18l1.25-1.25M16.75 7.25 18 6"/></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.25A7.5 7.5 0 0 1 9.75 4.5a7.75 7.75 0 1 0 9.75 9.75Z"/></symbol>
+        <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M12 16v3.5M8.5 19.5h7"/></symbol>
     </svg>
 
     <!-- Navegação Superior -->
@@ -50,15 +70,51 @@
             <span class="brand-badge">Projeto A3</span>
         </a>
 
-        {% if session.get('user_id') %}
-        <div class="nav-user">
-            <div class="user-badge">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-user"></use></svg>
-                <strong class="user-name">{{ session.get('name') }}</strong>
+        <div class="nav-actions">
+            <!-- Seletor de tema (features/02): FORA da condição de sessão: aparece com e sem login.
+                 Só aparece com JavaScript (classe .js no <html>). Não é formulário: nada vai ao servidor. -->
+            <div class="theme-switch">
+                <button type="button" class="theme-toggle" id="themeToggle" popovertarget="themeMenu" aria-controls="themeMenu" aria-expanded="false">
+                    <svg class="icon theme-icon theme-icon--light" aria-hidden="true" focusable="false"><use href="#i-sun"></use></svg>
+                    <svg class="icon theme-icon theme-icon--dark" aria-hidden="true" focusable="false"><use href="#i-moon"></use></svg>
+                    <svg class="icon theme-icon theme-icon--system" aria-hidden="true" focusable="false"><use href="#i-monitor"></use></svg>
+                    <span class="nav-btn-label">Tema</span><span class="sr-only" id="themeCurrent">: Dispositivo</span>
+                </button>
+                <div class="theme-menu" id="themeMenu" popover hidden>
+                    <fieldset class="theme-options">
+                        <legend class="sr-only">Tema</legend>
+                        <label class="theme-option">
+                            <input class="theme-option-input" type="radio" name="studyia-theme" value="light">
+                            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-sun"></use></svg>
+                            <span class="theme-option-text">Claro</span>
+                            <svg class="icon icon-sm theme-option-check" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
+                        </label>
+                        <label class="theme-option">
+                            <input class="theme-option-input" type="radio" name="studyia-theme" value="dark">
+                            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-moon"></use></svg>
+                            <span class="theme-option-text">Escuro</span>
+                            <svg class="icon icon-sm theme-option-check" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
+                        </label>
+                        <label class="theme-option">
+                            <input class="theme-option-input" type="radio" name="studyia-theme" value="system" aria-describedby="themeSystemHint">
+                            <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-monitor"></use></svg>
+                            <span class="theme-option-text">Dispositivo<span class="theme-option-hint" id="themeSystemHint">Segue o sistema</span></span>
+                            <svg class="icon icon-sm theme-option-check" aria-hidden="true" focusable="false"><use href="#i-check"></use></svg>
+                        </label>
+                    </fieldset>
+                </div>
             </div>
-            <a href="{{ url_for('logout') }}" class="btn btn-danger-outline btn-sm">Sair</a>
+
+            {% if session.get('user_id') %}
+            <div class="nav-user">
+                <div class="user-badge">
+                    <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-user"></use></svg>
+                    <strong class="user-name">{{ session.get('name') }}</strong>
+                </div>
+                <a href="{{ url_for('logout') }}" class="btn btn-danger-outline btn-sm">Sair</a>
+            </div>
+            {% endif %}
         </div>
-        {% endif %}
     </nav>
 
     <!-- Mensagens de Alerta (Flash) -->
@@ -87,7 +143,7 @@
 
     <!-- Marked.js para renderização de Markdown didático -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="{{ url_for('static', filename='js/app.js') }}?v=sem_modal_v1"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}?v=tema_v1"></script>
     <script>
         if (window.lucide) {
             lucide.createIcons();
