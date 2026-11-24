@@ -5,61 +5,69 @@
 ## Princípios
 
 - **Mesmo stack:** HTML + Jinja + CSS puro + o `app.js` existente. **Sem React, sem Tailwind, sem build step, sem npm.** Ícones em SVG inline (sprite no `base.html`), sem biblioteca.
-- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `redesign_v3`).
+- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `tema_v3`).
 - **Nenhum contrato de [04-contratos-frontend.md](04-contratos-frontend.md) é quebrado.** As classes usadas pelo JS ou geradas pelo backend continuam existindo.
 - **Inspiração:** a anatomia de componentes do shadcn/ui (estrutura simples, variantes por modificador, estados explícitos), feita **em CSS puro**.
-- **Direção "Caderno quieto" (D1):** app de estudos calmo e legível. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro. Superfícies com borda de 1 px e sem sombra em repouso; sombra só no modal. Sem gradiente, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone.
-- **Componentes usam só tokens semânticos** (`--color-*`, `--space-*`, `--text-*`, `--radius-*`, `--duration-*`). Nenhuma cor literal em template.
+- **Direção "Caderno quieto" (D1):** app de estudos calmo e legível. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro. Superfícies com borda de 1 px e sem sombra em repouso; sombra só no que flutua (o painel do tema). Sem gradiente, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone.
+- **Componentes usam só tokens semânticos** (`--color-*`, `--space-*`, `--text-*`, `--radius-*`, `--duration-*`). Nenhuma cor literal em template, CSS de componente ou JS. Primitivos (`--neutral-*`, `--accent-*`…) também não: eles só têm o valor claro e quebram o tema escuro (ver [§7](#7-temas-claro-e-escuro)).
+- **Dois temas** (feature 02): claro e escuro, com os mesmos tokens semânticos. Toda cor nova precisa de valor nos dois ([§7](#7-temas-claro-e-escuro)).
 
 ## 1. Tokens (`static/css/tokens.css`)
 
 ### Cor
 
-Primitivos em escalas (`--neutral-*`, `--accent-*`, `--success-*`, `--warning-*`, `--danger-*`); os componentes usam os semânticos abaixo. Contrastes WCAG medidos.
+Primitivos em escalas (`--neutral-*`, `--accent-*`, `--success-*`, `--warning-*`, `--danger-*`), **só do tema claro**; os componentes usam os semânticos abaixo, que têm um valor em cada tema. Contrastes WCAG medidos (claro · escuro). Como o tema é aplicado: [§7](#7-temas-claro-e-escuro).
 
-| Token | Valor | Uso | Contraste |
-|---|---|---|---|
-| `--color-bg` | `#F5F6F4` | fundo da página, área do chat | — |
-| `--color-surface` | `#FFFFFF` | cards, campos, bolha da IA | — |
-| `--color-surface-muted` | `#EDEFEC` | badges neutros, aviso de transparência, desabilitado | — |
-| `--color-border` | `#E2E5E1` | bordas de card e divisórias | — |
-| `--color-border-strong` | `#C5CBC6` | botão secundário, alternativa | — |
-| `--color-border-input` | `#868F89` | borda de campo, checkbox, radio | 3,3:1 no branco (não-texto) |
-| `--color-text` | `#17201C` | tinta | 16,7 (branco) · 15,4 (fundo) |
-| `--color-text-secondary` | `#55605A` | texto de apoio | 6,6 · 6,0 |
-| `--color-text-subtle` | `#646E68` | placeholder, hora, desabilitado | 5,3 · 4,9 · 4,6 (muted) |
-| `--color-accent` | `#1E6B5C` | botão primário, progresso, links, foco | branco por cima 6,3 |
-| `--color-accent-hover` / `-active` | `#18584B` / `#124538` | hover / pressionado | 8,3 / — |
-| `--color-accent-soft` | `#EAF3F0` | alternativa marcada, fundo de hover | — |
-| `--color-success` / `-text` / `-soft` / `-border` | `#237A4B` / `#1A5E39` / `#EBF5EF` / `#A8D1B8` | concluído, nota alta | texto/soft 7,0 |
-| `--color-warning` / `-text` / `-soft` / `-border` | `#B57A10` / `#8A5A00` / `#FFF6DB` / `#EBD38A` | pendente, nota média, aviso de demo | texto/soft 5,5; `warning` só gráfico (3,7) |
-| `--color-danger` / `-text` / `-soft` / `-border` | `#B42318` / `#912018` / `#FDF0EE` / `#EDABA2` | "Sair", excluir, erro, nota baixa | 6,6 · texto/soft 7,8 |
-| `--color-selection` | `#D3E6E0` | `::selection` | tinta por cima 12,8 |
-| `--color-scrollbar` | `#C5CBC6` | polegar das barras de rolagem | — |
-| `--color-overlay` | `rgb(23 32 28 / .5)` | fundo do modal | — |
-| `--color-code-bg` / `-text` | `#17201C` / `#F5F6F4` | bloco de código no chat | — |
+| Token | Claro | Escuro | Uso | Contraste (claro · escuro) |
+|---|---|---|---|---|
+| `--color-bg` | `#F5F6F4` | `#111714` | fundo da página, área do chat | — |
+| `--color-surface` | `#FFFFFF` | `#18201C` | cards, campos, bolha da IA, navbar | — |
+| `--color-surface-muted` | `#EDEFEC` | `#222B27` | badges neutros, aviso de transparência, desabilitado, hover neutro | — |
+| `--color-surface-raised` / `-hover` | `#FFFFFF` / `#EDEFEC` | `#1E2723` / `#252F2A` | o que flutua sobre a página (painel do tema) e o hover dentro dele | sutil por cima: 5,3 / 4,6 · 5,2 / 4,7 |
+| `--color-border` | `#E2E5E1` | `#2E3833` | bordas de card e divisórias | — |
+| `--color-border-strong` | `#C5CBC6` | `#3E4A44` | botão secundário, alternativa, painel flutuante | — |
+| `--color-border-input` | `#868F89` | `#727D77` | borda de campo, checkbox, radio | 3,3 · 3,9 (não-texto) |
+| `--color-text` | `#17201C` | `#E6EBE8` | tinta | 16,7 · 13,8 (na superfície) |
+| `--color-text-secondary` | `#55605A` | `#AAB4AE` | texto de apoio | 6,6 · 7,8 |
+| `--color-text-subtle` | `#646E68` | `#8E9993` | placeholder, hora, desabilitado, tarefa concluída | 5,3 · 5,7 (4,6 · 4,9 no muted) |
+| `--color-text-inverse` | `#FFFFFF` | `#111714` | texto sobre fundo invertido | — |
+| `--color-accent` | `#1E6B5C` | `#5DB8A2` | botão primário, progresso, foco, bolha do usuário | texto por cima 6,3 · 7,2 |
+| `--color-accent-hover` / `-active` | `#18584B` / `#124538` | `#77C7B3` / `#8FD3C2` | hover / pressionado (no escuro clareia) | 8,3 · 8,7 / — · 10,0 |
+| `--color-on-accent` | `#FFFFFF` | `#0B1F1A` | texto e ✓ sobre o acento | ver acento |
+| `--color-link` / `--color-focus` | `#1E6B5C` | `#5DB8A2` | links / anel de foco | 6,3 · 7,0 |
+| `--color-accent-soft` | `#EAF3F0` | `#173029` | alternativa marcada, fundo de hover | acento por cima — · 5,9 |
+| `--color-accent-soft-active` | `#D3E6E0` | `#1F4037` | pressionado do contorno e do fantasma | acento por cima — · 4,8 |
+| `--color-accent-soft-border` | `#A9CFC3` | `#2F6356` | borda da alternativa marcada | — |
+| `--color-success` / `-text` / `-soft` / `-border` | `#237A4B` / `#1A5E39` / `#EBF5EF` / `#A8D1B8` | `#6CC793` / `#86D3A5` / `#15281D` / `#2E5A40` | concluído, nota alta | texto/soft 7,0 · 8,8 |
+| `--color-warning` / `-text` / `-soft` / `-border` | `#B57A10` / `#8A5A00` / `#FFF6DB` / `#EBD38A` | `#D9A945` / `#E9C46F` / `#2A2313` / `#5C4A1F` | pendente, nota média, aviso de demo | texto/soft 5,5 · 9,3; `warning` só gráfico no claro (3,7) |
+| `--color-danger` / `-text` / `-soft` / `-border` | `#B42318` / `#912018` / `#FDF0EE` / `#EDABA2` | `#F08A7E` / `#F3A59B` / `#301B18` / `#6B3630` | "Sair", excluir, erro, nota baixa | 6,6 · 6,9; texto/soft 7,8 · 8,2 |
+| `--color-danger-soft-active` | `#F8D7D2` | `#40231F` | pressionado do "Sair" e do excluir | — · 5,9 |
+| `--color-selection` | `#D3E6E0` | `#24493F` | `::selection` | tinta por cima 12,8 · 8,3 |
+| `--color-scrollbar` | `#C5CBC6` | `#3E4A44` | polegar das barras de rolagem | — |
+| `--color-code-bg` / `-text` | `#17201C` / `#F5F6F4` | `#0A0E0C` / `#E6EBE8` | bloco de código no chat (no escuro, mais fundo que a página) | — · 16,1 |
+| `--icon-select-arrow` | SVG com traço `#55605A` | SVG com traço `#AAB4AE` | seta do `<select>` (imagem; o `<select>` não aceita `::before`) | 7,8 no escuro |
 
-Os aliases `--chakra-*` e `--gray-*` continuam no fim do `tokens.css` por compatibilidade, apontando para a paleta nova. **Nenhum template os usa mais**; podem sair num PR separado.
+**Removidos na feature 02:** os aliases `--chakra-*` (66) e `--gray-*` (4), sem uso desde a sprint 01, e os tokens do modal (`--color-overlay`, `--shadow-overlay`, `--z-modal`), sem uso desde a feature 01.
 
 ### Tipografia
 
 - **Família:** Atkinson Hyperlegible Next (Google Fonts, 400/600/700) com fallback `system-ui`. Algarismos proporcionais por padrão; números que alinham usam `font-variant-numeric: tabular-nums`.
-- **Escala:** `--text-xs` 12 (badge) · `--text-sm` 13 (metadados, botão pequeno, dica) · `--text-ui` 14 (interface) · `--text-base` 16 (leitura, campos, h3) · `--text-lg` 20 (h2, título do modal) · `--text-xl` 24 (h1, KPI) · `--text-2xl` 36 (nota).
+- **Escala:** `--text-xs` 12 (badge) · `--text-sm` 13 (metadados, botão pequeno, dica) · `--text-ui` 14 (interface) · `--text-base` 16 (leitura, campos, h3) · `--text-lg` 20 (h2) · `--text-xl` 24 (h1, KPI) · `--text-2xl` 36 (nota).
 - **Altura de linha:** 1,2 títulos · 1,35 rótulos · 1,5 interface · 1,6 leitura. Títulos com `-0.015em` e `text-wrap: balance`.
 - **Caixa:** sentence case em tudo (títulos, botões, rótulos, badges), exceto os textos da [tabela 7.5](04-contratos-frontend.md#75-textos-verificados-pelo-test_apppy) e nomes próprios.
 
 ### Espaço, raio, sombra, controles
 
 - **Espaço** (base 4 px): `--space-0-5` 2 · `-1` 4 · `-1-5` 6 · `-2` 8 · `-3` 12 · `-4` 16 · `-5` 20 · `-6` 24 · `-8` 32 · `-10` 40 · `-12` 48 · `-16` 64.
-- **Raio:** `--radius-xs` 4 (checkbox) · `-sm` 6 (botão, campo) · `-md` 8 (card, alerta) · `-lg` 12 (modal) · `-full` (badges, barra).
-- **Sombra:** só `--shadow-overlay` (modal). Nada em repouso.
+- **Raio:** `--radius-xs` 4 (checkbox) · `-sm` 6 (botão, campo) · `-md` 8 (card, alerta) · `-lg` 12 (reservado para superfície flutuante grande) · `-full` (badges, barra).
+- **Sombra:** só `--shadow-floating` (painel do tema), com um valor por tema (mais densa no escuro). Nada em repouso.
 - **Layout:** `--container-max` 1200 px; `--gutter` 16 px (24 px a partir de 640); `--nav-height` 56 px.
 - **Controles:** campos sempre com 44 px e fonte de 16 px (sem zoom no iOS). Botões com `--touch-min` 44 px abaixo de 768 px e `--control-h` 40 px (36 px no `.btn-sm`) a partir daí.
 - **Ícones:** `--icon-sm` 16 · `--icon-md` 18 · `--icon-lg` 24, traço de 1,5 px na tela.
 
 ### Movimento
 
-- `--duration-instant` 100 ms (pressionar) · `--duration-fast` 150 ms (cor, borda, ponto do radio) · `--duration-base` 200 ms (modal, barra, entrada de mensagem) · `--duration-slow` 300 ms (painel da nota).
+- `--duration-instant` 100 ms (pressionar) · `--duration-fast` 150 ms (cor, borda, ponto do radio) · `--duration-base` 200 ms (barra, entrada de mensagem) · `--duration-slow` 300 ms (painel da nota).
 - `--ease-out` `cubic-bezier(.23, 1, .32, 1)` para tudo que é interação; `--ease-in-out` `cubic-bezier(.77, 0, .175, 1)` reservado para movimento na tela.
 
 ### Breakpoints (mobile-first, sempre `min-width`)
@@ -94,10 +102,11 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | Tarefa | `.task-list`, `.task-item` (o `<label>`), `.plan-task-checkbox` (contrato), `.task-text` (+ `.is-done`), `.plan-days`, `.plan-day-header`, `.cta-strip` |
 | Chat | `.chat-window`, `.chat-header`, `.chat-title`, `.chat-count`, `.chat-messages`, `.message-row`, `.avatar-circle`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble.user/.assistant/.typing/.error`, `.chat-demo-note`, `.chat-input-area` (estrutura da bolha é contrato) |
 | Seminário | `.score-panel` + `.score--high/mid/low` (≥ 70 / 50–69 / < 50, D2), `.score-head`, `.score-title`, `.score-summary`, `.score-box`, `.score-value`, `.score-label`, `.score-insights`, `.insight` (+ `--positive`, `--review`), `.question-list`, `.question-head`, `.question-title`, `.choices`, `.choice` (+ `.is-selected`, `.is-readonly`, `.is-editable`), `.choice-input`, `.choice-text`, `.feedback` (+ `--correct`, `--partial`, `--incorrect`) |
-| ~~Modal~~ | removido na feature 01 (o histórico do git guarda o CSS). Os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` ficaram sem uso |
+| ~~Modal~~ | removido na feature 01 (o histórico do git guarda o CSS). Os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` saíram na feature 02 |
 | Auth | `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer` |
 | Telas | `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.site-footer` |
-| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-user`, `.nav-btn-label` (sem uso; reservado para o seletor de tema), `.user-badge`, `.user-name` |
+| Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `-glyph`), `.brand-badge`, `.nav-actions` (seletor + `.nav-user`), `.nav-user`, `.nav-btn-label` (rótulo que some abaixo de 640 px), `.user-badge`, `.user-name` |
+| Seletor de tema | `.theme-switch` (só aparece com a classe `js` no `<html>`), `.theme-toggle` (+ `.theme-icon--light/--dark/--system`), `.theme-menu` (`[popover]`), `.theme-options`, `.theme-option` (+ `-input`, `-text`, `-hint`, `-check`), `.theme-switching` (no `<html>` durante a troca). Detalhes no [§7](#seletor-de-tema) |
 | Grade | `.container`, `.grid-2`, `.grid-3` |
 | Ícone e acessibilidade | `.icon` (+ `-sm`, `-lg`), `.icon-sprite`, `.sr-only` |
 
@@ -115,13 +124,14 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | **Digitando** | `.chat-bubble.typing`: quadro da bolha da IA, texto secundário em 14 px e 3 pontos em onda; parados com movimento reduzido |
 | **Concluído (tarefa)** | `.task-item:has(:checked) .task-text` e `.task-text.is-done`: cor sutil + riscado. Depois do clique, o inline do `app.js` vence (ver exceções) |
 | **Selecionado (alternativa)** | `.choice:has(:checked)` / `.is-selected`: borda e ponto no acento, fundo `--color-accent-soft`. Com o retorno da questão: verde (correta), âmbar (parcial), vermelho (incorreta), por `.card:has(> .feedback--*)` (D35; ⚠️ depende do B1) |
-| **Superfícies do navegador** | `::selection`, `caret-color`, `accent-color` e barras de rolagem (finas no chat e no modal) com a paleta |
+| **Superfícies do navegador** | `::selection`, `caret-color`, `accent-color` e barras de rolagem (finas no chat) com a paleta. `color-scheme` (claro/escuro) faz os controles nativos acompanharem o tema: lista do `<select>`, botão do input de arquivo, barras de rolagem |
 
 ## 4. Movimento
 
 - Só CSS. Animar `transform` e `opacity`; a exceção é a `width` da barra de progresso, que o contrato manda controlar por `style.width`.
 - Nada anima no histórico nem em listas no carregamento. As mensagens novas do chat animam porque não têm `.markdown-content` (só o `app.js` as cria).
-- Saídas são instantâneas (modal fecha na hora).
+- Saídas são instantâneas (o painel do tema fecha na hora).
+- **Troca de tema sem transição:** o `theme.js` põe a classe `.theme-switching` no `<html>` por um quadro, e ela zera as transições. Sem isso, cada botão e cada borda mudariam de cor no seu próprio tempo (efeito "onda").
 - **Movimento reduzido:** `@media (prefers-reduced-motion: reduce)` zera duração de transições e animações, para os 3 pontos e remove as escalas de pressão. Tudo desligado (D6).
 
 | O quê | Duração / easing |
@@ -133,7 +143,7 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | Entrada das mensagens novas: opacidade + 6 px | 200 ms, ease-out |
 | "Digitando": 3 pontos em onda | 1 s, linear, infinito |
 | Barra de progresso | 200 ms, ease-out |
-| Modal: fade do overlay + card de .97 a 1 (`@starting-style`) | 200 ms, ease-out |
+| Painel do tema: opacidade + de .97 e 4 px acima para 1, a partir do canto do botão (`@starting-style`) | 150 ms, ease-out |
 | Painel da nota: opacidade + 8 px, uma vez | 300 ms, ease-out |
 
 ## 5. Regra: nada de `style=""` inline
@@ -146,8 +156,8 @@ Novos estilos vão **sempre** para classes no CSS. Os 183 `style=""` originais v
 |---|---|
 | `style="width: {{ … }}%"` em `.progress-bar-fill` (`plan_view.html`, `study_topic.html`) | valor dinâmico vindo do banco. O `#planProgressBar` ainda é **atualizado pelo JS via `style.width`** (contrato) |
 | ~~`style.display` no `#settingsModal`~~ | removido na feature 01 |
-| `style.textDecoration` / `style.color` em `#label_<task_key>` | escrito pelo JS (`app.js:167-175`). O inline vence a classe, então, **depois do primeiro clique**, a cor do JS (`#94a3b8`, 2,45:1) prevalece sobre o CSS. Alinhar exige mudar o JS (B11) |
-| HTML com `style` gerado no JS (`app.js:118`, nota de demo no chat) | só muda junto com o JS (B11) |
+| `style.textDecoration` / `style.color` em `#label_<task_key>` | escrito pelo JS (`app.js:144-149`). Desde a feature 02 a cor é `var(--color-text-subtle)`: o inline segue o tema e é igual à do `.is-done` do CSS. O mecanismo (inline no JS) continua; unificar com a classe é o [B11](05-achados-frontend.md#b11-duplicações-) |
+| ~~HTML com `style` gerado no JS (`app.js:118`, nota de demo)~~ | resolvido na feature 01: a nota usa a classe `.chat-demo-note` |
 
 Para valores dinâmicos novos, prefira uma **CSS custom property** no elemento (`style="--progress: 40%"`) consumida pela classe, sem trocar o mecanismo das exceções acima sem alinhar com o JS.
 
@@ -159,4 +169,83 @@ SVG inline num sprite no topo do `base.html`, traço de 1,5 px na tela, sempre `
 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>
 ```
 
-Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`. Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).
+Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`, `sun`, `moon`, `monitor` (os 3 últimos do seletor de tema). Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (a marca: livro branco sobre o acento).
+
+## 7. Temas (claro e escuro)
+
+Entrou na [feature 02](features/02-tema-claro-escuro-dispositivo.md). A pessoa escolhe **Claro**, **Escuro** ou **Dispositivo** (o padrão, que segue o sistema operacional) no seletor da navbar. A escolha fica **só no navegador**: nada vai ao servidor.
+
+### Tokens semânticos: a regra que sustenta os dois temas
+
+Os componentes não sabem qual tema está ativo. Eles leem só tokens semânticos (`--color-bg`, `--color-text`, `--color-accent`…), e é o `tokens.css` que dá um valor diferente a cada token em cada tema. Por isso:
+
+- **Nunca** use cor literal (`#hex`, `rgb()`, `white`) num componente, no template ou no JS. No escuro ela fica igual à do claro, e quase sempre ilegível.
+- **Nunca** use um primitivo (`--neutral-500`, `--accent-100`…) direto num componente. Os primitivos só existem com o valor claro; o escuro não os redefine.
+- No JS, se precisar escrever uma cor, escreva o token: `label.style.color = 'var(--color-text-subtle)'` (como o `app.js` faz no checklist).
+- Ícone em SVG de dados (`url("data:image/svg+xml,…")`) não herda `currentColor`. Use o SVG como **máscara** e pinte com `background-color: var(--token)` (padrão do ✓ do checkbox e dos ícones dos alertas). Onde não houver `::before` (a seta do `<select>`), crie um token de imagem por tema (`--icon-select-arrow`).
+
+### Os dois temas
+
+| | Claro | Escuro |
+|---|---|---|
+| Fundo · superfície · muted | `#F5F6F4` · `#FFFFFF` · `#EDEFEC` | `#111714` · `#18201C` · `#222B27` |
+| Elevação (o que flutua) | igual à superfície, separada pela sombra | `#1E2723`, um tom acima dos cards (a sombra quase não aparece no escuro) |
+| Tinta | `#17201C` | `#E6EBE8` |
+| Acento | `#1E6B5C`, texto branco por cima; hover **escurece** | `#5DB8A2`, texto escuro (`#0B1F1A`) por cima; hover **clareia** |
+| Estados (sucesso, atenção, perigo) | tinta escura sobre fundo suave claro | tinta clara sobre fundo suave escuro, mesma lógica |
+| Código no chat | bloco escuro na página clara | bloco **mais escuro** que a página, para não sumir |
+| `color-scheme` | `light` | `dark` (controles nativos e barras de rolagem escuros) |
+
+Hierarquia de superfícies no escuro: **fundo < superfície < elevada < muted**, sempre com a borda de 1 px. Sem sombra em repouso nos dois temas; no escuro a separação vem do tom e da borda.
+
+### Como o mecanismo funciona
+
+| `data-theme` no `<html>` | Sistema claro | Sistema escuro |
+|---|---|---|
+| ausente (Dispositivo) | claro (`:root`) | escuro (bloco **4a**) |
+| `light` | claro | claro |
+| `dark` | escuro (bloco **4b**) | escuro (bloco **4b**) |
+
+1. **`tokens.css`:** a seção 2 define os semânticos no `:root` (claro). A seção 4 redefine **os mesmos nomes** com os valores escuros, em dois blocos **idênticos**:
+   - **4a:** `@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { … } }` (Dispositivo com o sistema escuro);
+   - **4b:** `:root[data-theme="dark"] { … }` (Escuro escolhido).
+
+   Sem build step não dá para escrever o bloco uma vez só (`light-dark()` foi descartado no doc 02 §5.2). Mudou um, mude o outro.
+2. **Script inline no `<head>` do `base.html`, antes de qualquer `<link>`:** lê a chave `studyia-theme` do `localStorage` e põe o `data-theme` no `<html>` antes da primeira pintura (sem flash). Também põe a classe `js`, que faz o seletor aparecer. **Não mover** para depois do CSS nem para um arquivo com `defer`.
+3. **`static/js/theme.js` (`defer`):** cuida só do seletor (abrir, fechar, teclado, gravar a escolha, dica "Segue o sistema (claro/escuro)" ao vivo). Não usa nada do `app.js`, e o `app.js` não usa nada dele.
+4. **Dispositivo ao vivo:** sem `data-theme`, quem troca a paleta é o próprio `@media` quando o sistema muda; o `theme.js` só desliga as transições nesse quadro e atualiza a dica.
+5. **Sem JavaScript:** o seletor some (`.js .theme-switch`) e a página segue o sistema.
+
+### Seletor de tema
+
+- `.theme-toggle`: botão de 44 × 44 px na navbar, **fora** do `{% if session.get('user_id') %}` (aparece também no login e no cadastro). O ícone mostra a escolha (sol, lua ou monitor) e vem só do CSS, pelo `data-theme`, sem esperar o JS. O rótulo "Tema" some abaixo de 640 px (`.nav-btn-label`), e o nome acessível é "Tema: <escolha>".
+- `.theme-menu`: painel `[popover]` (top layer; Esc e clique fora são do navegador), na superfície elevada, com borda forte e `--shadow-floating`. Fallback com `[hidden]` para navegador sem `popover`.
+- `.theme-option`: um `<label>` de 44 px com um radio nativo escondido. Setas trocam o tema ao vivo com o painel aberto; Enter escolhe e fecha; clique escolhe e fecha. Escolhida: semibold e ✓ no acento. Foco: anel na linha inteira. Hover: `--color-surface-raised-hover`.
+
+### Como adicionar uma cor nova (nos dois temas)
+
+1. **Procure um token que já sirva** na [tabela de cor](#cor). Reaproveitar é o caminho preferido.
+2. **Crie o token semântico** na seção 2 do `tokens.css`, com o nome pelo **papel** (`--color-<papel>`, nunca pela cor: `--color-highlight`, não `--color-yellow`). O valor claro aponta para um primitivo (crie o primitivo na seção 1, se faltar).
+3. **Dê o valor escuro nos DOIS blocos**, 4a e 4b, com o mesmo valor e o mesmo comentário. Para conferir que os blocos continuam iguais (bash):
+
+   ```bash
+   diff <(sed -n '/^@media (prefers-color-scheme: dark)/,/^}/p' static/css/tokens.css | sed 's/^  //' | grep -- '--') \
+        <(sed -n '/^:root\[data-theme="dark"\]/,/^}/p' static/css/tokens.css | grep -- '--') && echo "4a == 4b"
+   ```
+4. **Meça o contraste nos dois temas** contra o fundo em que a cor vai aparecer (texto ≥ 4,5:1; texto grande, ícone e borda de campo ≥ 3:1) e anote no comentário do token. No escuro, cores claras e pouco saturadas funcionam melhor que a versão clara da paleta com o brilho aumentado.
+5. **Use só o token** no `style.css`: `color: var(--color-<papel>)`.
+6. **Suba o `?v=`** dos dois `<link>` do `base.html`.
+7. **Confira na tela** nos dois temas, em 375 e 1440 px: pelo seletor, ou no DevTools (Ctrl+Shift+P → "Rendering" → `prefers-color-scheme`).
+8. **Acrescente a linha** na tabela de cor do §1, com os dois valores e os dois contrastes.
+
+Exemplo:
+
+```css
+/* tokens.css, seção 2 (claro) */
+--color-highlight: var(--warning-50);
+/* tokens.css, blocos 4a E 4b (escuro) */
+--color-highlight: #2A2313;  /* tinta por cima: 12,9 */
+
+/* style.css */
+.mark-highlight { background-color: var(--color-highlight); }
+```

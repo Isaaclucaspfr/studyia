@@ -19,7 +19,19 @@ Todos os 7 templates de página fazem `{% extends "base.html" %}` e preenchem **
 
 ## `static/`
 
-Só existem dois arquivos.
+> **Atualização (feature 02, 2026-11-23).** As tabelas abaixo descrevem o código **antes** da sprint 01 (commit `7fbd035`) e ficam como registro. Hoje o `static/` tem:
+>
+> | Arquivo | O que é |
+> |---|---|
+> | `css/tokens.css` | só variáveis: primitivos (só claro), tokens semânticos, tipografia, espaço, movimento e os blocos do **tema escuro** (4a e 4b, idênticos). Os aliases `--chakra-*`/`--gray-*` e os tokens do modal saíram na feature 02 |
+> | `css/style.css` | componentes e telas (mobile-first), incluindo o **seletor de tema** (`.theme-*`) |
+> | `js/app.js` | chat, Markdown e checklist (sem o modal desde a feature 01). Na feature 02 só mudou a cor do label da tarefa: `'#94a3b8'` → `'var(--color-text-subtle)'` |
+> | `js/theme.js` | **novo (feature 02)**, `defer` no `<head>`: o seletor de tema (abrir/fechar, teclado, gravar `studyia-theme` no `localStorage`, Dispositivo ao vivo). Independente do `app.js`. O `data-theme` inicial vem de um script inline no `<head>` do `base.html`, antes do CSS |
+> | `favicon.svg` | a marca |
+>
+> `?v=` atual: `tokens.css` e `style.css` em `tema_v3`; `app.js` e `theme.js` em `tema_v1`. Padrões e tokens: [06-padroes-visuais.md](06-padroes-visuais.md) (§7, "Temas").
+
+Na época, só existiam dois arquivos.
 
 ### `static/css/style.css` (549 linhas)
 
