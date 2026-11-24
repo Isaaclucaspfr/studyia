@@ -39,6 +39,20 @@ def login_required(f):
         if 'user_id' not in session:
             flash("Por favor, faça login para acessar esta página.", "warning")
             return redirect(url_for('login'))
+
+        # Sessão órfã: o cookie aponta para um usuário que não existe neste banco
+        # (banco recriado, outro DATABASE_PATH, usuário removido). Sem esta checagem,
+        # as páginas abrem e o primeiro INSERT falha com FOREIGN KEY (erro 500).
+        conn = database.get_db_connection()
+        user_exists = conn.execute(
+            "SELECT 1 FROM users WHERE id = ?", (session['user_id'],)
+        ).fetchone()
+        conn.close()
+        if not user_exists:
+            session.clear()
+            flash("Sua sessão expirou. Entre novamente.", "info")
+            return redirect(url_for('login'))
+
         return f(*args, **kwargs)
     return decorated_function
 
