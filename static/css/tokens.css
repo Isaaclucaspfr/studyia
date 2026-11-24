@@ -1,5 +1,6 @@
 /* ==========================================================================
-   StudyIA — Design tokens ("Caderno quieto", Sprint 01 · D1)
+   StudyIA — Design tokens (identidade azul, rebrand de 24/11/2026;
+   estrutura da Sprint 01 · D1 e da feature 02)
    Carregado ANTES do style.css (base.html). Ordem do arquivo:
      1. Primitivos (escalas de cor, só do tema claro)
      2. Tokens semânticos (o que os componentes usam)
@@ -8,7 +9,7 @@
    (Os aliases --chakra-* e --gray-* saíram na features/02: sem uso desde a sprint 01.)
    Componentes usam SÓ os tokens semânticos (seção 2 em diante). Usar um
    primitivo direto num componente quebra o tema escuro.
-   Contrastes WCAG medidos: doc da sprint 01 (claro) e features/02 (escuro).
+   Contrastes WCAG medidos: docs/06-padroes-visuais.md §1 (tabela do rebrand).
 
    Como o tema é escolhido (features/02, §5.1):
      sem data-theme no <html>  → segue o sistema (@media prefers-color-scheme)
@@ -21,49 +22,57 @@
 
   /* ---------- 1. Primitivos ---------- */
 
-  /* Neutros levemente esverdeados (tinta #17201C, fundo #F5F6F4) */
+  /* Neutros levemente azulados (tinta #0B1A2E, fundo #F4F7FB) */
   --neutral-0:   #FFFFFF;
-  --neutral-50:  #F5F6F4;
-  --neutral-100: #EDEFEC;
-  --neutral-200: #E2E5E1;
-  --neutral-300: #C5CBC6;
-  --neutral-400: #868F89;  /* borda de campo: 3,3:1 sobre branco (não-texto) */
-  --neutral-500: #646E68;  /* texto sutil: 4,9:1 no fundo, 5,3:1 no branco */
-  --neutral-600: #55605A;  /* texto secundário: 6,0:1 no fundo, 6,6:1 no branco */
-  --neutral-700: #3A443F;
-  --neutral-800: #252E2A;
-  --neutral-900: #17201C;  /* tinta */
+  --neutral-50:  #F4F7FB;
+  --neutral-100: #E9EFF6;
+  --neutral-200: #DCE3EC;
+  --neutral-300: #C1CCDA;
+  --neutral-400: #7D8CA1;  /* borda de campo: 3,4:1 sobre branco (não-texto) */
+  --neutral-500: #596A80;  /* texto sutil: 5,2:1 no fundo, 5,5:1 no branco */
+  --neutral-600: #475A71;  /* texto secundário: 6,6:1 no fundo, 7,1:1 no branco */
+  --neutral-700: #33445A;
+  --neutral-800: #1C2C42;
+  --neutral-900: #0B1A2E;  /* tinta: o marinho da marca, clareado só o bastante para ler */
 
-  /* Acento único: verde-petróleo */
-  --accent-50:  #EAF3F0;
-  --accent-100: #D3E6E0;
-  --accent-200: #A9CFC3;
-  --accent-300: #6FA99A;
-  --accent-500: #1E6B5C;   /* branco sobre ele: 6,3:1 */
-  --accent-600: #18584B;   /* hover */
-  --accent-700: #124538;   /* pressionado / texto sobre acento-50 (9,6:1) */
-  --accent-800: #0D3329;
+  /* Acento: azul (a referência #007BFF escurecida até passar no AA) */
+  --accent-50:  #EAF2FE;
+  --accent-100: #D3E4FC;
+  --accent-200: #A7C9F5;
+  --accent-300: #6BA6EE;
+  --accent-400: #0874D9;   /* início do gradiente do botão: branco por cima 4,7:1 */
+  --accent-450: #0767C2;   /* início do gradiente no hover: branco 5,6:1 */
+  --accent-500: #0B5FCC;   /* branco sobre ele: 6,0:1 */
+  --accent-550: #065AA8;   /* início do gradiente pressionado: branco 6,9:1 */
+  --accent-600: #0A50AD;   /* hover */
+  --accent-700: #08418E;   /* pressionado */
+  --accent-800: #06336E;
 
-  /* Sucesso */
-  --success-50:  #EBF5EF;
-  --success-100: #CFE6D8;
-  --success-200: #A8D1B8;
-  --success-500: #237A4B;  /* 5,3:1 sobre branco */
-  --success-700: #1A5E39;  /* texto sobre sucesso-50: 7,0:1 */
+  /* Azul elétrico: fim do gradiente do botão (#1F4FD1, branco por cima 6,8:1) */
+  --electric-500: #1F4FD1;
+  --electric-600: #1A44B5;
+  --electric-700: #163A9C;
+
+  /* Sucesso (verde um pouco mais frio, para conviver com o azul) */
+  --success-50:  #EAF6F0;
+  --success-100: #CDE9DB;
+  --success-200: #A5D5BD;
+  --success-500: #18794E;  /* 5,4:1 sobre branco */
+  --success-700: #105C3A;  /* texto sobre sucesso-50: 7,3:1 */
 
   /* Atenção */
-  --warning-50:  #FFF6DB;
-  --warning-100: #F6E7B4;
-  --warning-200: #EBD38A;
-  --warning-500: #B57A10;  /* só gráfico (borda, ícone): 3,7:1 */
-  --warning-700: #8A5A00;  /* texto: 5,5:1 sobre atenção-50 */
+  --warning-50:  #FFF5DB;
+  --warning-100: #F7E6B3;
+  --warning-200: #EECF89;
+  --warning-500: #B26E00;  /* só gráfico (borda, ícone, ponto): 4,1:1 */
+  --warning-700: #8A5300;  /* texto: 5,8:1 sobre atenção-50 */
 
   /* Perigo */
-  --danger-50:  #FDF0EE;
-  --danger-100: #F8D7D2;
-  --danger-200: #EDABA2;
-  --danger-500: #B42318;   /* 6,6:1 sobre branco */
-  --danger-700: #912018;   /* texto sobre perigo-50: 7,8:1 */
+  --danger-50:  #FDEFEF;
+  --danger-100: #FBE2E3;
+  --danger-200: #F0AEB1;
+  --danger-500: #C0262D;   /* 5,9:1 sobre branco · 4,8:1 sobre perigo-100 */
+  --danger-700: #9B1B21;   /* texto sobre perigo-50: 7,3:1 */
 
   /* ---------- 2. Tokens semânticos ---------- */
 
@@ -94,6 +103,17 @@
   --color-link:               var(--accent-500);
   --color-focus:              var(--accent-500);
 
+  /* Ação principal (rebrand): o botão primário com gradiente e a bolha do usuário.
+     Iguais nos dois temas, de propósito: no escuro o acento vira ciano (texto
+     escuro por cima), mas o botão continua azul com texto branco, como na
+     referência. Por isso estes tokens NÃO aparecem nos blocos 4a/4b.
+     O gradiente é o único da interface (decisão do grupo); o resto é chapado. */
+  --color-primary:        var(--accent-500);    /* cor sólida: bolha do usuário, fallback do botão */
+  --color-on-primary:     var(--neutral-0);     /* branco: 4,7 no ponto mais claro do gradiente */
+  --gradient-primary:        linear-gradient(135deg, var(--accent-400), var(--electric-500));  /* 4,7 → 6,8 */
+  --gradient-primary-hover:  linear-gradient(135deg, var(--accent-450), var(--electric-600));  /* 5,6 → 8,3 */
+  --gradient-primary-active: linear-gradient(135deg, var(--accent-550), var(--electric-700));  /* 6,9 → 9,9 */
+
   --color-success:        var(--success-500);
   --color-success-text:   var(--success-700);
   --color-success-soft:   var(--success-50);
@@ -110,7 +130,7 @@
   --color-danger-soft-active: var(--danger-100); /* pressionado do "Sair" e do excluir */
   --color-danger-border:  var(--danger-200);
 
-  --color-selection:      var(--accent-100);   /* ::selection; tinta por cima: 12,8:1 */
+  --color-selection:      var(--accent-100);   /* ::selection; tinta por cima: 13,5:1 */
   --color-scrollbar:      var(--neutral-300);  /* polegar das barras de rolagem */
 
   --color-code-bg:        var(--neutral-900);
@@ -118,12 +138,14 @@
 
   /* Seta do <select>: o <select> não aceita ::before, então a seta é uma imagem
      com a cor do texto secundário escrita dentro (uma por tema). */
-  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355605A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475A71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
   /* ---------- 3. Tipografia ---------- */
 
   --font-sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
                "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  /* Só o wordmark do logo (rebrand). @font-face no topo do style.css */
+  --font-brand: "Inter Wordmark", var(--font-sans);
   --font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
 
   /* Escala: 12 · 13 · 14 · 16 · 20 · 24 · 36 */
@@ -146,6 +168,7 @@
 
   --tracking-tight:  -0.015em; /* h1/h2 */
   --tracking-normal: 0;
+  --tracking-brand:  -0.03em;  /* wordmark em Inter */
 
   --measure: 68ch; /* largura máxima de parágrafo de leitura */
 
@@ -177,7 +200,7 @@
   --shadow-none:     none;
   /* Só o que flutua sobre a página (painel do tema). No escuro a sombra fica mais
      densa e a separação vem também da borda (seção 4). */
-  --shadow-floating: 0 12px 32px -12px rgb(23 32 28 / 0.24), 0 2px 6px rgb(23 32 28 / 0.08);
+  --shadow-floating: 0 12px 32px -12px rgb(11 26 46 / 0.24), 0 2px 6px rgb(11 26 46 / 0.08);
 
   /* ---------- Layout e controles ---------- */
 
@@ -223,7 +246,9 @@
 }
 
 /* ---------- 4. Tema escuro (features/02) ----------
-   "Caderno quieto" à noite: neutros esverdeados escuros e o acento clareado.
+   Perto da referência do grupo: fundo marinho #00152B, campos #102D4D e o
+   acento em ciano. O botão primário continua azul com texto branco (tokens
+   --color-primary e --gradient-primary, iguais nos dois temas: não aparecem aqui).
    Só os tokens semânticos mudam; os componentes não sabem qual tema está ativo.
    No escuro, a hierarquia vem da diferença entre fundo e superfície e da borda
    (D1: superfícies sem sombra em repouso).
@@ -238,53 +263,53 @@
   :root:not([data-theme="light"]) {
     color-scheme: dark;
 
-    --color-bg:             #111714;
-    --color-surface:        #18201C;
-    --color-surface-muted:  #222B27;
-    --color-surface-raised:       #1E2723;  /* um tom acima da superfície: painel do tema */
-    --color-surface-raised-hover: #252F2A;  /* sutil por cima: 4,7 */
-    --color-border:         #2E3833;
-    --color-border-strong:  #3E4A44;
-    --color-border-input:   #727D77;  /* 3,9:1 na superfície (não-texto) */
+    --color-bg:             #00152B;  /* o marinho da referência, sem ajuste */
+    --color-surface:        #061E39;
+    --color-surface-muted:  #102D4D;  /* o fundo de campo da referência */
+    --color-surface-raised:       #0B2645;  /* um tom acima da superfície: painel do tema */
+    --color-surface-raised-hover: #133353;  /* sutil por cima: 5,0 */
+    --color-border:         #18385B;
+    --color-border-strong:  #24486F;
+    --color-border-input:   #5C84AF;  /* "borda azul clara": 4,3:1 na superfície (não-texto) */
 
-    --color-text:           #E6EBE8;  /* 15,1 fundo · 13,8 superfície */
-    --color-text-secondary: #AAB4AE;  /* 8,5 · 7,8 · 6,8 muted */
-    --color-text-subtle:    #8E9993;  /* 6,2 · 5,7 · 4,9 muted */
-    --color-text-inverse:   #111714;
+    --color-text:           #E8F1FB;  /* 16,1 fundo · 14,7 superfície */
+    --color-text-secondary: #A8BDD5;  /* 9,6 · 8,7 · 7,3 muted */
+    --color-text-subtle:    #8CA4C0;  /* 7,2 · 6,5 · 5,4 muted */
+    --color-text-inverse:   #00152B;
 
-    --color-accent:             #5DB8A2;  /* 7,0 como texto na superfície */
-    --color-accent-hover:       #77C7B3;  /* on-accent por cima: 8,7 */
-    --color-accent-active:      #8FD3C2;  /* on-accent por cima: 10,0 */
-    --color-accent-soft:        #173029;  /* texto por cima: 11,7 · acento: 5,9 */
-    --color-accent-soft-active: #1F4037;  /* acento por cima: 4,8 */
-    --color-accent-soft-border: #2F6356;
-    --color-on-accent:          #0B1F1A;  /* 7,2 sobre o acento */
-    --color-link:               #5DB8A2;
-    --color-focus:              #5DB8A2;  /* 7,0 superfície · 7,7 fundo */
+    --color-accent:             #38D1FF;  /* ciano (ref. #00CFFF, um pouco mais claro): 9,4 na superfície */
+    --color-accent-hover:       #6ADDFF;  /* on-accent por cima: 11,7 */
+    --color-accent-active:      #93E7FF;  /* on-accent por cima: 13,2 */
+    --color-accent-soft:        #072F4B;  /* texto por cima: 12,1 · acento: 7,7 */
+    --color-accent-soft-active: #0C3C5E;  /* acento por cima: 6,4 */
+    --color-accent-soft-border: #1C5F86;
+    --color-on-accent:          #00152B;  /* 10,3 sobre o acento */
+    --color-link:               #38D1FF;
+    --color-focus:              #38D1FF;  /* 9,4 superfície · 10,3 fundo */
 
-    --color-success:        #6CC793;  /* 8,1 na superfície (nota alta, ícones) */
-    --color-success-text:   #86D3A5;  /* 8,8 sobre o soft */
-    --color-success-soft:   #15281D;
-    --color-success-border: #2E5A40;
+    --color-success:        #4FD39C;  /* 8,9 na superfície (nota alta, ícones) */
+    --color-success-text:   #80E2B8;  /* 9,9 sobre o soft */
+    --color-success-soft:   #06292A;
+    --color-success-border: #1E5E50;
 
-    --color-warning:        #D9A945;  /* 7,7 na superfície */
-    --color-warning-text:   #E9C46F;  /* 9,3 sobre o soft */
-    --color-warning-soft:   #2A2313;
-    --color-warning-border: #5C4A1F;
+    --color-warning:        #F2B649;  /* 9,2 na superfície */
+    --color-warning-text:   #F7CC78;  /* 10,2 sobre o soft */
+    --color-warning-soft:   #2A2410;
+    --color-warning-border: #5E4A1C;
 
-    --color-danger:             #F08A7E;  /* "Sair": 6,9 na superfície */
-    --color-danger-text:        #F3A59B;  /* 8,2 sobre o soft */
-    --color-danger-soft:        #301B18;
-    --color-danger-soft-active: #40231F;  /* "Sair" pressionado: 5,9 */
-    --color-danger-border:      #6B3630;
+    --color-danger:             #FF8A8F;  /* "Sair": 7,4 na superfície */
+    --color-danger-text:        #FFA9AC;  /* 9,1 sobre o soft */
+    --color-danger-soft:        #311626;
+    --color-danger-soft-active: #432033;  /* "Sair" pressionado: 6,2 */
+    --color-danger-border:      #6E2F45;
 
-    --color-selection:      #24493F;  /* texto por cima: 8,3 */
-    --color-scrollbar:      #3E4A44;
+    --color-selection:      #12406A;  /* texto por cima: 9,4 */
+    --color-scrollbar:      #24486F;
 
-    --color-code-bg:        #0A0E0C;  /* mais fundo que a página: o bloco não some */
-    --color-code-text:      #E6EBE8;  /* 16,1 */
+    --color-code-bg:        #000C1A;  /* mais fundo que a página: o bloco não some */
+    --color-code-text:      #E8F1FB;  /* 17,2 */
 
-    --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AAB4AE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+    --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8BDD5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
     --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
   }
@@ -295,53 +320,53 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg:             #111714;
-  --color-surface:        #18201C;
-  --color-surface-muted:  #222B27;
-  --color-surface-raised:       #1E2723;  /* um tom acima da superfície: painel do tema */
-  --color-surface-raised-hover: #252F2A;  /* sutil por cima: 4,7 */
-  --color-border:         #2E3833;
-  --color-border-strong:  #3E4A44;
-  --color-border-input:   #727D77;  /* 3,9:1 na superfície (não-texto) */
+  --color-bg:             #00152B;  /* o marinho da referência, sem ajuste */
+  --color-surface:        #061E39;
+  --color-surface-muted:  #102D4D;  /* o fundo de campo da referência */
+  --color-surface-raised:       #0B2645;  /* um tom acima da superfície: painel do tema */
+  --color-surface-raised-hover: #133353;  /* sutil por cima: 5,0 */
+  --color-border:         #18385B;
+  --color-border-strong:  #24486F;
+  --color-border-input:   #5C84AF;  /* "borda azul clara": 4,3:1 na superfície (não-texto) */
 
-  --color-text:           #E6EBE8;  /* 15,1 fundo · 13,8 superfície */
-  --color-text-secondary: #AAB4AE;  /* 8,5 · 7,8 · 6,8 muted */
-  --color-text-subtle:    #8E9993;  /* 6,2 · 5,7 · 4,9 muted */
-  --color-text-inverse:   #111714;
+  --color-text:           #E8F1FB;  /* 16,1 fundo · 14,7 superfície */
+  --color-text-secondary: #A8BDD5;  /* 9,6 · 8,7 · 7,3 muted */
+  --color-text-subtle:    #8CA4C0;  /* 7,2 · 6,5 · 5,4 muted */
+  --color-text-inverse:   #00152B;
 
-  --color-accent:             #5DB8A2;  /* 7,0 como texto na superfície */
-  --color-accent-hover:       #77C7B3;  /* on-accent por cima: 8,7 */
-  --color-accent-active:      #8FD3C2;  /* on-accent por cima: 10,0 */
-  --color-accent-soft:        #173029;  /* texto por cima: 11,7 · acento: 5,9 */
-  --color-accent-soft-active: #1F4037;  /* acento por cima: 4,8 */
-  --color-accent-soft-border: #2F6356;
-  --color-on-accent:          #0B1F1A;  /* 7,2 sobre o acento */
-  --color-link:               #5DB8A2;
-  --color-focus:              #5DB8A2;  /* 7,0 superfície · 7,7 fundo */
+  --color-accent:             #38D1FF;  /* ciano (ref. #00CFFF, um pouco mais claro): 9,4 na superfície */
+  --color-accent-hover:       #6ADDFF;  /* on-accent por cima: 11,7 */
+  --color-accent-active:      #93E7FF;  /* on-accent por cima: 13,2 */
+  --color-accent-soft:        #072F4B;  /* texto por cima: 12,1 · acento: 7,7 */
+  --color-accent-soft-active: #0C3C5E;  /* acento por cima: 6,4 */
+  --color-accent-soft-border: #1C5F86;
+  --color-on-accent:          #00152B;  /* 10,3 sobre o acento */
+  --color-link:               #38D1FF;
+  --color-focus:              #38D1FF;  /* 9,4 superfície · 10,3 fundo */
 
-  --color-success:        #6CC793;  /* 8,1 na superfície (nota alta, ícones) */
-  --color-success-text:   #86D3A5;  /* 8,8 sobre o soft */
-  --color-success-soft:   #15281D;
-  --color-success-border: #2E5A40;
+  --color-success:        #4FD39C;  /* 8,9 na superfície (nota alta, ícones) */
+  --color-success-text:   #80E2B8;  /* 9,9 sobre o soft */
+  --color-success-soft:   #06292A;
+  --color-success-border: #1E5E50;
 
-  --color-warning:        #D9A945;  /* 7,7 na superfície */
-  --color-warning-text:   #E9C46F;  /* 9,3 sobre o soft */
-  --color-warning-soft:   #2A2313;
-  --color-warning-border: #5C4A1F;
+  --color-warning:        #F2B649;  /* 9,2 na superfície */
+  --color-warning-text:   #F7CC78;  /* 10,2 sobre o soft */
+  --color-warning-soft:   #2A2410;
+  --color-warning-border: #5E4A1C;
 
-  --color-danger:             #F08A7E;  /* "Sair": 6,9 na superfície */
-  --color-danger-text:        #F3A59B;  /* 8,2 sobre o soft */
-  --color-danger-soft:        #301B18;
-  --color-danger-soft-active: #40231F;  /* "Sair" pressionado: 5,9 */
-  --color-danger-border:      #6B3630;
+  --color-danger:             #FF8A8F;  /* "Sair": 7,4 na superfície */
+  --color-danger-text:        #FFA9AC;  /* 9,1 sobre o soft */
+  --color-danger-soft:        #311626;
+  --color-danger-soft-active: #432033;  /* "Sair" pressionado: 6,2 */
+  --color-danger-border:      #6E2F45;
 
-  --color-selection:      #24493F;  /* texto por cima: 8,3 */
-  --color-scrollbar:      #3E4A44;
+  --color-selection:      #12406A;  /* texto por cima: 9,4 */
+  --color-scrollbar:      #24486F;
 
-  --color-code-bg:        #0A0E0C;  /* mais fundo que a página: o bloco não some */
-  --color-code-text:      #E6EBE8;  /* 16,1 */
+  --color-code-bg:        #000C1A;  /* mais fundo que a página: o bloco não some */
+  --color-code-text:      #E8F1FB;  /* 17,2 */
 
-  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23AAB4AE' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8BDD5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
   --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
 }
