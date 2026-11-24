@@ -31,7 +31,7 @@
             Gerar plano de estudo
         </a>
         <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
-            <button type="submit" class="btn btn-purple btn-sm">
+            <button type="submit" class="btn btn-purple btn-sm" data-loading-text="Gerando seminário…">
                 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
                 Iniciar mini seminário
             </button>
@@ -90,6 +90,8 @@
             <button type="submit" class="btn btn-primary" id="sendBtn">
                 Perguntar à IA
             </button>
+            <!-- Anúncio do envio para leitor de tela (B4). Escrito pelo app.js -->
+            <p class="sr-only" id="chatStatus" role="status" aria-live="polite"></p>
         </form>
     </div>
 
@@ -143,7 +145,7 @@
             <div class="card-header">
                 <h3 class="card-title"><svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg> Mini seminários</h3>
                 <form action="{{ url_for('create_seminar', topic_id=topic.id) }}" method="POST">
-                    <button type="submit" class="btn btn-ghost btn-sm">
+                    <button type="submit" class="btn btn-ghost btn-sm" data-loading-text="Gerando seminário…">
                         <svg class="icon icon-sm" aria-hidden="true" focusable="false"><use href="#i-plus"></use></svg>
                         Gerar
                     </button>

@@ -92,7 +92,7 @@
         </p>
     </div>
     <form action="{{ url_for('create_seminar', topic_id=plan.topic_id) }}" method="POST">
-        <button type="submit" class="btn btn-purple">
+        <button type="submit" class="btn btn-purple" data-loading-text="Gerando seminário…">
             <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-target"></use></svg>
             Iniciar mini seminário deste tema
         </button>
