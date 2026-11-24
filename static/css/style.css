@@ -312,7 +312,7 @@ svg.icon { display: inline-block; }
   margin: 0;
   padding: var(--space-1);
   color: var(--color-text);
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-raised); /* no escuro, um tom acima dos cards */
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-floating);
@@ -406,10 +406,10 @@ svg.icon { display: inline-block; }
 @media (hover: hover) {
   .theme-option:hover {
     color: var(--color-text);
-    background-color: var(--color-surface-muted);
+    background-color: var(--color-surface-raised-hover);
   }
 }
-.theme-option:active { background-color: var(--color-surface-muted); }
+.theme-option:active { background-color: var(--color-surface-raised-hover); }
 
 /* Na troca de tema, o theme.js desliga as transições por um quadro: sem isso,
    cada botão e cada borda animaria a cor separadamente (efeito "onda"). */
