@@ -231,5 +231,95 @@ class RemoverConfigurarIATestCase(unittest.TestCase):
         self.assertEqual(restantes, 0)
 
 
+class SessaoOrfaTestCase(unittest.TestCase):
+    """Sessão órfã (docs/handoff/backend-pendencias.md §17): o cookie aponta para
+    um user_id que não existe no banco. O login_required limpa a sessão e manda
+    para o login, em vez de abrir a página e falhar no INSERT (erro 500)."""
+
+    def setUp(self):
+        import os
+        app.config['TESTING'] = True
+        self._env_key = os.environ.get('GEMINI_API_KEY')
+        os.environ['GEMINI_API_KEY'] = ''
+        self.client = app.test_client()
+        database.init_db()
+
+        conn = database.get_db_connection()
+        conn.execute("DELETE FROM users WHERE username = 'alunoorfao'")
+        conn.commit()
+        conn.close()
+
+        self.client.post('/register', data={
+            'name': 'Aluno Orfao',
+            'username': 'alunoorfao',
+            'email': f'orfao_{time.time_ns()}@teste.com',
+            'password': 'senha123teste',
+            'confirm_password': 'senha123teste'
+        }, follow_redirects=True)
+
+        # Remove o usuário do banco, mas mantém o cookie de sessão no cliente.
+        conn = database.get_db_connection()
+        self.user_id = conn.execute("SELECT id FROM users WHERE username = 'alunoorfao'").fetchone()['id']
+        conn.execute("DELETE FROM users WHERE id = ?", (self.user_id,))
+        conn.commit()
+        conn.close()
+
+        with self.client.session_transaction() as sess:
+            self.assertEqual(sess.get('user_id'), self.user_id)
+
+    def tearDown(self):
+        import os
+        if self._env_key is None:
+            os.environ.pop('GEMINI_API_KEY', None)
+        else:
+            os.environ['GEMINI_API_KEY'] = self._env_key
+
+    def test_dashboard_redireciona_e_limpa_a_sessao(self):
+        res = self.client.get('/dashboard')
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.headers['Location'].endswith('/login'))
+
+        with self.client.session_transaction() as sess:
+            self.assertNotIn('user_id', sess)
+
+        res = self.client.get('/login')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('Sua sessão expirou. Entre novamente.'.encode('utf-8'), res.data)
+
+    def test_criar_assunto_nao_da_500(self):
+        res = self.client.post('/topic/new-subject', data={
+            'title': 'Assunto da Sessao Orfa',
+            'initial_question': ''
+        })
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.headers['Location'].endswith('/login'))
+
+        conn = database.get_db_connection()
+        criados = conn.execute(
+            "SELECT COUNT(*) FROM study_topics WHERE title = 'Assunto da Sessao Orfa'"
+        ).fetchone()[0]
+        conn.close()
+        self.assertEqual(criados, 0)
+
+    def test_rota_json_mantem_o_redirect(self):
+        # Decisão registrada: as rotas chamadas por fetch continuam com o redirect
+        # do login_required (não 401 JSON) até o grupo decidir. Ver docs/handoff §17.
+        res = self.client.post('/topic/1/message', json={'message': 'oi'})
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.headers['Location'].endswith('/login'))
+
+    def test_sessao_valida_continua_entrando(self):
+        self.client.post('/register', data={
+            'name': 'Aluno Orfao',
+            'username': 'alunoorfao',
+            'email': f'orfao2_{time.time_ns()}@teste.com',
+            'password': 'senha123teste',
+            'confirm_password': 'senha123teste'
+        })
+        res = self.client.get('/dashboard')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn(b"Painel de Estudos", res.data)
+
+
 if __name__ == '__main__':
     unittest.main()
