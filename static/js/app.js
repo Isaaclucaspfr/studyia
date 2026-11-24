@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (label) {
                         if (data.status === 'checked') {
                             label.style.textDecoration = 'line-through';
-                            label.style.color = '#94a3b8';
+                            label.style.color = 'var(--color-text-subtle)';
                         } else {
                             label.style.textDecoration = 'none';
                             label.style.color = 'inherit';
