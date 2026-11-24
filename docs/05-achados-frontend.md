@@ -105,12 +105,18 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Por que não é só visual:** é segurança. A correção muda o pipeline de renderização e provavelmente adiciona uma dependência (por exemplo, DOMPurify).
 
 ### B3. `fetch` sem checar `response.ok` ✅
+> **Toque da branch [`fix/robustez-envio-e-sessao`](https://github.com/Isaaclucaspfr/studyia/tree/fix/robustez-envio-e-sessao) (24/11/2026):** no chat, o botão "Perguntar à IA" agora volta ao normal no sucesso **e** no erro (bloco `finally`, `app.js:92-95`), então um erro não deixa mais o envio travado. **Continua pendente:** o `response.ok` não é checado nem no chat nem no checklist; com a sessão expirada, o chat ainda mostra o erro genérico (as rotas JSON mantêm o redirect: ver [handoff §17](handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)).
+
 - **Onde:** `app.js:63-76` (chat) e `app.js:153-176` (checklist).
 - **Impacto:** se o salvamento da tarefa falhar, a caixa fica marcada na tela, mas não foi gravada, e ao recarregar ela aparece desmarcada. Com a sessão expirada, o chat mostra um erro genérico em vez de pedir login (ver [02-rotas.md](02-rotas.md#login_required-e-as-rotas-json)).
 - **Requisito:** RNF03.
 - **Por que não é só visual:** é tratamento de erro em JS.
 
-### B4. Sem estado de carregamento e sem proteção contra clique duplo ✅
+### B4. Sem estado de carregamento e sem proteção contra clique duplo ✅ — resolvido
+> **Resolvido na branch [`fix/robustez-envio-e-sessao`](https://github.com/Isaaclucaspfr/studyia/tree/fix/robustez-envio-e-sessao) (24/11/2026).** Novo `static/js/forms.js` (genérico, por atributo): todo botão de envio com `data-loading-text` trava o form no 1º envio (`aria-busy` no form, `aria-disabled` no botão, foco preservado), troca o rótulo por um anel + o texto ("Criando estudo…", "Processando arquivo…", "Gerando plano…", "Gerando seminário…", "Avaliando respostas…") e anuncia numa região `role="status"`. O `pageshow` restaura os botões ao voltar pelo histórico (bfcache). No chat, a guarda fica no `app.js` (`isSending`, `app.js:22-60`): botão e Enter bloqueados até a resposta, rótulo "Respondendo…", volta ao normal no sucesso e no erro, e `#chatStatus` anuncia. Sem JavaScript, os forms enviam como antes. **Validado no navegador** (Playwright, IA com 2,5 s de atraso, banco descartável, tema claro e escuro): clique triplo + Enter cria **1** registro em cada um dos 7 forms; sem o `forms.js`, o mesmo clique triplo cria **3** (o teste reproduz o bug). **Confirmado no teste manual do Renzo (24/11/2026):** estado de carregamento e bloqueio do clique duplo nos forms, chat, e o "voltar" do navegador no **Chrome real com bfcache** (botões de volta ao normal) ✅. Contratos novos em [04 · Histórico](04-contratos-frontend.md#histórico-de-mudanças-nos-contratos).
+>
+> **Limite conhecido:** a proteção é só no navegador. Duas abas, um reenvio pelo F5 depois do POST ou um cliente fora do navegador ainda podem duplicar. A idempotência no backend fica como sugestão futura ([handoff §20](handoff/backend-pendencias.md#20-sugestão-futura-idempotência-nas-rotas-de-ia)).
+
 - **Onde:** os POSTs síncronos com IA: `dashboard.html:79` (novo assunto), `plan_create.html:24` (plano), `study_topic.html:35`, `:138`, `plan_view.html:97` e `seminar_view.html:29` (gerar seminário), e `seminar_view.html:94` (enviar respostas). Também o upload (`dashboard.html:109`), que pode demorar em PDFs grandes, e o chat (`app.js:46-83`), que não desabilita o botão.
 - **Impacto:** a página fica parada por vários segundos sem nenhum sinal. Um segundo clique cria **tópicos, planos ou seminários duplicados**.
 - **Requisito:** RNF03.
@@ -160,7 +166,7 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 
 ### B11. Duplicações ✅
 - **Bolha de chat em Jinja e em JS:** `study_topic.html:67-81` e `app.js:86-130`.
-- **Form "gerar seminário" repetido 4×:** `study_topic.html:35`, `:138`, `plan_view.html:97` e `seminar_view.html:29`.
+- **Form "gerar seminário" repetido 4×:** `study_topic.html:35`, `:138`, `plan_view.html:97` e `seminar_view.html:29`. Desde a branch [`fix/robustez-envio-e-sessao`](https://github.com/Isaaclucaspfr/studyia/tree/fix/robustez-envio-e-sessao) os 4 botões levam também `data-loading-text="Gerando seminário…"`: um 5º lugar ou uma macro precisa repetir o atributo, senão aquele botão volta a aceitar clique duplo.
 - ~~**Dois jeitos de abrir o modal:** listener em `app.js:9-13` e `onclick` inline em `dashboard.html:23`.~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o modal, o listener e o `onclick` saíram.
 - **Estilo da tarefa concluída** definido no template (`.task-text.is-done` no CSS) e no JS (`app.js:144-149`, inline). ~~A cor do JS era fixa (`#94a3b8`, 2,45:1, igual nos dois temas).~~ **Cores inline resolvidas na [feature 02](features/02-tema-claro-escuro-dispositivo.md):** o JS escreve `var(--color-text-subtle)`, o mesmo token do CSS, então a cor é a mesma antes e depois do clique e segue o tema (5,3:1 no claro, 5,7:1 no escuro, na superfície). **Continua** a duplicação do mecanismo (classe no template × inline no JS); unificar exige mudar o JS.
 - ~~**Aviso de demo** como HTML inline dentro do JS (`app.js:118`).~~ Resolvido na [feature 01](features/01-remover-configurar-ia.md): o JS gera só `<div class="chat-demo-note">`, e o estilo (com tokens, incluindo a antiga cor `#718096`) fica no CSS.

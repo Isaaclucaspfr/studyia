@@ -21,6 +21,7 @@
   - chave `studyia-theme` no `localStorage`: `light`, `dark` ou `system`;
   - classe `js` no `<html>`: sem ela o seletor fica escondido;
   - IDs do seletor usados pelo `theme.js`: `#themeToggle` (com `popovertarget="themeMenu"`), `#themeMenu` (`[popover]`), `#themeCurrent`, `#themeSystemHint` e os radios `name="studyia-theme"` com `value` `light`/`dark`/`system`. Os radios **não** estão num `<form>`: nada vai ao servidor.
+- [ ] **Carregamento dos forms: `static/js/forms.js`** (B4, branch `fix/robustez-envio-e-sessao`): entra no `<head>` logo depois do `theme.js`, com `defer`, e **não depende do `app.js` nem do `theme.js`** (nem eles dele). A ordem `marked` → `app.js` no fim do `<body>` não muda. Ver [7.6](#76-estado-de-carregamento-data-loading-text).
 - [ ] **`ai_demo_mode`** (variável global, `context_processor` em `app.py`): `True` quando não há `GEMINI_API_KEY` no ambiente. Controla o banner "Modo demonstração" do `dashboard.html`. Está disponível em **todos** os templates.
 - [ ] **Link da marca** (`base.html:19`): vai para `dashboard` se houver sessão, senão para `login`.
 - [ ] **Nomes de endpoint em `url_for`** são os nomes das funções Python do `app.py`. Um erro de digitação gera `BuildError` e **derruba a página inteira**:
@@ -40,7 +41,8 @@
 | `#chatForm` + `data-topic-id` | `study_topic.html:85` | submit com `preventDefault`; o ID do tópico vem de `dataset.topicId` (`app.js:29`, `:46-51`) | o ID e o atributo `data-topic-id="{{ topic.id }}"`; o form **não tem `action`**, então sem o JS ele faria GET na própria página |
 | `#chatInput` | `study_topic.html:86` | `.value` lido e limpo (`app.js:30`, `:48`, `:55`) | o ID; **não tem `name`** e não precisa (vai via JSON) |
 | `#chatMessages` | `study_topic.html:66` | recebe as bolhas com `appendChild` e `scrollTop = scrollHeight` (`app.js:31`, `:44`, `:128`) | o ID; precisa de **altura limitada + `overflow-y:auto`** para a rolagem automática funcionar. Hoje isso vem de `.chat-messages` (`style.css:382-390`, `flex:1; overflow-y:auto`) dentro de `.chat-window` com `height:620px` inline (`study_topic.html:58`) |
-| `#sendBtn` | `study_topic.html:87` | **não é usado** pelo JS | livre |
+| `#sendBtn` | `study_topic.html:90` | o `app.js` pega o **botão de envio dentro do `#chatForm`** (`querySelector('button[type="submit"]')`, não pelo ID) para travar o envio: `aria-disabled`, rótulo "Respondendo…" e de volta ao original no fim (B4) | o ID é livre; o `#chatForm` precisa ter **um** `button[type="submit"]`. O conteúdo do botão é salvo e restaurado pelo JS |
+| `#chatStatus` | `study_topic.html:94` | `textContent` com o anúncio do envio para leitor de tela (`app.js:26`, `:50`) | o ID, `role="status"` e `class="sr-only"`; deve existir **vazio** no carregamento (B4) |
 | `.plan-task-checkbox` + `data-plan-id` + `data-task-key` | `plan_view.html:71-78` | listener de `change`; payload do fetch (`app.js:145-149`) | a classe e os dois atributos |
 | `#label_{{ task_key }}` | `plan_view.html:80` | `style.textDecoration` e `style.color` alterados pelo JS (`app.js:144-149`); desde a feature 02 a cor escrita é `var(--color-text-subtle)` e segue o tema | o ID derivado da `task_key`. O JS escreve **estilo inline**, que vence qualquer classe CSS (ver [06-padroes-visuais.md](06-padroes-visuais.md#exceções-permitidas)) |
 | `#planProgressBar` | `plan_view.html:39` | `style.width = "<n>%"` (`app.js:161`, `:164`) | o ID; a largura é controlada via `style.width` |
@@ -135,6 +137,26 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 
 ---
 
+## 7.6 Estado de carregamento (`data-loading-text`)
+
+Contrato do `static/js/forms.js` (B4). Todo **botão de envio de um form POST que chama a IA** leva o atributo com o texto curto do carregamento, em sentence case e sem emoji:
+
+| Form | Onde | `data-loading-text` |
+|---|---|---|
+| Novo assunto | `dashboard.html:66` | `Criando estudo…` |
+| Upload | `dashboard.html:94` | `Processando arquivo…` |
+| Plano | `plan_create.html:73` | `Gerando plano…` |
+| Gerar seminário (4×) | `study_topic.html:34`, `:148`; `plan_view.html:95`; `seminar_view.html:31` | `Gerando seminário…` |
+| Enviar seminário | `seminar_view.html:171` | `Avaliando respostas…` |
+
+- O atributo fica no `<button type="submit">`, não no `<form>`. Form sem o atributo (login, cadastro, excluir) não é tocado.
+- No 1º envio, o JS põe `aria-busy="true"` no form e `aria-disabled="true"` no botão (**não** `disabled`: o foco continua no botão), troca o conteúdo do botão por `<span class="btn-spinner">` + o texto e escreve o anúncio em `#formsStatus` (criado pelo próprio JS no fim do `<body>`; não use esse ID em template). Os envios seguintes são cancelados.
+- No `pageshow` (voltar pelo histórico), o conteúdo original do botão é restaurado e os atributos saem.
+- **O CSS do estado** (`style.css`, logo depois de `.btn:disabled`): `.btn-spinner` e `form[aria-busy="true"] .btn[aria-disabled="true"]`. Usa o visual de desabilitado que já existia, com `currentColor` (segue o tema). O anel só gira com `prefers-reduced-motion: no-preference`.
+- **Um form POST de IA novo precisa do atributo**, senão ele volta a aceitar clique duplo. O chat **não** usa este atributo: a guarda dele fica no `app.js` (ver 7.2).
+
+---
+
 ## Antes de mexer em um template, confirme:
 
 1. [ ] O template continua com `{% extends "base.html" %}` e o conteúdo está dentro de `{% block content %}`.
@@ -148,6 +170,7 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 9. [ ] O `#chatMessages` continua com altura limitada e `overflow-y:auto`.
 10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.chat-demo-note`, `.alert-success/-danger/-warning/-info`, **nos dois temas** (só com tokens semânticos; ver [06 §7](06-padroes-visuais.md#7-temas-claro-e-escuro)).
 11. [ ] Se mexeu no `<head>` ou na navbar do `base.html`: o script inline do tema continua **antes** dos `<link>` de CSS, e o seletor de tema continua **fora** do `{% if session.get('user_id') %}`.
+12. [ ] Todo botão de envio de form POST que chama a IA tem `data-loading-text` ([7.6](#76-estado-de-carregamento-data-loading-text)), e o `#chatForm` continua com um único `button[type="submit"]` e o `#chatStatus` vazio.
 
 ---
 
@@ -155,5 +178,6 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 
 | Data | Mudança | Origem |
 |---|---|---|
+| 2026-11-24 | **Adicionados:** o `static/js/forms.js` (`defer`, no `<head>` depois do `theme.js`, independente do `app.js` e do `theme.js`); o atributo `data-loading-text` nos 9 botões de envio dos forms POST de IA ([7.6](#76-estado-de-carregamento-data-loading-text)); os estados `aria-busy` no form e `aria-disabled` no botão durante o envio; o ID `#formsStatus` (criado pelo JS); o `<p id="chatStatus" role="status">` no `#chatForm`; as classes `.btn-spinner` e a regra `form[aria-busy="true"] .btn[aria-disabled="true"]` no CSS. **Alterado:** o envio do chat no `app.js` (guarda `isSending`, botão travado e rótulo "Respondendo…" até a resposta, de volta no `finally`); o `app.js` passa a usar o `button[type="submit"]` do `#chatForm`. **Sem mudança:** payload, URL e resposta do `fetch`, estrutura da bolha, `name`/`action`/`method` dos forms. Cache: `style.css` e `app.js` em `?v=robustez_v1`. **Backend:** o `login_required` agora trata a sessão órfã (redirect + flash `info`); as rotas JSON mantêm o redirect. | branch `fix/robustez-envio-e-sessao` (B4 + [handoff §17](handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)) |
 | 2026-11-23 | **Adicionados:** o seletor de tema na navbar, **fora** da condição de sessão (`.nav-actions` › `.theme-switch`); o script inline anti-flash no `<head>`, antes do CSS; o `static/js/theme.js` (`defer`, independente do `app.js`); o contrato `data-theme` no `<html>` (`light`/`dark`/ausente), a chave `studyia-theme` no `localStorage` (`light`/`dark`/`system`), a classe `js` no `<html>` e os IDs `#themeToggle`, `#themeMenu`, `#themeCurrent` e `#themeSystemHint`. **Alterado:** a cor que o `app.js` escreve em `#label_<task_key>` (`#94a3b8` → `var(--color-text-subtle)`); o ID e o mecanismo não mudaram. **Nenhum contrato existente removido.** | [feature 02](features/02-tema-claro-escuro-dispositivo.md) |
 | 2026-11-22 | **Removidos:** `#openSettingsBtn`, `#settingsModal`, `#closeSettingsBtn`, `#openSettingsBtn2` (e o `onclick` inline), o form "Chave Gemini" (`gemini_api_key`), o endpoint `update_api_key` (rota `POST /settings/api-key`) e o item 9 do checklist sobre o modal. **Adicionados:** a variável global `ai_demo_mode` (no lugar do `has_custom_key`) e a classe `.chat-demo-note` gerada pelo `app.js`. | [feature 01](features/01-remover-configurar-ia.md) |

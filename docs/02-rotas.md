@@ -28,7 +28,9 @@ Arquivos estáticos: `url_for('static', filename=...)` em `base.html:7` (CSS) e 
 
 ## `@login_required` e as rotas JSON
 
-O decorator (`app.py:32-39`) protege todas as rotas, exceto `/`, `/register`, `/login` e `/logout`. Sem sessão, ele **sempre** responde com `flash` e **redirect HTML para `/login`**, inclusive em `/topic/<id>/message` e `/plan/<id>/toggle-task`.
+O decorator (`app.py:36-57`) protege todas as rotas, exceto `/`, `/register`, `/login` e `/logout`. Sem sessão, ele **sempre** responde com `flash` e **redirect HTML para `/login`**, inclusive em `/topic/<id>/message` e `/plan/<id>/toggle-task`.
+
+Desde a branch `fix/robustez-envio-e-sessao` ele também confere se o `user_id` da sessão **existe no banco** (sessão órfã, [handoff §17](handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)). Se não existir, limpa a sessão, faz `flash("Sua sessão expirou. Entre novamente.", "info")` e redireciona para `/login`. As rotas JSON mantêm o mesmo redirect (decisão registrada no handoff).
 
 Na prática, o `fetch` segue o redirect, recebe o HTML da página de login com status 200, e o `response.json()` lança exceção:
 - no chat, aparece a mensagem genérica "Ocorreu um erro ao conectar ao serviço de IA" (`app.js:77-80`);
