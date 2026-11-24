@@ -1,5 +1,7 @@
 # 02 — Tema claro / escuro / dispositivo
 
+> **Status: concluída — aguardando revisão** (PR `feat/tema-claro-escuro` → `main`, 2026-11-23). Registro completo no [§12](#12-registro-da-implementação).
+>
 > Índice: [features/README.md](README.md) · Base: commit `69c99ab` · Tamanho: médio (1 PR) · Escopos: **A** (tokens, CSS, markup) + **B** (um JS novo e, se aprovado, 3 linhas do `app.js`) · **Não toca o backend.**
 >
 > **Atualização depois da [01](01-remover-configurar-ia.md) (implementada na branch `feat/remover-configurar-ia`):**
@@ -258,24 +260,26 @@ Requisitos (acessibilidade visual tem prioridade sobre estética, como na sprint
 
 ## 9. Critérios de aceite
 
-- [ ] **3 modos:** Claro, Escuro e Dispositivo aplicam a paleta certa em todas as 7 telas (login, cadastro, dashboard, tópico/chat, criar plano, ver plano, seminário).
-- [ ] **Seletor em todas as páginas:** o botão de tema aparece **com e sem sessão** (login e cadastro incluídos) e abre o painel com as 3 opções. Quando a [04](04-landing-page.md) entrar, aparece também na landing.
-- [ ] **Backend intacto:** o PR não altera nenhum `.py`.
-- [ ] **Padrão:** sem nada salvo, o tema segue o sistema operacional.
-- [ ] **Persistência:** a escolha sobrevive a recarregar (Ctrl+Shift+R), a navegar entre páginas e a fechar e reabrir o navegador.
-- [ ] **Sem flash:** com Escuro escolhido e o sistema claro (e vice-versa), recarregar não mostra o outro tema nem por um quadro (conferir com a gravação de performance do DevTools ou com a rede em "Slow 3G").
-- [ ] **Dispositivo ao vivo:** com Dispositivo escolhido, trocar o tema do sistema (ou emular no DevTools: Rendering → `prefers-color-scheme`) muda a página sem recarregar.
-- [ ] **Sem JS:** a página segue o sistema e o seletor não aparece.
-- [ ] **`localStorage` bloqueado:** a página não quebra e segue o sistema.
-- [ ] **AA nos dois temas:** texto ≥ 4,5:1, texto grande e elementos não-texto (bordas de campo, ícones informativos, barra de progresso) ≥ 3:1. Itens 7 a 10 da auditoria resolvidos.
-- [ ] **Controles nativos:** select, input de arquivo e barras de rolagem acompanham o tema (`color-scheme`).
-- [ ] **Teclado:** o seletor é alcançável por Tab, abre com Enter/Espaço, troca com as setas, fecha com Esc e tem anel de foco visível nos dois temas.
-- [ ] **Leitor de tela:** o botão anuncia "Tema: <atual>" e as opções anunciam o estado selecionado.
-- [ ] **Alvo de toque:** botão e opções com pelo menos 44 × 44 px.
-- [ ] **Movimento:** se a troca de tema tiver transição, ela some com `prefers-reduced-motion: reduce`.
-- [ ] **Comportamento intacto:** chat (enviar mensagem), plano (marcar tarefa ou, depois da 03, concluir leitura) e seminário funcionam igual nos dois temas.
-- [ ] `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py` passa.
-- [ ] **Nenhum contrato do [04](../04-contratos-frontend.md) quebrado** (checklist final do 04).
+- [x] **3 modos:** Claro, Escuro e Dispositivo aplicam a paleta certa em todas as 7 telas (login, cadastro, dashboard, tópico/chat, criar plano, ver plano, seminário).
+- [x] **Seletor em todas as páginas:** o botão de tema aparece **com e sem sessão** (login e cadastro incluídos) e abre o painel com as 3 opções. Quando a [04](04-landing-page.md) entrar, aparece também na landing.
+- [x] **Backend intacto:** o PR não altera nenhum `.py`.
+- [x] **Padrão:** sem nada salvo, o tema segue o sistema operacional.
+- [x] **Persistência:** a escolha sobrevive a recarregar (Ctrl+Shift+R), a navegar entre páginas e a fechar e reabrir o navegador.
+- [x] **Sem flash:** com Escuro escolhido e o sistema claro (e vice-versa), recarregar não mostra o outro tema nem por um quadro (conferir com a gravação de performance do DevTools ou com a rede em "Slow 3G").
+- [x] **Dispositivo ao vivo:** com Dispositivo escolhido, trocar o tema do sistema (ou emular no DevTools: Rendering → `prefers-color-scheme`) muda a página sem recarregar.
+- [x] **Sem JS:** a página segue o sistema e o seletor não aparece.
+- [x] **`localStorage` bloqueado:** a página não quebra e segue o sistema.
+- [x] **AA nos dois temas:** texto ≥ 4,5:1, texto grande e elementos não-texto (bordas de campo, ícones informativos, barra de progresso) ≥ 3:1. Itens 7 a 10 da auditoria resolvidos.
+- [x] **Controles nativos:** select, input de arquivo e barras de rolagem acompanham o tema (`color-scheme`).
+- [x] **Teclado:** o seletor é alcançável por Tab, abre com Enter/Espaço, troca com as setas, fecha com Esc e tem anel de foco visível nos dois temas.
+- [x] **Leitor de tela:** o botão anuncia "Tema: <atual>" e as opções anunciam o estado selecionado.
+- [x] **Alvo de toque:** botão e opções com pelo menos 44 × 44 px.
+- [x] **Movimento:** se a troca de tema tiver transição, ela some com `prefers-reduced-motion: reduce`.
+- [x] **Comportamento intacto:** chat (enviar mensagem), plano (marcar tarefa ou, depois da 03, concluir leitura) e seminário funcionam igual nos dois temas.
+- [x] `DATABASE_PATH=/tmp/studyia-teste.db python -m unittest test_app.py` passa (com banco novo: um `/tmp/studyia-teste.db` de execuções antigas faz o `test_full_user_flow` falhar com 404, sem relação com o tema).
+- [x] **Nenhum contrato do [04](../04-contratos-frontend.md) quebrado** (checklist final do 04).
+
+Todos conferidos no Chromium (Playwright) e no teste manual do Renzo; detalhes no [§12, Fase 2](#fase-2-revisão-tela-a-tela-e-entrega-2026-11-23). O leitor de tela lê "Tema : Dispositivo" (decisão 4 da Fase 2). ⚠️ **Firefox e Safari não testados:** pedido de teste no Firefox na revisão do PR.
 
 ## 10. Divisão em PRs e responsáveis
 
@@ -289,7 +293,7 @@ Um PR (passo 3 da [ordem](README.md#ordem-de-implementação--decidido)), **fron
 | Tokens escuros + `color-scheme` | A | |
 | Script inline + `theme.js` + seletor fora da condição de sessão | B (JS novo) | aprovado pelo grupo ao decidir a funcionalidade |
 | `app.js:170` (e `:118`, se a 01 atrasar) | B | ✅ decidido: só o hex vira `var(--color-text-subtle)` (§5.5) |
-| Docs 06, 04, 03 | — | |
+| Docs 06, 04, 03, 05 e handoff | — | ✅ Fase 2 |
 
 **Checklist do PR** (registro completo no [§12](#12-registro-da-implementação)):
 
@@ -299,23 +303,23 @@ Um PR (passo 3 da [ordem](README.md#ordem-de-implementação--decidido)), **fron
 - [x] `static/js/theme.js` (com fallback sem `popover`)
 - [x] Seletor fora da condição de sessão + 3 ícones no sprite (`i-sun`, `i-moon`, `i-monitor`)
 - [x] `app.js:146` (antes `:170`): só o hex trocado
-- [x] `?v=` atualizado: CSS `tema_v2`, `app.js` e `theme.js` `tema_v1`
+- [x] `?v=` atualizado: CSS `tema_v3` (Fase 2), `app.js` e `theme.js` `tema_v1`
 - [x] `test_app.py` passando; verificação no navegador (Playwright)
 - [x] Teste manual do Renzo: tema escuro aprovado em todas as telas
-- [ ] Revisão tela a tela nos dois temas (**Fase 2**)
-- [ ] Docs 06, 04 e 03 (**Fase 2**)
+- [x] Revisão tela a tela nos dois temas (**Fase 2**)
+- [x] Docs 06, 04, 03, 05 e handoff (**Fase 2**)
 
 ## 11. Em aberto / futuro
 
-- 💡 **Fallback para navegador sem `popover`** (detalhe de implementação, não é decisão do grupo): recomendação: sim, com poucas linhas no `theme.js`. Decidir no PR.
-- **Futuro:** salvar a preferência no banco (coluna em `users` + rota), para valer em outros dispositivos. Registrado no [handoff](../handoff/backend-pendencias.md).
+- ✅ ~~**Fallback para navegador sem `popover`**~~: entrou na Fase 1 (`[hidden]` no `theme.js`).
+- **Futuro:** salvar a preferência no banco (coluna em `users` + rota), para valer em outros dispositivos. Registrado no [handoff, item 19](../handoff/backend-pendencias.md#19-sugestão-futura-preferência-de-tema-salva-no-banco).
 - **Futuro:** favicon com variante escura (hoje não precisa).
 - 💡 **Futuro: troca de tema suavizada (View Transitions).** Hoje a troca é instantânea: o `theme.js` desliga as transições por um quadro, para a página não mudar de cor "em onda". A apple-design recomenda suavizar trocas bruscas de brilho (claro ↔ escuro). Dá para fazer um *crossfade* curto (≈ 200 ms) com `document.startViewTransition()` em volta da troca do `data-theme`, só no `theme.js` e sem mexer no CSS dos componentes. Cuidados: respeitar `prefers-reduced-motion` (sem animação) e manter a troca instantânea nos navegadores sem a API (Firefox só a partir da 144). Não entra neste PR.
 - 💡 **Opcionais do §5.4 não implementados** (decisão 8 da revisão): sincronizar outras abas pelo evento `storage` e o `<meta name="theme-color">`.
 
 ## 12. Registro da implementação
 
-Branch `feat/tema-claro-escuro` (a partir da `main` em `fb893a6`; não existe `dev`), 2026-11-23. Fase 1 de 2: implementação. A Fase 2 é a revisão tela a tela e a entrega.
+**Status: concluída — aguardando revisão do grupo.** Branch `feat/tema-claro-escuro` (a partir da `main` em `fb893a6`; não existe `dev`, o PR tem base `main`), 2026-11-23. Fase 1: implementação. Fase 2: revisão tela a tela e entrega.
 
 ### O que entrou
 
@@ -354,10 +358,49 @@ Branch `feat/tema-claro-escuro` (a partir da `main` em `fb893a6`; não existe `d
 - Troca de tema suavizada (View Transitions): ideia futura, no §11.
 - O detector do impeccable não lê o CSS por causa dos `{{ url_for }}` no `<link>`; a conferência visual foi feita por screenshots.
 
-### Contexto para retomar (Fase 2: revisão e entrega)
+### Fase 2: revisão tela a tela e entrega (2026-11-23)
 
-1. Ler o `CLAUDE.local.md` (seções "Funcionalidade 02 — Tema" e "Ambiente") e este §12.
-2. Branch `feat/tema-claro-escuro`, com os commits da Fase 1 feitos pelo Renzo. Conferir `git log` e `git status` antes de começar.
-3. **Revisão tela a tela nos dois temas** (critérios do §9): as 7 telas em 375, 768 e 1440 px; estados de hover, foco, pressionado e desabilitado; Markdown da IA no chat (código, tabela, citação); alertas `success`/`danger`/`warning`/`info` e bolha de erro do chat; avisos de demo; nota do seminário nas 3 faixas (alta, média, baixa).
-4. **Docs (§6 e §10):** `docs/04-contratos-frontend.md` (§7.1: o seletor fora da condição de sessão, o script inline antes do CSS e o `theme.js`; contrato novo: `data-theme`, a chave `studyia-theme` e a classe `js`; linha no histórico), `docs/06-padroes-visuais.md` (tabela de tokens com a coluna escura, tokens novos e removidos, componente "Seletor de tema", estados, regra de não usar primitivos) e `docs/03-frontend-inventario.md` (`theme.js`, tokens sem os aliases).
-5. Rodar os testes, marcar os critérios do §9 e os 2 itens abertos do checklist do §10, e entregar os comandos de commit e o texto do PR (base `main`).
+**Revisão.** As 10 telas (login, cadastro, painel vazio e com dados, tópico de assunto e de arquivo, criar plano, plano, seminário respondendo e com resultado) em 375, 768 e 1440 px, nos dois temas (60 capturas), mais 72 capturas de estados: Markdown da IA no chat (tabela, código, citação, link, lista), nota de demonstração, "digitando", erro do servidor e erro de rede, os 4 alertas pelo fluxo real, hover e foco, alternativa selecionada, desabilitado, estado vazio, as 3 faixas de nota (troca de classe só na captura) e o painel do tema. Nenhum cinza ilegível, borda sumindo ou controle nativo claro no escuro.
+
+**Ajuste feito (o único).** O painel do tema usava a mesma superfície dos cards; no escuro a sombra quase não aparece, então a elevação precisa vir do tom. Dois tokens novos, usados só pelo `.theme-menu`:
+
+| Token | Claro | Escuro | Contraste no escuro |
+|---|---|---|---|
+| `--color-surface-raised` | `#FFFFFF` (= superfície) | `#1E2723` (um tom acima dos cards) | tinta 12,7 · secundário 7,2 · sutil 5,2 |
+| `--color-surface-raised-hover` | `#EDEFEC` (= muted, o hover de antes) | `#252F2A` | sutil 4,7 · secundário 6,5 |
+
+No claro os valores são os de antes: o tema claro não muda. `?v=` do CSS: `tema_v2` → `tema_v3`.
+
+**Decisões da Fase 2 (aprovadas pelo Renzo, 2026-11-23).**
+
+1. Superfície elevada do painel no escuro (acima): aplicada.
+2. Acento escuro mantido em `#5DB8A2`. O teste com `#52AA95` (menos brilho) mudou pouco na tela e derrubaria o texto do botão fantasma pressionado para 4,08:1. Capturas A/B em `../studyia-screenshots/feature-02-fase2/decisoes/`.
+3. O hover do botão primário no escuro clareia (`#77C7B3`, texto por cima 8,7:1): mantido, é a convenção do escuro.
+4. O nome acessível do botão sai "Tema : Dispositivo" (o Chrome separa os itens do `inline-flex`; os leitores não falam os dois-pontos no nível padrão de pontuação): mantido.
+5. Borda do campo desabilitado com 1,65:1 (claro) e 1,8:1 (escuro): mantida. Desabilitado é isento na WCAG, e o tratamento é o mesmo nos dois temas.
+
+**Contraste final (medido em todo texto visível, placeholder, ícone e borda de campo, nas 10 telas e nos estados).** Nenhum par abaixo do AA nos dois temas, fora o desabilitado (decisão 5). Margens mais apertadas: texto 4,88 no claro (hora da mensagem sobre o fundo) e 5,65 no escuro (placeholder); borda de campo 3,33 no claro e 3,89 no escuro.
+
+**Alvos de toque (375 px).** Nenhum controle abaixo de 44 px; a única exceção é o link "Faça login" dentro da frase do cadastro (isento na WCAG 2.5.8). Iguais nos dois temas.
+
+**Regressão do claro.** A `main` rodando lado a lado (`git archive`, banco próprio): o estilo computado de 1.624 elementos (10 telas, 375 e 1440 px, navbar fora) só difere no checkbox marcado, pela técnica nova do ✓ (máscara no `::before`, item 8). Em pixels, 12 de 6.720 diferem, com variação máxima de 6/255 (suavização de borda). A navbar ganhou o botão "Tema", como previsto. Conferido também com as capturas de `feature-01/`.
+
+**Regressão de comportamento.** Cadastro, assunto, chat, plano com checklist (progresso, barra, tarefa riscada com `var(--color-text-subtle)`), seminário pendente e avaliado, upload, exclusão com o `confirm()` e logout: iguais à `main`. Console sem erros (fora as quedas de rede provocadas no teste do erro do chat). `git diff --stat main` sem `.py`. Testes: 7 passando com banco novo.
+
+**Seletor (Chromium).** Tab chega ao botão; Enter e Espaço abrem; o foco vai para a opção marcada; as setas trocam o tema ao vivo com o painel aberto; Enter escolhe e fecha; Esc e clique fora fecham, com o foco de volta no botão; persiste entre páginas e ao recarregar; Dispositivo troca ao vivo e a dica mostra "(escuro)"/"(claro)"; trocar o tema com o chat aberto mantém o texto digitado e a rolagem, e o envio segue funcionando; sem flash com o `theme.js` atrasado 3 s; os blocos 4a e 4b dão o mesmo estilo; sem JS o seletor some e a página segue o sistema.
+
+**Teste manual do Renzo (2026-11-23).** Lista aberta do `select` no escuro: todos os itens legíveis. Troca real pelo COSMIC no modo Dispositivo: segue o sistema ao vivo, nos dois sentidos. Celular real: ok.
+
+**⚠️ Não confirmado:** Firefox e Safari. Pedido de teste no Firefox na revisão do PR.
+
+**Pendências encontradas na Fase 2.**
+
+- **[B12](../05-achados-frontend.md#b12-progresso-10--100-)** (categoria B) e **[handoff, item 18](../handoff/backend-pendencias.md#18-percentuais-sempre-com-uma-casa-decimal-100)**: o progresso aparece "10%" logo depois de marcar a tarefa (o `app.js` escreve o número do JSON) e "10.0%" depois de recarregar (o Jinja imprime o `float` do banco). Existe também na `main`; não é deste PR.
+- **[Handoff, item 19](../handoff/backend-pendencias.md#19-sugestão-futura-preferência-de-tema-salva-no-banco):** a persistência da preferência no banco, registrada como sugestão futura.
+- [B11](../05-achados-frontend.md#b11-duplicações-) atualizado: a cor da tarefa concluída no JS agora usa o token; a duplicação template × JS continua.
+
+Capturas: `../studyia-screenshots/feature-02-fase2/` (`telas/`, `estados/`, `main-claro/`, `regressao-claro/`, `decisoes/`).
+
+### Próximo passo
+
+PR `feat/tema-claro-escuro` → `main`, revisão do grupo (com teste no Firefox) e merge. Depois, pela [ordem](README.md#ordem-de-implementação--decidido): conteúdo do plano (4a → 4c → 4b) e, em paralelo, a landing page ([04](04-landing-page.md)), que já nascem nos dois temas usando a seção "Temas" do [06](../06-padroes-visuais.md#7-temas-claro-e-escuro).

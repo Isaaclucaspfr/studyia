@@ -14,7 +14,13 @@
   - Renomear ou remover esses blocos quebra todas as páginas. **Não existe** bloco `head`/`scripts`/`styles`. Criar um novo é permitido, desde que os dois atuais continuem.
 - [ ] **Ordem dos scripts no fim do `<body>`** (`base.html:87-88`): primeiro `marked`, depois `app.js`. O `app.js` usa `window.marked` no `DOMContentLoaded` (`app.js:37`, `:111`). Não mova o `app.js` para o `<head>` sem `defer` e não inverta a ordem.
 - [ ] **Flashes** (`base.html:63-73`): o loop precisa continuar gerando `class="alert alert-{{ category }}"`. O backend usa exatamente as categorias **`success`, `danger`, `warning` e `info`** (`flash(..., "<categoria>")` em todo o `app.py`). Se renomear as classes do CSS, mantenha esses 4 sufixos ou faça o mapeamento no template.
-- [ ] **Condição de sessão:** o nome do usuário e o "Sair" (`base.html:54`) só existem com `{% if session.get('user_id') %}`. Mantenha a condição. (O botão "Configurar IA" e o modal da chave saíram na [feature 01](features/01-remover-configurar-ia.md).)
+- [ ] **Condição de sessão:** o nome do usuário e o "Sair" só existem com `{% if session.get('user_id') %}` (dentro da `.nav-user`). Mantenha a condição. O **seletor de tema** fica **fora** dela, na `.nav-actions`, e aparece com e sem login (decisão da [feature 02](features/02-tema-claro-escuro-dispositivo.md); a [landing](features/04-landing-page.md) depende disso). (O botão "Configurar IA" e o modal da chave saíram na [feature 01](features/01-remover-configurar-ia.md).)
+- [ ] **Tema: script inline anti-flash** (feature 02): fica no `<head>` do `base.html`, **antes de qualquer `<link>` de CSS**. Ele lê a chave `studyia-theme` do `localStorage` e põe `data-theme` e a classe `js` no `<html>` antes da primeira pintura. Movido para depois do CSS, para um arquivo ou com `defer`, o tema errado pisca ao carregar. O `static/js/theme.js` entra logo depois do CSS, com `defer`, e **não depende do `app.js`** (nem o `app.js` dele): a ordem `marked` → `app.js` no fim do `<body>` não muda.
+- [ ] **Tema: contrato do navegador** (feature 02), lido pelo CSS e pelo `theme.js`:
+  - `data-theme` no `<html>`: `light`, `dark` ou **ausente** (= Dispositivo, segue o sistema);
+  - chave `studyia-theme` no `localStorage`: `light`, `dark` ou `system`;
+  - classe `js` no `<html>`: sem ela o seletor fica escondido;
+  - IDs do seletor usados pelo `theme.js`: `#themeToggle` (com `popovertarget="themeMenu"`), `#themeMenu` (`[popover]`), `#themeCurrent`, `#themeSystemHint` e os radios `name="studyia-theme"` com `value` `light`/`dark`/`system`. Os radios **não** estão num `<form>`: nada vai ao servidor.
 - [ ] **`ai_demo_mode`** (variável global, `context_processor` em `app.py`): `True` quando não há `GEMINI_API_KEY` no ambiente. Controla o banner "Modo demonstração" do `dashboard.html`. Está disponível em **todos** os templates.
 - [ ] **Link da marca** (`base.html:19`): vai para `dashboard` se houver sessão, senão para `login`.
 - [ ] **Nomes de endpoint em `url_for`** são os nomes das funções Python do `app.py`. Um erro de digitação gera `BuildError` e **derruba a página inteira**:
@@ -36,7 +42,7 @@
 | `#chatMessages` | `study_topic.html:66` | recebe as bolhas com `appendChild` e `scrollTop = scrollHeight` (`app.js:31`, `:44`, `:128`) | o ID; precisa de **altura limitada + `overflow-y:auto`** para a rolagem automática funcionar. Hoje isso vem de `.chat-messages` (`style.css:382-390`, `flex:1; overflow-y:auto`) dentro de `.chat-window` com `height:620px` inline (`study_topic.html:58`) |
 | `#sendBtn` | `study_topic.html:87` | **não é usado** pelo JS | livre |
 | `.plan-task-checkbox` + `data-plan-id` + `data-task-key` | `plan_view.html:71-78` | listener de `change`; payload do fetch (`app.js:145-149`) | a classe e os dois atributos |
-| `#label_{{ task_key }}` | `plan_view.html:80` | `style.textDecoration` e `style.color` alterados pelo JS (`app.js:150`, `:167-175`) | o ID derivado da `task_key`. O JS escreve **estilo inline**, que vence qualquer classe CSS (ver [06-padroes-visuais.md](06-padroes-visuais.md#exceções-permitidas)) |
+| `#label_{{ task_key }}` | `plan_view.html:80` | `style.textDecoration` e `style.color` alterados pelo JS (`app.js:144-149`); desde a feature 02 a cor escrita é `var(--color-text-subtle)` e segue o tema | o ID derivado da `task_key`. O JS escreve **estilo inline**, que vence qualquer classe CSS (ver [06-padroes-visuais.md](06-padroes-visuais.md#exceções-permitidas)) |
 | `#planProgressBar` | `plan_view.html:39` | `style.width = "<n>%"` (`app.js:161`, `:164`) | o ID; a largura é controlada via `style.width` |
 | `#planProgressText` | `plan_view.html:36` | `textContent = "<n>%"` (`app.js:162`, `:165`) | o ID; o conteúdo é sobrescrito |
 
@@ -140,7 +146,8 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 7. [ ] A fórmula da `task_key` e o loop de tarefas (`plan_view.html:66-86`) estão intactos.
 8. [ ] Os textos da [tabela 7.5](#75-textos-verificados-pelo-test_apppy) continuam presentes.
 9. [ ] O `#chatMessages` continua com altura limitada e `overflow-y:auto`.
-10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.chat-demo-note`, `.alert-success/-danger/-warning/-info`.
+10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.chat-demo-note`, `.alert-success/-danger/-warning/-info`, **nos dois temas** (só com tokens semânticos; ver [06 §7](06-padroes-visuais.md#7-temas-claro-e-escuro)).
+11. [ ] Se mexeu no `<head>` ou na navbar do `base.html`: o script inline do tema continua **antes** dos `<link>` de CSS, e o seletor de tema continua **fora** do `{% if session.get('user_id') %}`.
 
 ---
 
@@ -148,4 +155,5 @@ O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`
 
 | Data | Mudança | Origem |
 |---|---|---|
+| 2026-11-23 | **Adicionados:** o seletor de tema na navbar, **fora** da condição de sessão (`.nav-actions` › `.theme-switch`); o script inline anti-flash no `<head>`, antes do CSS; o `static/js/theme.js` (`defer`, independente do `app.js`); o contrato `data-theme` no `<html>` (`light`/`dark`/ausente), a chave `studyia-theme` no `localStorage` (`light`/`dark`/`system`), a classe `js` no `<html>` e os IDs `#themeToggle`, `#themeMenu`, `#themeCurrent` e `#themeSystemHint`. **Alterado:** a cor que o `app.js` escreve em `#label_<task_key>` (`#94a3b8` → `var(--color-text-subtle)`); o ID e o mecanismo não mudaram. **Nenhum contrato existente removido.** | [feature 02](features/02-tema-claro-escuro-dispositivo.md) |
 | 2026-11-22 | **Removidos:** `#openSettingsBtn`, `#settingsModal`, `#closeSettingsBtn`, `#openSettingsBtn2` (e o `onclick` inline), o form "Chave Gemini" (`gemini_api_key`), o endpoint `update_api_key` (rota `POST /settings/api-key`) e o item 9 do checklist sobre o modal. **Adicionados:** a variável global `ai_demo_mode` (no lugar do `has_custom_key`) e a classe `.chat-demo-note` gerada pelo `app.js`. | [feature 01](features/01-remover-configurar-ia.md) |
