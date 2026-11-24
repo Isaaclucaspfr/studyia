@@ -225,6 +225,200 @@ svg.icon { display: inline-block; }
   }
 }
 
+/* Lado direito da navbar: seletor de tema (sempre) + .nav-user (só com sessão) */
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+@media (min-width: 640px) {
+  .nav-actions { gap: var(--space-3); }
+}
+
+/* --------------------------------------------------------------------------
+   Seletor de tema (features/02): botão de 44 px + painel com 3 opções.
+   Sem JavaScript o controle não funcionaria, então só aparece com a classe
+   .js no <html> (posta pelo script inline do <head>). Comportamento: theme.js.
+   -------------------------------------------------------------------------- */
+
+.theme-switch { display: none; }
+.js .theme-switch { display: block; }
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1-5);
+  min-width: var(--touch-min);
+  min-height: var(--touch-min);
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--text-ui);
+  font-weight: var(--weight-semibold);
+  line-height: var(--leading-snug);
+  color: var(--color-text-secondary);
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-instant) var(--ease-out);
+}
+.theme-toggle:active { transform: scale(0.97); }
+.theme-toggle[aria-expanded="true"] {
+  color: var(--color-text);
+  background-color: var(--color-surface-muted);
+}
+
+@media (hover: hover) {
+  .theme-toggle:hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-muted);
+  }
+}
+
+@media (min-width: 640px) {
+  .theme-toggle { padding-inline: var(--space-3); }
+}
+
+/* Ícone da opção escolhida, decidido só pelo CSS (sem esperar o theme.js):
+   sem data-theme = Dispositivo (monitor); light = sol; dark = lua.
+   (.theme-toggle na frente para vencer o "svg.icon { display: inline-block }") */
+.theme-toggle .theme-icon { display: none; }
+:root:not([data-theme]) .theme-icon--system,
+:root[data-theme="light"] .theme-icon--light,
+:root[data-theme="dark"] .theme-icon--dark { display: inline-block; }
+
+/* Painel. É um [popover]: o navegador o coloca acima de tudo (top layer) e
+   cuida do Esc e do clique fora. Abaixo do botão; o theme.js passa a posição
+   exata em --theme-menu-top / --theme-menu-right ao abrir.
+   Não pôr "display" aqui: quebraria o [hidden] e o fechamento do popover. */
+.theme-menu {
+  position: fixed;
+  inset: auto;
+  top: var(--theme-menu-top, calc(var(--nav-height) + var(--space-1)));
+  right: var(--theme-menu-right, var(--gutter));
+  z-index: calc(var(--z-nav) + 1); /* só vale no fallback sem popover */
+  width: max-content;
+  min-width: 13.5rem;
+  max-width: calc(100vw - 2 * var(--gutter));
+  margin: 0;
+  padding: var(--space-1);
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-floating);
+  overflow: visible;
+  transform-origin: top right;
+}
+
+/* Abrir: 150 ms, de 97 % e 4 px acima, a partir do canto do botão (sem animação
+   ao fechar, que precisa ser imediato). */
+@media (prefers-reduced-motion: no-preference) {
+  .theme-menu {
+    transition:
+      opacity var(--duration-fast) var(--ease-out),
+      transform var(--duration-fast) var(--ease-out);
+  }
+  @starting-style {
+    .theme-menu:popover-open {
+      opacity: 0;
+      transform: translateY(-0.25rem) scale(0.97);
+    }
+  }
+}
+
+.theme-options {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5);
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Cada opção é um <label> com um radio nativo escondido: setas, "selecionado,
+   1 de 3" e o Espaço vêm do navegador. A linha inteira é o alvo (44 px). */
+.theme-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--touch-min);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-ui);
+  line-height: var(--leading-snug);
+  color: var(--color-text-secondary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.theme-option-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.theme-option-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.theme-option-hint {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--color-text-subtle);
+}
+
+.theme-option-check {
+  margin-left: auto;
+  color: var(--color-accent);
+  visibility: hidden;
+}
+
+.theme-option:has(.theme-option-input:checked) {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text);
+}
+.theme-option-input:checked ~ .theme-option-check { visibility: visible; }
+
+.theme-option:has(.theme-option-input:focus-visible) {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+@media (hover: hover) {
+  .theme-option:hover {
+    color: var(--color-text);
+    background-color: var(--color-surface-muted);
+  }
+}
+.theme-option:active { background-color: var(--color-surface-muted); }
+
+/* Na troca de tema, o theme.js desliga as transições por um quadro: sem isso,
+   cada botão e cada borda animaria a cor separadamente (efeito "onda"). */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 /* --------------------------------------------------------------------------
    Layout
    -------------------------------------------------------------------------- */
@@ -449,8 +643,8 @@ svg.icon { display: inline-block; }
 .btn-secondary:active:not(:disabled):not([aria-disabled="true"]),
 .btn-purple:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--color-surface-muted); }
 .btn-outline:active:not(:disabled):not([aria-disabled="true"]),
-.btn-ghost:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--accent-100); }
-.btn-danger-outline:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--danger-100); }
+.btn-ghost:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--color-accent-soft-active); }
+.btn-danger-outline:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--color-danger-soft-active); }
 
 @media (min-width: 768px) {
   .btn { min-height: var(--control-h); }
@@ -656,7 +850,8 @@ select.form-control {
   appearance: none;
   -webkit-appearance: none;
   padding-right: var(--space-10);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355605A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+  /* seta com a cor do texto secundário de cada tema (token no tokens.css) */
+  background-image: var(--icon-select-arrow);
   background-repeat: no-repeat;
   background-position: right var(--space-3) center;
   background-size: var(--icon-md);
@@ -692,14 +887,13 @@ select.form-control {
 .plan-task-checkbox {
   appearance: none;
   -webkit-appearance: none;
+  display: inline-grid;
+  place-content: center;
   flex: none;
   width: 1.25rem;
   height: 1.25rem;
   margin: 0;
   background-color: var(--color-surface);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 0.875rem;
   border: 1.5px solid var(--color-border-input);
   border-radius: var(--radius-xs);
   cursor: pointer;
@@ -715,11 +909,22 @@ select.form-control {
   transform: scale(0.9);
 }
 
+/* O ✓ é uma máscara pintada com --color-on-accent: branco no claro, escuro no escuro */
+.plan-task-checkbox::before {
+  content: "";
+  width: 0.875rem;
+  height: 0.875rem;
+  background-color: var(--color-on-accent);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E") center / contain no-repeat;
+  visibility: hidden;
+}
+
 .plan-task-checkbox:checked {
   background-color: var(--color-accent);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12.5 4.5 4.5L19 7.5'/%3E%3C/svg%3E");
   border-color: var(--color-accent);
 }
+.plan-task-checkbox:checked::before { visibility: visible; }
 
 .plan-task-checkbox:disabled {
   opacity: 0.5;
@@ -2058,6 +2263,7 @@ input[type="file"].form-control::file-selector-button {
   }
   .chat-bubble.typing::before { animation: none; }
   .btn:active:not(:disabled):not([aria-disabled="true"]),
+  .theme-toggle:active,
   .plan-task-checkbox:active:not(:disabled),
   .task-item:active .plan-task-checkbox:not(:disabled),
   .choice.is-editable:active .choice-input { transform: none; }
