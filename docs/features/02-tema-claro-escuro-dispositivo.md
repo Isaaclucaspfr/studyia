@@ -291,8 +291,73 @@ Um PR (passo 3 da [ordem](README.md#ordem-de-implementação--decidido)), **fron
 | `app.js:170` (e `:118`, se a 01 atrasar) | B | ✅ decidido: só o hex vira `var(--color-text-subtle)` (§5.5) |
 | Docs 06, 04, 03 | — | |
 
+**Checklist do PR** (registro completo no [§12](#12-registro-da-implementação)):
+
+- [x] Correções da auditoria: item 2 (código), 3 (tokens do modal removidos), 4 (aliases removidos), 5 e 6 (`:active`), 7 (seta do `select`) e 8 (✓ do checkbox)
+- [x] Tokens escuros (blocos 4a e 4b, idênticos) + `color-scheme` nos dois temas
+- [x] Script inline anti-flash no `<head>`, antes do CSS
+- [x] `static/js/theme.js` (com fallback sem `popover`)
+- [x] Seletor fora da condição de sessão + 3 ícones no sprite (`i-sun`, `i-moon`, `i-monitor`)
+- [x] `app.js:146` (antes `:170`): só o hex trocado
+- [x] `?v=` atualizado: CSS `tema_v2`, `app.js` e `theme.js` `tema_v1`
+- [x] `test_app.py` passando; verificação no navegador (Playwright)
+- [x] Teste manual do Renzo: tema escuro aprovado em todas as telas
+- [ ] Revisão tela a tela nos dois temas (**Fase 2**)
+- [ ] Docs 06, 04 e 03 (**Fase 2**)
+
 ## 11. Em aberto / futuro
 
 - 💡 **Fallback para navegador sem `popover`** (detalhe de implementação, não é decisão do grupo): recomendação: sim, com poucas linhas no `theme.js`. Decidir no PR.
 - **Futuro:** salvar a preferência no banco (coluna em `users` + rota), para valer em outros dispositivos. Registrado no [handoff](../handoff/backend-pendencias.md).
 - **Futuro:** favicon com variante escura (hoje não precisa).
+- 💡 **Futuro: troca de tema suavizada (View Transitions).** Hoje a troca é instantânea: o `theme.js` desliga as transições por um quadro, para a página não mudar de cor "em onda". A apple-design recomenda suavizar trocas bruscas de brilho (claro ↔ escuro). Dá para fazer um *crossfade* curto (≈ 200 ms) com `document.startViewTransition()` em volta da troca do `data-theme`, só no `theme.js` e sem mexer no CSS dos componentes. Cuidados: respeitar `prefers-reduced-motion` (sem animação) e manter a troca instantânea nos navegadores sem a API (Firefox só a partir da 144). Não entra neste PR.
+- 💡 **Opcionais do §5.4 não implementados** (decisão 8 da revisão): sincronizar outras abas pelo evento `storage` e o `<meta name="theme-color">`.
+
+## 12. Registro da implementação
+
+Branch `feat/tema-claro-escuro` (a partir da `main` em `fb893a6`; não existe `dev`), 2026-11-23. Fase 1 de 2: implementação. A Fase 2 é a revisão tela a tela e a entrega.
+
+### O que entrou
+
+- **Tokens (`tokens.css`):** blocos escuros **4a** (`@media (prefers-color-scheme: dark)` + `:root:not([data-theme="light"])`) e **4b** (`:root[data-theme="dark"]`), idênticos e comentados ("manter igual"). `color-scheme` claro no `:root` e escuro nos dois blocos. Paleta de §5.2 sem mudanças.
+- **Tokens semânticos novos:** `--color-accent-soft-active` e `--color-danger-soft-active` (pressionado, itens 5 e 6), `--icon-select-arrow` (seta do `select`, item 7) e `--shadow-floating` (painel do tema). No claro, todos têm o mesmo valor de antes: o tema claro não mudou.
+- **Removidos:** `--color-overlay`, `--shadow-overlay` e `--z-modal` (sem uso desde a 01); os aliases `--chakra-*` (66) e `--gray-*` (4), item 4 da auditoria. Antes, um `grep` em CSS, templates e JS confirmou que nada mais os usava. Depois, uma comparação do estilo computado de todos os elementos, nas 7 telas, nos dois temas e em 375/1440 px, deu resultado idêntico com e sem os aliases.
+- **Anti-flash:** script inline no `<head>` do `base.html`, antes de todos os `<link>`, comentado.
+- **`static/js/theme.js`** (`defer`, no `<head>`): grava a preferência, resolve o Dispositivo com `matchMedia` (dica "Segue o sistema (claro/escuro)" ao vivo), desliga as transições por um quadro na troca (classe `.theme-switching`), guarda a escolha em memória se o `localStorage` estiver bloqueado e tem fallback com `[hidden]` para navegador sem `popover` (§11 resolvido: entrou).
+- **Seletor:** `.nav-actions` (novo) com o `.theme-switch` fora do `{% if session.get('user_id') %}`; o `if` continua envolvendo só o nome e o "Sair". Botão `.theme-toggle` de 44 × 44 px (rótulo "Tema" a partir de 640 px) e painel `.theme-menu` (`popover`) com 3 radios nativos. O ícone do botão vem só do CSS (`data-theme`), sem esperar o JS.
+- **`app.js:146`** (era o `:170` da auditoria): `label.style.color = '#94a3b8'` → `'var(--color-text-subtle)'`. Nenhuma outra linha.
+- **`?v=`:** `tokens.css` e `style.css` em `tema_v2` (o `tema_v1` foi testado pelo Renzo antes da remoção dos aliases); `app.js` `sem_modal_v1` → `tema_v1`; `theme.js` `tema_v1`.
+
+### Desvios e decisões da revisão (aprovadas pelo Renzo, 2026-11-23)
+
+1. **Contraste final do escuro** (pares da D9): tinta 15,1 · 13,8; secundário 8,5 · 7,8; sutil 6,2 · 5,7 · 4,9 (muted); texto sobre acento · hover 7,2 · 8,7; acento como link 7,0 · 7,7; sucesso/atenção/perigo sobre o fundo suave 8,8 · 9,3 · 8,2; "Sair" 6,9; borda de campo 3,9; barra/trilho 5,1; código 16,1; seleção 8,3; seta do `select` 7,8.
+2. Os 4 tokens semânticos novos (acima).
+3. **Seta do `select`:** o §2 (item 7) propunha `mask` + `currentColor`, mas o `<select>` não aceita `::before`. Virou uma imagem por tema, escolhida pelo token `--icon-select-arrow`. O ✓ do checkbox (item 8) seguiu a proposta: `::before` com máscara e `--color-on-accent`.
+4. **Aliases `--chakra-*`/`--gray-*` removidos** neste PR, como o item 4 previa.
+5. `?v=` com o prefixo `tema_` em vez de `redesign_v5`.
+6. O ícone do botão mostra a opção escolhida; em Dispositivo, o monitor.
+7. **Painel:** clique numa opção escolhe e fecha; pelo teclado, as setas trocam o tema com o painel aberto, Enter escolhe e fecha, Esc fecha e devolve o foco ao botão. Abertura em 150 ms (opacidade + escala a partir do canto do botão), sem animação ao fechar e nenhuma com `prefers-reduced-motion`.
+8. Opcionais do §5.4 (evento `storage` e `theme-color`) ficaram de fora (§11).
+9. O botão fica antes do nome e do "Sair", como na estrutura do §5.6.
+
+### Verificação
+
+- `DATABASE_PATH=/tmp/… python -m unittest test_app.py`: 7 testes passando. Nenhum `.py` no diff.
+- Playwright (49 checagens, console sem erros), nos dois temas: cadastro, login e logout, chat, upload, exclusão, checklist (progresso e cor inline pelo token) e seminário; os 3 modos; persistência entre páginas e após recarregar; Dispositivo ao vivo; **sem flash** (com o `theme.js` atrasado 3 s, a página já pinta no tema certo); teclado (Tab, Enter, setas, Esc com o foco de volta); `localStorage` bloqueado; JS desligado (seletor some, página segue o sistema); navbar numa linha em 320 e 375 px, botão com 44 × 44 px.
+- Screenshots em `../studyia-screenshots/feature-02-fase1/` (7 telas, claro e escuro, 375 e 1440 px, painel aberto) e `…/feature-02-fase1/sem-aliases/` (depois da remoção dos aliases).
+- Teste manual do Renzo: tema escuro aprovado em todas as telas, sem problemas visuais.
+
+### Pendências encontradas
+
+- **Backend, item 17 do [handoff](../handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)** (🔴 alta, encontrado pelo Renzo neste teste, não é deste PR): sessão de um usuário que não existe mais no banco → 500 ao criar um assunto (`FOREIGN KEY constraint failed`).
+- **[B10](../05-achados-frontend.md#b10-cdns-sem-versão-fixa-e-script-morto-)** (categoria B): o `lucide@latest` síncrono no `<head>` bloqueia a primeira pintura. Registrado lá; sai com a revisão das CDNs.
+- Troca de tema suavizada (View Transitions): ideia futura, no §11.
+- O detector do impeccable não lê o CSS por causa dos `{{ url_for }}` no `<link>`; a conferência visual foi feita por screenshots.
+
+### Contexto para retomar (Fase 2: revisão e entrega)
+
+1. Ler o `CLAUDE.local.md` (seções "Funcionalidade 02 — Tema" e "Ambiente") e este §12.
+2. Branch `feat/tema-claro-escuro`, com os commits da Fase 1 feitos pelo Renzo. Conferir `git log` e `git status` antes de começar.
+3. **Revisão tela a tela nos dois temas** (critérios do §9): as 7 telas em 375, 768 e 1440 px; estados de hover, foco, pressionado e desabilitado; Markdown da IA no chat (código, tabela, citação); alertas `success`/`danger`/`warning`/`info` e bolha de erro do chat; avisos de demo; nota do seminário nas 3 faixas (alta, média, baixa).
+4. **Docs (§6 e §10):** `docs/04-contratos-frontend.md` (§7.1: o seletor fora da condição de sessão, o script inline antes do CSS e o `theme.js`; contrato novo: `data-theme`, a chave `studyia-theme` e a classe `js`; linha no histórico), `docs/06-padroes-visuais.md` (tabela de tokens com a coluna escura, tokens novos e removidos, componente "Seletor de tema", estados, regra de não usar primitivos) e `docs/03-frontend-inventario.md` (`theme.js`, tokens sem os aliases).
+5. Rodar os testes, marcar os critérios do §9 e os 2 itens abertos do checklist do §10, e entregar os comandos de commit e o texto do PR (base `main`).
