@@ -19,12 +19,46 @@ document.addEventListener('DOMContentLoaded', () => {
         // Rola até o final das mensagens
         chatMessages.scrollTop = chatMessages.scrollHeight;
 
+        // Anti-envio-duplo (B4): enquanto a resposta não chega, o botão e o Enter
+        // ficam bloqueados. aria-disabled (e não disabled) para o foco não sair do botão.
+        const sendBtn = chatForm.querySelector('button[type="submit"]');
+        const sendBtnChildren = sendBtn ? Array.from(sendBtn.childNodes) : [];
+        const chatStatus = document.getElementById('chatStatus');
+        let isSending = false;
+
+        function setSending(sending, announcement) {
+            isSending = sending;
+            if (sending) {
+                chatForm.setAttribute('aria-busy', 'true');
+            } else {
+                chatForm.removeAttribute('aria-busy');
+            }
+            if (sendBtn) {
+                if (sending) {
+                    const spinner = document.createElement('span');
+                    spinner.className = 'btn-spinner';
+                    spinner.setAttribute('aria-hidden', 'true');
+                    const label = document.createElement('span');
+                    label.textContent = 'Respondendo…';
+                    sendBtn.setAttribute('aria-disabled', 'true');
+                    sendBtn.replaceChildren(spinner, label);
+                } else {
+                    sendBtn.removeAttribute('aria-disabled');
+                    sendBtn.replaceChildren(...sendBtnChildren);
+                }
+            }
+            if (chatStatus) chatStatus.textContent = announcement;
+        }
+
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            if (isSending) return;
             const message = chatInput.value.trim();
             if (!message) return;
 
             const topicId = chatForm.dataset.topicId;
+            setSending(true, 'Pergunta enviada. A IA está respondendo.');
+            let failed = false;
 
             // Insere bolha do usuário imediatamente
             appendBubble(message, 'user');
@@ -48,11 +82,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (data.reply) {
                     appendBubble(data.reply, 'assistant', data.is_simulated);
                 } else if (data.error) {
+                    failed = true;
                     appendBubble(`Erro: ${data.error}`, 'assistant error');
                 }
             } catch (err) {
+                failed = true;
                 typingBubble.remove();
                 appendBubble('Ocorreu um erro ao conectar ao serviço de IA. Tente novamente.', 'assistant error');
+            } finally {
+                // Sucesso ou erro: o envio volta a funcionar.
+                setSending(false, failed ? 'Não foi possível obter a resposta. Tente novamente.' : 'Resposta recebida.');
             }
 
             chatMessages.scrollTop = chatMessages.scrollHeight;
