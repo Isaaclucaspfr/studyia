@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<!-- html_attrs (landing, features/04): vazio por padrão. A landing põe data-theme="dark" e
+     data-theme-lock: tema fixo, que o script anti-flash abaixo não troca pela escolha salva -->
+<html lang="pt-BR"{% block html_attrs %}{% endblock %}>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +9,21 @@
     <!-- Tema (features/02), anti-flash. TEM que ficar aqui: inline, no <head> e ANTES
          de qualquer <link> de CSS, para o atributo estar no <html> antes da primeira
          pintura. Fora daqui (ou num arquivo com defer), o tema errado pisca ao carregar.
-         Só lê a escolha salva e marca o <html>; o resto está no static/js/theme.js. -->
+         Só lê a escolha salva e marca o <html>; o resto está no static/js/theme.js.
+         Página com data-theme-lock no <html> (só a landing): o tema vem fixo do servidor e
+         a escolha salva não é lida nem alterada. -->
     <script>
         (function () {
-            try {
-                // "light" ou "dark" salvos: aplica. Nada salvo ou "system": o CSS segue o sistema.
-                var tema = localStorage.getItem("studyia-theme");
-                if (tema === "light" || tema === "dark") document.documentElement.setAttribute("data-theme", tema);
-            } catch (e) {} // localStorage bloqueado (modo privado, cookies desligados): segue o sistema
+            var raiz = document.documentElement;
+            if (!raiz.hasAttribute("data-theme-lock")) {
+                try {
+                    // "light" ou "dark" salvos: aplica. Nada salvo ou "system": o CSS segue o sistema.
+                    var tema = localStorage.getItem("studyia-theme");
+                    if (tema === "light" || tema === "dark") raiz.setAttribute("data-theme", tema);
+                } catch (e) {} // localStorage bloqueado (modo privado, cookies desligados): segue o sistema
+            }
             // Avisa o CSS que há JavaScript: só assim o seletor de tema aparece.
-            document.documentElement.classList.add("js");
+            raiz.classList.add("js");
         })();
     </script>
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}?v=rebrand_v1">
@@ -27,15 +34,15 @@
     <!-- Wordmark do logo (rebrand): Inter 600 só com os glifos de "StudyIA", 1,3 KB, local (sem CDN) -->
     <link rel="preload" href="{{ url_for('static', filename='vendor/fonts/inter-wordmark-600.woff2') }}" as="font" type="font/woff2" crossorigin>
     <!-- Tokens antes dos componentes -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=auth_v1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=auth_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}?v=landing_v1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=landing_v1">
+    <!-- CSS, fontes e metadados de uma página só (vazio por padrão). Hoje: só a landing -->
+    {% block head_extra %}{% endblock %}
     <!-- Seletor de tema (features/02). Independente do app.js: um não usa nada do outro -->
     <script src="{{ url_for('static', filename='js/theme.js') }}?v=tema_v1" defer></script>
     <!-- Carregamento e anti-clique-duplo dos forms POST (B4): botões com data-loading-text.
          Independente do app.js e do theme.js. Sem ele, os forms enviam como sempre -->
     <script src="{{ url_for('static', filename='js/forms.js') }}?v=robustez_v1" defer></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
@@ -59,6 +66,7 @@
         <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
         <symbol id="i-x" viewBox="0 0 24 24"><path d="m6.5 6.5 11 11M17.5 6.5l-11 11"/></symbol>
         <symbol id="i-arrow-left" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+        <symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M6 13l6 6 6-6"/></symbol>
         <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
         <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
         <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 4.6 3.2 17a2 2 0 0 0 1.7 3h14.2a2 2 0 0 0 1.7-3L13.7 4.6a2 2 0 0 0-3.4 0Z"/><path d="M12 9.5v4M12 16.75v.01"/></symbol>
@@ -68,12 +76,20 @@
         <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M10.2 5.7A9 9 0 0 1 12 5.5c5.75 0 9.25 6.5 9.25 6.5a17 17 0 0 1-2.6 3.4M6.7 6.9C4.1 8.6 2.75 12 2.75 12S6.25 18.5 12 18.5a8.6 8.6 0 0 0 4.6-1.3"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2M4 4l16 16"/></symbol>
         <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></symbol>
         <symbol id="i-at" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M15.5 8.5v4.75a2.25 2.25 0 0 0 4.5 0V12a8 8 0 1 0-3.2 6.4"/></symbol>
+        <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><rect x="10" y="10" width="4" height="4" rx=".75"/><path d="M10 3.5v3M14 3.5v3M10 17.5v3M14 17.5v3M3.5 10h3M3.5 14h3M17.5 10h3M17.5 14h3"/></symbol>
+        <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 4 8.5 4.25L12 12.5 3.5 8.25Z"/><path d="m3.5 12.25 8.5 4.25 8.5-4.25M3.5 16.25l8.5 4.25 8.5-4.25"/></symbol>
+        <symbol id="i-network" viewBox="0 0 24 24"><circle cx="6" cy="6.5" r="2.25"/><circle cx="18" cy="9" r="2.25"/><circle cx="9.5" cy="18" r="2.25"/><path d="m8.2 7 7.6 1.5M16.4 10.7l-5.3 5.6M6.7 8.6l2.1 7.2"/></symbol>
+        <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4.5h8V10a4 4 0 0 1-8 0Z"/><path d="M8 6.5H5.5A2.5 2.5 0 0 0 8.2 10M16 6.5h2.5a2.5 2.5 0 0 1-2.7 3.5M12 14v3.5M8.5 20h7M10 17.5h4"/></symbol>
+        <symbol id="i-cap" viewBox="0 0 24 24"><path d="M2.5 9.5 12 5l9.5 4.5L12 14Z"/><path d="M6.5 11.6v4.1c0 1.3 2.5 2.8 5.5 2.8s5.5-1.5 5.5-2.8v-4.1M21.5 9.5v5"/></symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9.5 17.5h5M10.25 20.5h3.5"/><path d="M12 3.5a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.4 1.1 2.2v1h5v-1c0-.8.4-1.6 1.1-2.2A6 6 0 0 0 12 3.5Z"/></symbol>
+        <symbol id="i-chart-up" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="m7.5 15 3.5-4 3 2.5 5-6M15.5 7.5H19V11"/></symbol>
+        <symbol id="i-laptop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="10" rx="1.5"/><path d="M3.5 15 2.5 19h19l-1-4"/></symbol>
         <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="11.5" rx="2"/><path d="M12 16v3.5M8.5 19.5h7"/></symbol>
     </svg>
 
     <!-- Navegação Superior -->
     <nav class="navbar">
-        <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('login') }}" class="nav-brand">
+        <a href="{{ url_for('dashboard') if session.get('user_id') else url_for('index') }}" class="nav-brand">
             <!-- Logo (rebrand): cérebro em linhas com trilhas de rede neural + wordmark + "Projeto A3" -->
             <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M11.5 5.2A3 3 0 0 0 6.2 6.5a3 3 0 0 0-2.3 4 3.2 3.2 0 0 0 .4 5.2 3 3 0 0 0 3.5 3.3 3 3 0 0 0 3.7.8"/><path d="M12.5 5.2a3 3 0 0 1 5.3 1.3 3 3 0 0 1 2.3 4 3.2 3.2 0 0 1-.4 5.2 3 3 0 0 1-3.5 3.3 3 3 0 0 1-3.7.8"/><path d="M12 5.5v14M12 9H9.5L8 7.8M12 13.5H9l-1.5 1.7M12 9h2.5L16 7.8M12 13.5h3l1.5 1.7"/><circle class="brand-mark-node" cx="8" cy="7.8" r="1.1"/><circle class="brand-mark-node" cx="7.5" cy="15.2" r="1.1"/><circle class="brand-mark-node" cx="16" cy="7.8" r="1.1"/><circle class="brand-mark-node" cx="16.5" cy="15.2" r="1.1"/></svg>
             <span class="brand-name">Study<span class="brand-name-accent">IA</span></span>
@@ -83,7 +99,9 @@
 
         <div class="nav-actions">
             <!-- Seletor de tema (features/02): FORA da condição de sessão: aparece com e sem login.
-                 Só aparece com JavaScript (classe .js no <html>). Não é formulário: nada vai ao servidor. -->
+                 Só aparece com JavaScript (classe .js no <html>). Não é formulário: nada vai ao servidor.
+                 Bloco theme_switch: a landing (sempre escura) o deixa vazio; as outras telas não mexem. -->
+            {% block theme_switch %}
             <div class="theme-switch">
                 <button type="button" class="theme-toggle" id="themeToggle" popovertarget="themeMenu" aria-controls="themeMenu" aria-expanded="false">
                     <svg class="icon theme-icon theme-icon--light" aria-hidden="true" focusable="false"><use href="#i-sun"></use></svg>
@@ -115,6 +133,10 @@
                     </fieldset>
                 </div>
             </div>
+            {% endblock %}
+
+            <!-- Links de uma página só (vazio por padrão). Hoje: "Entrar" e "Começar agora" na landing -->
+            {% block nav_extra %}{% endblock %}
 
             {% if session.get('user_id') %}
             <div class="nav-user">
@@ -159,10 +181,5 @@
          na ordem marked → app.js. Login e cadastro: auth.js (mostrar/ocultar senha)
          e neural-bg.js (fundo de rede animada) -->
     {% block scripts_extra %}{% endblock %}
-    <script>
-        if (window.lucide) {
-            lucide.createIcons();
-        }
-    </script>
 </body>
 </html>
