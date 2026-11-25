@@ -12,7 +12,45 @@
     <!-- Inter dos títulos (só a landing): 400–600 variável, corte Display, subconjunto latino, local -->
     <link rel="preload" href="{{ url_for('static', filename='vendor/fonts/inter-display-latin.woff2') }}" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="{{ url_for('static', filename='vendor/fonts/inter-display-latin-italic.woff2') }}" as="font" type="font/woff2" crossorigin>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v=landing_v7">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/landing.css') }}?v=landing_v11">
+
+    <!-- Cena 3D (Fase 2). O importmap só dá nome ao Three.js 0.187.0 e aos addons (nada é
+         baixado aqui) e tem que vir antes de qualquer módulo ou modulepreload, por isso fica
+         no <head>. O three.module.js importa o ./three.core.js pelo nome (os dois juntos no vendor). -->
+    <script type="importmap">
+    { "imports": {
+        "three": "{{ url_for('static', filename='vendor/three/0.187.0/three.module.js') }}",
+        "three/addons/": "{{ url_for('static', filename='vendor/three/0.187.0/addons/') }}"
+    } }
+    </script>
+    <!-- "Vai ter 3D?", antes da primeira pintura: desktop (≥ 768 px), ponteiro fino, sem
+         movimento reduzido e com WebGL 2 acelerado. Se sim: <html class="scene-3d"> (o CSS
+         esconde o cérebro SVG; o espaço fica reservado) e os downloads da cena começam já
+         (modulepreload + preload do modelo). No celular, nada disso é baixado. -->
+    <script>
+    (function () {
+        try {
+            if (!window.matchMedia('(min-width: 768px) and (pointer: fine) and (prefers-reduced-motion: no-preference)').matches) return;
+            var gl = document.createElement('canvas').getContext('webgl2', { failIfMajorPerformanceCaveat: true });
+            if (!gl) return;
+            var lose = gl.getExtension('WEBGL_lose_context');
+            if (lose) lose.loseContext();
+            document.documentElement.classList.add('scene-3d');
+            function hint(rel, href, as) {
+                var link = document.createElement('link');
+                link.rel = rel;
+                link.href = href;
+                if (as) { link.as = as; link.crossOrigin = 'anonymous'; }
+                document.head.appendChild(link);
+            }
+            hint('modulepreload', '{{ url_for('static', filename='js/landing-scene.js') }}?v=landing_scene_v6');
+            hint('modulepreload', '{{ url_for('static', filename='vendor/three/0.187.0/three.module.js') }}');
+            hint('modulepreload', '{{ url_for('static', filename='vendor/three/0.187.0/three.core.js') }}');
+            hint('modulepreload', '{{ url_for('static', filename='vendor/three/0.187.0/addons/math/MeshSurfaceSampler.js') }}');
+            hint('preload', '{{ url_for('static', filename='vendor/models/brain/brain-v2.glb') }}', 'fetch');
+        } catch (e) {}
+    })();
+    </script>
 {% endblock %}
 
 {# Sem seletor de tema na landing #}
@@ -29,7 +67,7 @@
 <div class="landing">
 
     <!-- 1. Hero: a primeira tela inteira. Título, apoio, CTAs, o cérebro (SVG estático;
-         na Fase 2, a cena 3D por cima) e o "role para explorar" no pé -->
+         no desktop, a cena 3D por cima) e o "role para explorar" no pé -->
     <section class="landing-hero" aria-labelledby="landingTitle">
         <div class="landing-hero-main">
             <div class="landing-hero-text">
@@ -45,8 +83,10 @@
             </div>
 
             <!-- Decorativo (aria-hidden): o cérebro do logo em rede neural, sobre a base holográfica,
-                 com 6 conceitos em órbita. Mesmo espaço (aspect-ratio) que a cena 3D vai ocupar -->
-            <div class="landing-visual" data-hero-visual>
+                 com 6 conceitos em órbita. No desktop capaz, este SVG fica escondido e a cena 3D
+                 (landing-scene.js) entra no mesmo espaço (aspect-ratio); ele é o fallback (celular,
+                 sem WebGL, movimento reduzido, sem JS, ou se a cena falhar ou atrasar) -->
+            <div class="landing-visual" data-hero-visual data-scene-src="{{ url_for('static', filename='js/landing-scene.js') }}?v=landing_scene_v6" data-model-src="{{ url_for('static', filename='vendor/models/brain/brain-v2.glb') }}">
                 <svg class="brain" viewBox="0 0 640 600" aria-hidden="true" focusable="false">
                 <defs>
                 <radialGradient id="brainFloor"><stop offset="0" class="brain-stop-glow"/><stop offset="1" class="brain-stop-clear"/></radialGradient>
@@ -246,12 +286,19 @@
 </div>
 {% endblock %}
 
+{# Crédito do modelo 3D da cena (CC BY 4.0 exige atribuição): static/vendor/models/brain/README.md #}
+{% block footer_extra %}
+        <p class="landing-credit">Modelo 3D do cérebro: <a href="https://sketchfab.com/3d-models/brain-6ca0844a846b400695ff54553dc9bda4" rel="noopener">“Brain”</a> por farhad.Guli (Sketchfab), licença <a href="https://creativecommons.org/licenses/by/4.0/deed.pt-br" rel="noopener license">CC BY 4.0</a>.</p>
+{% endblock %}
+
 {% block scripts_extra %}
 <!-- Só na landing (nunca no base.html): fundo de rede (o mesmo do login), GSAP 3.15.1 +
      ScrollTrigger (vendor, versão no caminho) e as animações. Tudo com defer, nesta ordem.
-     Sem JS, ou com movimento reduzido, a página aparece completa e parada. -->
+     Sem JS, ou com movimento reduzido, a página aparece completa e parada.
+     A cena 3D (landing-scene.js, Three.js e o modelo) é importada pelo landing.js, só no
+     desktop capaz; o importmap e a decisão "vai ter 3D?" ficam no <head> (head_extra). -->
 <script src="{{ url_for('static', filename='js/neural-bg.js') }}?v=auth_v2" defer></script>
 <script src="{{ url_for('static', filename='vendor/gsap/3.15.1/gsap.min.js') }}" defer></script>
 <script src="{{ url_for('static', filename='vendor/gsap/3.15.1/ScrollTrigger.min.js') }}" defer></script>
-<script src="{{ url_for('static', filename='js/landing.js') }}?v=landing_v3" defer></script>
+<script src="{{ url_for('static', filename='js/landing.js') }}?v=landing_v8" defer></script>
 {% endblock %}
