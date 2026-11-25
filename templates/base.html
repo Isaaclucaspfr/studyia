@@ -172,6 +172,8 @@
     <footer class="site-footer">
         <p><strong>StudyIA — Assistente Inteligente de Estudos</strong> | Unidade curricular: Inteligência Artificial (Projeto A3)</p>
         <p>Transparência (RNF06): as respostas, planos e seminários são gerados com apoio de inteligência artificial e devem ser revisados pelo usuário. Quando a IA não está disponível, o StudyIA mostra conteúdo de demonstração e avisa na tela.</p>
+        {# Linhas extras do rodapé de uma tela (vazio por padrão; a landing põe o crédito do modelo 3D) #}
+        {% block footer_extra %}{% endblock %}
     </footer>
 
     <!-- Marked.js para renderização de Markdown didático -->

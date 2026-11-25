@@ -96,6 +96,23 @@ body:has(.landing) .site-footer {
   background-color: var(--color-bg);
 }
 
+/* Crédito do modelo 3D (CC BY 4.0): discreto, no fim do rodapé */
+.landing-credit {
+  margin-top: var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
+}
+.landing-credit a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  text-decoration-color: var(--color-border-strong);
+  transition: color var(--duration-fast) var(--ease-out), text-decoration-color var(--duration-fast) var(--ease-out);
+}
+@media (hover: hover) {
+  .landing-credit a:hover { color: var(--color-text); text-decoration-color: currentColor; }
+}
+
 .landing-nav {
   display: flex;
   align-items: center;
@@ -353,6 +370,50 @@ body:has(.landing) .site-footer {
 .brain-sat--back { opacity: 0.55; }
 
 /* --------------------------------------------------------------------------
+   Cena 3D (Fase 2, landing-scene.js): só no desktop capaz
+   O canvas é absoluto (não mexe no layout: CLS 0) e sangra 8% para cada lado,
+   para o brilho e os satélites da frente não baterem na borda. A .landing tem
+   overflow-x: clip, então a sobra não gera rolagem.
+   - .scene-3d no <html> (script do <head> do landing.html): o SVG não aparece;
+     o espaço fica reservado e o cérebro 3D surge com fade e escala (.is-3d).
+   - .is-fallback: a cena falhou ou atrasou; o SVG entra com fade.
+   - Sem .scene-3d (janela que alargou depois): crossfade do SVG para o 3D.
+   -------------------------------------------------------------------------- */
+
+.landing-scene {
+  position: absolute;
+  top: -8%;
+  left: -8%;
+  width: 116%;
+  height: 116%;
+  opacity: 0;
+  transform: scale(0.94);
+  pointer-events: none;
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.6s var(--ease-out);
+}
+
+.landing-visual > .brain { transition: opacity 0.9s var(--ease-in-out); }
+
+.landing-visual.is-3d > .landing-scene { opacity: 1; transform: none; }
+.landing-visual.is-3d > .brain { opacity: 0; }
+
+/* A mesma faixa do script do <head>: fora dela (janela estreita, movimento
+   reduzido ligado depois) o SVG volta sozinho */
+@media (min-width: 768px) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .scene-3d .landing-visual > .brain {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .scene-3d .landing-visual.is-fallback > .brain {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.8s var(--ease-out);
+  }
+}
+
+/* --------------------------------------------------------------------------
    Seções
    -------------------------------------------------------------------------- */
 
@@ -544,8 +605,8 @@ body:has(.landing) .site-footer {
   /* O título entra só com CSS, já na primeira pintura (sem esperar o JS):
      são os maiores elementos da tela (LCP). CTAs, cérebro e o "role para
      explorar" vêm com o GSAP, logo depois */
-  .js .landing-title { animation: landing-rise 0.9s var(--ease-out) both; }
-  .js .landing-lead  { animation: landing-rise 0.9s var(--ease-out) 0.09s both; }
+  .js .landing-title { animation: landing-rise 0.5s var(--ease-out) both; }
+  .js .landing-lead  { animation: landing-rise 0.5s var(--ease-out) 0.05s both; }
 }
 
 @keyframes landing-failsafe {
