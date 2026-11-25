@@ -22,6 +22,7 @@
   - classe `js` no `<html>`: sem ela o seletor fica escondido;
   - IDs do seletor usados pelo `theme.js`: `#themeToggle` (com `popovertarget="themeMenu"`), `#themeMenu` (`[popover]`), `#themeCurrent`, `#themeSystemHint` e os radios `name="studyia-theme"` com `value` `light`/`dark`/`system`. Os radios **não** estão num `<form>`: nada vai ao servidor.
 - [ ] **Carregamento dos forms: `static/js/forms.js`** (B4, branch `fix/robustez-envio-e-sessao`): entra no `<head>` logo depois do `theme.js`, com `defer`, e **não depende do `app.js` nem do `theme.js`** (nem eles dele). A ordem `marked` → `app.js` no fim do `<body>` não muda. Ver [7.6](#76-estado-de-carregamento-data-loading-text).
+- [ ] **Bloco `{% block scripts_extra %}`** (PR 3, `base.html`, logo depois do `<script>` do `app.js`): **vazio por padrão**; serve para scripts de uma página só. Fica **depois** do `app.js`, então a ordem `marked` → `app.js` não muda. Hoje só o login e o cadastro o preenchem (`auth.js` e `neural-bg.js`, ver [7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)). A [landing](features/04-landing-page.md) vai usá-lo também.
 - [ ] **`ai_demo_mode`** (variável global, `context_processor` em `app.py`): `True` quando não há `GEMINI_API_KEY` no ambiente. Controla o banner "Modo demonstração" do `dashboard.html`. Está disponível em **todos** os templates.
 - [ ] **Link da marca** (`base.html:19`): vai para `dashboard` se houver sessão, senão para `login`.
 - [ ] **Nomes de endpoint em `url_for`** são os nomes das funções Python do `app.py`. Um erro de digitação gera `BuildError` e **derruba a página inteira**:
@@ -72,8 +73,8 @@ A mesma estrutura é gerada **em dois lugares**: no Jinja, para o histórico (`s
 
 | Form | Onde | `action` / método | `name`s obrigatórios | Observações |
 |---|---|---|---|---|
-| Login | `login.html:18` | `POST url_for('login')` | `login_input`, `password` | `login_input` aceita usuário **ou** e-mail (`app.py:111-117`) |
-| Cadastro | `register.html:18` | `POST url_for('register')` | `name`, `username`, `email`, `password`, `confirm_password` | backend exige senha ≥ 6 e senhas iguais (`app.py:72-78`) |
+| Login | `login.html:18` | `POST url_for('login')` | `login_input`, `password` | `login_input` aceita usuário **ou** e-mail (`app.py:111-117`). `autocomplete`: `username` / `current-password` ([7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)) |
+| Cadastro | `register.html:18` | `POST url_for('register')` | `name`, `username`, `email`, `password`, `confirm_password` | backend exige senha ≥ 6 e senhas iguais (`app.py:72-78`). `autocomplete`: `name` / `username` / `email` / `new-password` (nas duas senhas) |
 | Novo assunto | `dashboard.html:79` | `POST url_for('new_subject')` | `title`, `initial_question` | `title` vazio → flash + volta ao dashboard |
 | Upload | `dashboard.html:109` | `POST url_for('upload_file')` | `document` (file), `custom_title` | **`enctype="multipart/form-data"` obrigatório**; `accept=".pdf,.txt,.md"` é só uma dica, quem valida é o backend |
 | Plano | `plan_create.html:24` | `POST url_for('create_plan', topic_id=…)` | `goal`, `level`, `daily_minutes`, `days_per_week`, `deadline` | `daily_minutes` e `days_per_week` passam por **`int()`**: os `value` dos `<option>` precisam ser números (`plan_create.html:44-47`, `:56-58`). `level` aparece como "Nível {{ level }}" (valores atuais: `Iniciante`, `Intermediário`, `Avançado`, `:35-37`) |
@@ -148,12 +149,42 @@ Contrato do `static/js/forms.js` (B4). Todo **botão de envio de um form POST qu
 | Plano | `plan_create.html:73` | `Gerando plano…` |
 | Gerar seminário (4×) | `study_topic.html:34`, `:148`; `plan_view.html:95`; `seminar_view.html:31` | `Gerando seminário…` |
 | Enviar seminário | `seminar_view.html:171` | `Avaliando respostas…` |
+| Login (PR 3) | `login.html:40` | `Entrando…` |
+| Cadastro (PR 3) | `register.html:68` | `Criando conta…` |
 
-- O atributo fica no `<button type="submit">`, não no `<form>`. Form sem o atributo (login, cadastro, excluir) não é tocado.
+- O atributo fica no `<button type="submit">`, não no `<form>`. Form sem o atributo (hoje só o excluir) não é tocado. Login e cadastro não chamam a IA, mas ganharam o atributo no PR 3 para o mesmo retorno visual e o anti-clique-duplo.
 - No 1º envio, o JS põe `aria-busy="true"` no form e `aria-disabled="true"` no botão (**não** `disabled`: o foco continua no botão), troca o conteúdo do botão por `<span class="btn-spinner">` + o texto e escreve o anúncio em `#formsStatus` (criado pelo próprio JS no fim do `<body>`; não use esse ID em template). Os envios seguintes são cancelados.
 - No `pageshow` (voltar pelo histórico), o conteúdo original do botão é restaurado e os atributos saem.
 - **O CSS do estado** (`style.css`, logo depois de `.btn:disabled`): `.btn-spinner` e `form[aria-busy="true"] .btn[aria-disabled="true"]`. Usa o visual de desabilitado que já existia, com `currentColor` (segue o tema). O anel só gira com `prefers-reduced-motion: no-preference`.
 - **Um form POST de IA novo precisa do atributo**, senão ele volta a aceitar clique duplo. O chat **não** usa este atributo: a guarda dele fica no `app.js` (ver 7.2).
+
+---
+
+## 7.7 Login e cadastro: olho da senha e fundo de rede
+
+Entrou no PR 3 (branch `feat/login-cadastro`). Tudo aqui é **só interface**: nenhum `name`, `action`, `method` ou validação do servidor mudou.
+
+**Olho de mostrar/ocultar senha** (`static/js/auth.js`, carregado pelo `scripts_extra` só no login e no cadastro):
+
+| O quê | Contrato |
+|---|---|
+| Botão | `<button type="button" class="password-toggle" aria-controls="<id do campo>" aria-label="Mostrar senha" aria-pressed="false" hidden>`, **dentro** do `.input-with-icon` do campo, depois do `<input>` |
+| Onde | `login.html:33` (`password`); `register.html:49` (`password`) e `:61` (`confirm_password`) |
+| Sem JS | o botão fica `hidden` e o campo funciona como sempre. O JS só tira o `hidden` dos botões cujo `aria-controls` aponta para um `input[type="password"]` existente |
+| Estado | o JS troca o `type` do campo (`password` ↔ `text`) e o `aria-pressed` (`false` ↔ `true`). **O `aria-label` é fixo** ("Mostrar senha"): o estado vai só no `aria-pressed` (decisão 6 do PR 3). O foco fica no botão |
+| Ícones | `#i-eye` (`.password-toggle-show`) e `#i-eye-off` (`.password-toggle-hide`) no sprite; o CSS mostra um ou outro pelo `aria-pressed` |
+| Envio | no `submit`, o campo volta a `type="password"` (o navegador não guarda a senha como texto). O valor enviado é o mesmo |
+
+**`autocomplete`** (ajuda os gerenciadores de senha; não muda nada no servidor): login `username` e `current-password`; cadastro `name`, `username`, `email` e `new-password` nos dois campos de senha. Os campos de usuário levam também `autocapitalize="none"` e `spellcheck="false"`.
+
+**Fundo de rede neural animada** (`static/js/neural-bg.js`, também pelo `scripts_extra`):
+
+- O JS **cria** o `<canvas class="neural-bg" aria-hidden="true">` no fim do `<body>` e põe a classe **`neural-bg-active` no `<html>`**. O CSS usa essa classe para tirar o fundo estático (`--pattern-network`). Sem JS ou sem canvas 2D, fica o fundo estático.
+- Lê do tema os tokens **`--color-accent`** e **`--network-strength`** (tokens.css, nos 3 blocos). Observa o `data-theme` do `<html>` (seletor) e o `prefers-color-scheme` (Dispositivo) para trocar a cor ao vivo.
+- Independente do `app.js`, do `theme.js`, do `forms.js` e do `auth.js`. Não lê nem envia dado nenhum.
+- Padrão visual e valores: [06 §9](06-padroes-visuais.md#9-telas-de-autenticação-login-e-cadastro).
+
+**Flashes no login e no cadastro:** o loop continua no `base.html` (7.1). O alinhamento com o card é só CSS (`body:has(.auth-page) .flash-container`), então a `.auth-page` precisa continuar existindo nos dois templates.
 
 ---
 
@@ -171,6 +202,7 @@ Contrato do `static/js/forms.js` (B4). Todo **botão de envio de um form POST qu
 10. [ ] As classes que o JS ou o backend geram dinamicamente continuam estilizadas: `.message-row.user/.assistant`, `.chat-bubble.user/.assistant`, `.chat-demo-note`, `.alert-success/-danger/-warning/-info`, **nos dois temas** (só com tokens semânticos; ver [06 §7](06-padroes-visuais.md#7-temas-claro-e-escuro)).
 11. [ ] Se mexeu no `<head>` ou na navbar do `base.html`: o script inline do tema continua **antes** dos `<link>` de CSS, e o seletor de tema continua **fora** do `{% if session.get('user_id') %}`.
 12. [ ] Todo botão de envio de form POST que chama a IA tem `data-loading-text` ([7.6](#76-estado-de-carregamento-data-loading-text)), e o `#chatForm` continua com um único `button[type="submit"]` e o `#chatStatus` vazio.
+13. [ ] No login e no cadastro: cada `.password-toggle` continua com `hidden`, `aria-controls` apontando para o `id` do campo de senha, `aria-label="Mostrar senha"` fixo e `aria-pressed="false"`; os `autocomplete` de [7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede) continuam; o `scripts_extra` carrega o `auth.js` e o `neural-bg.js`.
 
 ---
 
@@ -178,6 +210,7 @@ Contrato do `static/js/forms.js` (B4). Todo **botão de envio de um form POST qu
 
 | Data | Mudança | Origem |
 |---|---|---|
+| 2026-11-24 | **Adicionados:** o bloco vazio `{% block scripts_extra %}` no `base.html`, depois do `app.js` (7.1); o `static/js/auth.js` (olho da senha) e o `static/js/neural-bg.js` (fundo de rede animada), carregados só no login e no cadastro por esse bloco, independentes dos outros scripts; o botão `.password-toggle` nos 3 campos de senha, com `hidden`, `aria-controls`, `aria-label` fixo e `aria-pressed` ([7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)); os `autocomplete` dos dois forms (7.3); `data-loading-text` no login ("Entrando…") e no cadastro ("Criando conta…") (7.6); o `<canvas class="neural-bg">` e a classe `neural-bg-active` no `<html>`, criados pelo JS; os tokens `--pattern-network` e `--network-strength`; os ícones `#i-eye`, `#i-eye-off`, `#i-mail` e `#i-at` no sprite. **Alterado:** textos do cadastro (título "Criar conta no StudyIA", botão "Criar conta"). **Sem mudança:** `name`, `action`, `method` e `url_for` dos dois forms; o link da marca sem sessão continua indo para o `login`; nenhum texto da tabela 7.5. Cache: `tokens.css` e `style.css` em `?v=auth_v1`; `auth.js` em `?v=auth_v1`, `neural-bg.js` em `?v=auth_v2`. | PR 3, branch `feat/login-cadastro` ([features/04](features/04-landing-page.md), decisões 6 e 7 do rebrand) |
 | 2026-11-24 | **Adicionados:** o `static/js/forms.js` (`defer`, no `<head>` depois do `theme.js`, independente do `app.js` e do `theme.js`); o atributo `data-loading-text` nos 9 botões de envio dos forms POST de IA ([7.6](#76-estado-de-carregamento-data-loading-text)); os estados `aria-busy` no form e `aria-disabled` no botão durante o envio; o ID `#formsStatus` (criado pelo JS); o `<p id="chatStatus" role="status">` no `#chatForm`; as classes `.btn-spinner` e a regra `form[aria-busy="true"] .btn[aria-disabled="true"]` no CSS. **Alterado:** o envio do chat no `app.js` (guarda `isSending`, botão travado e rótulo "Respondendo…" até a resposta, de volta no `finally`); o `app.js` passa a usar o `button[type="submit"]` do `#chatForm`. **Sem mudança:** payload, URL e resposta do `fetch`, estrutura da bolha, `name`/`action`/`method` dos forms. Cache: `style.css` e `app.js` em `?v=robustez_v1`. **Backend:** o `login_required` agora trata a sessão órfã (redirect + flash `info`); as rotas JSON mantêm o redirect. | branch `fix/robustez-envio-e-sessao` (B4 + [handoff §17](handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)) |
 | 2026-11-23 | **Adicionados:** o seletor de tema na navbar, **fora** da condição de sessão (`.nav-actions` › `.theme-switch`); o script inline anti-flash no `<head>`, antes do CSS; o `static/js/theme.js` (`defer`, independente do `app.js`); o contrato `data-theme` no `<html>` (`light`/`dark`/ausente), a chave `studyia-theme` no `localStorage` (`light`/`dark`/`system`), a classe `js` no `<html>` e os IDs `#themeToggle`, `#themeMenu`, `#themeCurrent` e `#themeSystemHint`. **Alterado:** a cor que o `app.js` escreve em `#label_<task_key>` (`#94a3b8` → `var(--color-text-subtle)`); o ID e o mecanismo não mudaram. **Nenhum contrato existente removido.** | [feature 02](features/02-tema-claro-escuro-dispositivo.md) |
 | 2026-11-22 | **Removidos:** `#openSettingsBtn`, `#settingsModal`, `#closeSettingsBtn`, `#openSettingsBtn2` (e o `onclick` inline), o form "Chave Gemini" (`gemini_api_key`), o endpoint `update_api_key` (rota `POST /settings/api-key`) e o item 9 do checklist sobre o modal. **Adicionados:** a variável global `ai_demo_mode` (no lugar do `has_custom_key`) e a classe `.chat-demo-note` gerada pelo `app.js`. | [feature 01](features/01-remover-configurar-ia.md) |

@@ -66,7 +66,7 @@ Mostrar uma página de apresentação curta a quem chega ao StudyIA **sem sessã
 
 ✅ **Aprovado pelo Renzo** (eram 💡 propostas deste doc):
 
-1. **Template:** o `landing.html` **estende o `base.html`**, que ganha 3 blocos novos **vazios** por padrão: `head_extra`, `nav_extra` e `scripts_extra` (§5.2).
+1. **Template:** o `landing.html` **estende o `base.html`**, que ganha 3 blocos novos **vazios** por padrão: `head_extra`, `nav_extra` e `scripts_extra` (§5.2). ⚠️ O `scripts_extra` **já entrou no PR 3** (login e cadastro, 24/11/2026), no lugar previsto aqui (depois do `app.js`); o PR da landing cria só o `head_extra` e o `nav_extra`.
 2. **Three.js só no desktop:** abaixo de 768 px, com toque (`pointer: coarse`), sem WebGL ou com `prefers-reduced-motion: reduce`, a cena **não é baixada** e fica a ilustração em **SVG estático** (§5.5, §5.6, §5.7).
 3. **Meta de Lighthouse no celular:** **Desempenho ≥ 90**, **Acessibilidade ≥ 95**, **CLS = 0** (§9).
 4. **Link da marca sem sessão** (`base.html:48`) passa a ir para a **landing** (`index`) em vez do `login`. Isso muda o contrato "Link da marca" do [04 §7.1](../04-contratos-frontend.md#71-herança-jinja-e-estrutura-do-basehtml), registrado no §7 (§5.2).
@@ -89,8 +89,10 @@ Estas decisões vieram com o [rebrand azul](../06-padroes-visuais.md#8-identidad
    - "Estudos estruturados por temas"
    - "Conhecimento na prática"
 5. ✅ **Inter nos títulos da landing** (variável, peso 500, tracking ≈ −0,04em). O corpo de texto continua na Atkinson Hyperlegible Next. O arquivo da Inter vai em `static/vendor/fonts/` (OFL, sem CDN), com nome de família próprio, separado do subconjunto do wordmark (`Inter Wordmark`, só "StudyIA", que entrou no rebrand).
-6. ✅ **Login e cadastro com o layout dividido da referência** (painel da marca de um lado, formulário do outro), **olho de mostrar senha** e o **rodapé RNF06**, **sem os benefícios** (que ficam só na landing). É o PR 3 da sequência até 01/12 (rebrand → correções rápidas → login/cadastro → landing).
-   - 🔍 **Em análise:** o painel do login com o **cérebro pequeno em SVG** × **sem ele**. Decidir com os dois screenshots no PR 3.
+6. ✅ **Login e cadastro** com **olho de mostrar senha** e o **rodapé RNF06**, **sem os benefícios** (que ficam só na landing). É o PR 3 da sequência até 01/12 (rebrand → correções rápidas → login/cadastro → landing), branch `feat/login-cadastro`.
+   - ~~🔍 Em análise: o painel do login com o cérebro pequeno em SVG × sem ele.~~ ✅ **Decidido no PR 3 (24/11/2026), depois de ver as duas versões montadas:** **nem o layout dividido nem o cérebro.** Login e cadastro usam o **card centralizado** (com o símbolo do logo acima, a partir de 768 px) sobre um **fundo de rede neural animada em canvas 2D**. A versão com o cérebro em SVG estático ao lado do card foi descartada.
+7. ✅ **O cérebro é EXCLUSIVO da landing** (decisão do PR 3, 24/11/2026): o cérebro em 3D, com movimento e com as redes neurais em movimento ao redor (decisão 3), só aparece na landing. **Login e cadastro não têm ilustração:** só o fundo de rede neural em canvas 2D (`static/js/neural-bg.js`, sem Three.js), padrão visual no [06 §9](../06-padroes-visuais.md#9-telas-de-autenticação-login-e-cadastro).
+   - **Reaproveitável na landing:** o `neural-bg.js` cria o próprio `<canvas class="neural-bg">` em tela cheia, atrás da página, e não depende de nada do login. A landing pode carregá-lo pelo `scripts_extra` como **camada de fundo** atrás da cena 3D ou como **fallback** onde a cena não é baixada (celular, sem WebGL, movimento reduzido: §5.6, §5.7). Precisa do CSS `.neural-bg` / `.neural-bg-active` (hoje no bloco de autenticação do `style.css`; se a landing usar, mover para um bloco comum).
 
 ## 5. Proposta técnica
 
@@ -261,7 +263,7 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 |---|---|
 | **Backend** (`app.py`) | **1 linha:** `app.py:57`, `redirect(url_for('login'))` → `render_template('landing.html')`. Nada mais |
 | **Banco** | nada |
-| **Templates** | novo `templates/landing.html` (estende o `base.html`); `base.html`: 3 blocos novos **vazios** (`head_extra`, `nav_extra`, `scripts_extra`) e o link da marca sem sessão apontando para `index` (`:48`). Nenhum outro template muda |
+| **Templates** | novo `templates/landing.html` (estende o `base.html`); `base.html`: 2 blocos novos **vazios** (`head_extra`, `nav_extra`; o `scripts_extra` já entrou no PR 3) e o link da marca sem sessão apontando para `index` (`:48`). Nenhum outro template muda |
 | **CSS** | estilos da landing (hero, passos, contêiner da cena), só com tokens. 💡 Num arquivo próprio, `static/css/landing.css`, carregado pelo `head_extra`: as outras telas não baixam esse CSS. Subir o `?v=` |
 | **JS** | novo `static/js/landing.js` (módulo ES): cena, animações, pausas, troca de tema. Não depende do `app.js`, e o `app.js` não depende dele |
 | **Vendor** | nova pasta `static/vendor/` com `gsap/3.15.1/gsap.min.js`, `three/0.187.0/three.module.js` e `three.core.js` (minificados) e um `README.md` com origem, versão, data e licença |
