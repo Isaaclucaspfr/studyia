@@ -7,7 +7,7 @@
 ## Princípios
 
 - **Mesmo stack:** HTML + Jinja + CSS puro + o `app.js` existente. **Sem React, sem Tailwind, sem build step, sem npm.** Ícones em SVG inline (sprite no `base.html`), sem biblioteca.
-- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `rebrand_v1`; o favicon também leva `?v=`).
+- **Dois arquivos de CSS**, carregados pelo `base.html` nesta ordem: `static/css/tokens.css` (só variáveis) e `static/css/style.css` (componentes e telas, mobile-first). Ao mudar qualquer um deles, subir o `?v=` dos dois `<link>` (hoje `auth_v1`; o favicon também leva `?v=`).
 - **Nenhum contrato de [04-contratos-frontend.md](04-contratos-frontend.md) é quebrado.** As classes usadas pelo JS ou geradas pelo backend continuam existindo.
 - **Inspiração:** a anatomia de componentes do shadcn/ui (estrutura simples, variantes por modificador, estados explícitos), feita **em CSS puro**.
 - **Direção (D1, com a identidade azul do rebrand):** app de estudos calmo e legível, com cara de tecnologia **só onde a marca aparece**. A cor aparece onde há progresso, nota e a ação principal; o resto é neutro (neutros levemente azulados). Superfícies com borda de 1 px e sem sombra em repouso; sombra só no que flutua (o painel do tema). **Um único gradiente:** o do botão primário (decisão do grupo no rebrand). Fora dele: sem gradiente, sem brilho/glow, sem glass, sem borda colorida lateral, sem eyebrow, sem emoji como ícone. O "tecnológico" fica no logo e, depois, na cena 3D da landing.
@@ -51,6 +51,8 @@ Primitivos em escalas (`--neutral-*`, `--accent-*`, `--success-*`, `--warning-*`
 | `--color-scrollbar` | `#C1CCDA` | `#24486F` | polegar das barras de rolagem | — |
 | `--color-code-bg` / `-text` | `#0B1A2E` / `#F4F7FB` | `#000C1A` / `#E8F1FB` | bloco de código no chat (no escuro, mais fundo que a página) | 16,3 · 17,2 |
 | `--icon-select-arrow` | SVG com traço `#475A71` | SVG com traço `#A8BDD5` | seta do `<select>` (imagem; o `<select>` não aceita `::before`) | 7,1 · 8,7 |
+| `--pattern-network` | SVG 320 × 320 com traço `#C1CCDA` a 60% | SVG com traço `#1C3F66` a 90% | **novo (PR 3):** fundo de rede **estático** do login e do cadastro, só quando o canvas não roda (sem JS). A cor vem escrita no SVG, como a seta do `<select>` | decorativo |
+| `--network-strength` | `1` | `0.85` | **novo (PR 3):** multiplica a opacidade dos nós e das linhas da rede animada (`neural-bg.js`), cuja cor é o `--color-accent`. Menor no escuro porque o ciano sobre o marinho chama mais atenção | decorativo |
 
 Primitivos novos no rebrand: `--accent-400` (início do gradiente), `--accent-450` e `--accent-550` (inícios do hover e do pressionado) e a escala `--electric-500/600/700` (fim do gradiente). A sombra flutuante do claro passou a usar a tinta azul (`rgb(11 26 46 / …)`).
 
@@ -111,7 +113,7 @@ Nomenclatura **plana**, igual à original (`.btn`, `.card`), com variantes por c
 | Chat | `.chat-window`, `.chat-header`, `.chat-title`, `.chat-count`, `.chat-messages`, `.message-row`, `.avatar-circle`, `.message-content-wrapper`, `.message-sender-name`, `.message-time`, `.chat-bubble.user/.assistant/.typing/.error`, `.chat-demo-note`, `.chat-input-area` (estrutura da bolha é contrato) |
 | Seminário | `.score-panel` + `.score--high/mid/low` (≥ 70 / 50–69 / < 50, D2), `.score-head`, `.score-title`, `.score-summary`, `.score-box`, `.score-value`, `.score-label`, `.score-insights`, `.insight` (+ `--positive`, `--review`), `.question-list`, `.question-head`, `.question-title`, `.choices`, `.choice` (+ `.is-selected`, `.is-readonly`, `.is-editable`), `.choice-input`, `.choice-text`, `.feedback` (+ `--correct`, `--partial`, `--incorrect`) |
 | ~~Modal~~ | removido na feature 01 (o histórico do git guarda o CSS). Os tokens `--color-overlay`, `--shadow-overlay` e `--z-modal` saíram na feature 02 |
-| Auth | `.auth-page`, `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer` |
+| Auth | `.auth-page`, `.auth-logo` (símbolo do logo acima do card, ≥ 768 px), `.auth-card`, `.auth-header`, `.auth-title`, `.auth-subtitle`, `.auth-footer`; campo com ícone `.input-with-icon` + `.input-icon`; olho `.password-toggle` (+ `.password-toggle-show` / `-hide`); fundo `.neural-bg` (canvas) e `.neural-bg-active` (no `<html>`). Padrão no [§9](#9-telas-de-autenticação-login-e-cadastro) |
 | Telas | `.flows`, `.flow-card`, `.flow-head`, `.topic-layout`, `.topic-side`, `.site-footer` |
 | Navbar | `.navbar`, `.nav-brand`, `.brand-mark` (+ `.brand-mark-node`), `.brand-name` (+ `.brand-name-accent`, o "IA"), `.brand-sep` (separador vertical, ≥ 640 px), `.brand-badge`, `.nav-actions` (seletor + `.nav-user`), `.nav-user`, `.nav-btn-label` (rótulo que some abaixo de 640 px), `.user-badge`, `.user-name` |
 | Seletor de tema | `.theme-switch` (só aparece com a classe `js` no `<html>`), `.theme-toggle` (+ `.theme-icon--light/--dark/--system`), `.theme-menu` (`[popover]`), `.theme-options`, `.theme-option` (+ `-input`, `-text`, `-hint`, `-check`), `.theme-switching` (no `<html>` durante a troca). Detalhes no [§7](#seletor-de-tema) |
@@ -177,7 +179,7 @@ SVG inline num sprite no topo do `base.html`, traço de 1,5 px na tela, sempre `
 <svg class="icon" aria-hidden="true" focusable="false"><use href="#i-nome"></use></svg>
 ```
 
-Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`, `sun`, `moon`, `monitor` (os 3 últimos do seletor de tema). Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (versão simplificada do cérebro: um traço por hemisfério, em ciano `#38D1FF` sobre um quadrado marinho `#00152B`; funciona nas abas claras e escuras). O `i-book` continua no sprite: é o ícone de "Tópicos de estudo" e do estado vazio, não a marca.
+Ícones: `user`, `book`, `calendar`, `target`, `search`, `file`, `trash`, `download`, `refresh`, `lock`, `info`, `chat`, `database`, `clock`, `check`, `minus`, `x`, `alert`, `arrow-left`, `arrow-right`, `plus`, `sun`, `moon`, `monitor` (os 3 do seletor de tema), `eye`, `eye-off` (olho da senha), `mail`, `at` (campos de e-mail e usuário do cadastro). Assunto = `search`, arquivo = `file`. Botões só com ícone levam o nome em `.sr-only` ou `aria-label`. Favicon: `static/favicon.svg` (versão simplificada do cérebro: um traço por hemisfério, em ciano `#38D1FF` sobre um quadrado marinho `#00152B`; funciona nas abas claras e escuras). O `i-book` continua no sprite: é o ícone de "Tópicos de estudo" e do estado vazio, não a marca.
 
 ## 7. Temas (claro e escuro)
 
@@ -293,3 +295,57 @@ O tema claro é a mesma família em versão clara: neutros levemente azulados, t
 - O `.btn-primary` usa `background-origin: border-box`, para o gradiente cobrir a borda transparente do `.btn`, e o desabilitado zera o `background-image`.
 - O hover e o pressionado do primário trocam o gradiente sem transição (gradiente não interpola). A escala de pressão (.98) continua.
 
+- A "borda luminosa" da referência é **cor, não brilho**: no card do login e do cadastro, a borda usa `--color-accent-soft-border` (ver [§9](#9-telas-de-autenticação-login-e-cadastro)).
+
+## 9. Telas de autenticação (login e cadastro)
+
+Entrou no PR 3 (`feat/login-cadastro`, 24/11/2026), a partir da referência de login aprovada pelo grupo e das decisões do [features/04](features/04-landing-page.md) (decisões 6 e 7 do rebrand). **Login e cadastro seguem o mesmo padrão:** o que vale para um vale para o outro.
+
+### Layout
+
+- **Card centralizado** (`.auth-page`, até 28rem) sobre o **fundo de rede**. O conteúdo ocupa a altura que sobra entre a navbar e o rodapé (`body:has(.auth-page)` vira coluna flex) e o card fica no meio dela; o rodapé RNF06 do `base.html` encosta no fim da tela, com fundo liso.
+- **A partir de 768 px:** o símbolo do logo (`.auth-logo`) aparece acima do card, num quadrado de 56 px com a borda no acento suave (eco do favicon). **Abaixo de 768 px:** só o formulário (a marca já está na navbar). Sem rolagem horizontal em 375 px.
+- **Sem ilustração.** O cérebro (3D, com movimento) é **exclusivo da landing**. A versão com o cérebro em SVG ao lado do card foi montada e descartada pelo grupo no PR 3.
+- **Card:** o `.card` de sempre, com a borda em `--color-accent-soft-border` (a "borda luminosa" da referência, sem glow) e padding de 20 px no celular / 32 px a partir de 640 px.
+- **Título** com o "IA" no acento (`.brand-name-accent`), na mesma fonte do título (sem a Inter do wordmark). Rodapé do card centralizado, com divisória e o link de troca (login ↔ cadastro) com alvo de 44 px de altura.
+- **Flashes:** continuam no `base.html`; no login e no cadastro ficam na largura do card (`body:has(.auth-page) .flash-container`).
+
+### Campos
+
+- **Ícone à esquerda** (`.input-with-icon` + `.input-icon`): decorativo (`aria-hidden`), no texto sutil, sem receber clique. O `<label>` visível continua em todo campo. Ícones: `user` (usuário/e-mail, nome), `at` (nome de usuário), `mail` (e-mail), `lock` (senhas).
+- **Olho à direita** (`.password-toggle`): 44 × 44 px dentro do campo, no texto secundário (texto no hover), anel de foco **por dentro** (`outline-offset: -4px`). O campo só ganha o padding da direita quando o olho está visível (`:has(.password-toggle:not([hidden]))`); com o olho visível, o olho nativo do Edge (`::-ms-reveal`) some.
+- **Preenchimento automático:** o fundo que o navegador pinta (`:-webkit-autofill`) vira a superfície do tema, com a tinta do tema (preenchimento interno com `box-shadow inset`, não sombra).
+- **Botão principal:** `.btn-primary .btn-block` com a seta `arrow-right`, e o carregamento do `forms.js` ("Entrando…", "Criando conta…").
+
+Contrastes medidos (claro · escuro): placeholder e ícone 5,5 · 6,5; link 6,0 · 9,4; borda do campo 6,0 · 9,4 (sobre o card); olho 7,1 · 8,7. A borda do card (1,6 · 2,7) é decorativa: o card se separa do fundo também pela superfície.
+
+### Fundo de rede
+
+Duas camadas, com melhoria progressiva:
+
+| Camada | Quando | Como |
+|---|---|---|
+| **Estática** | sem JS ou sem canvas 2D | `background-image: var(--pattern-network)` no `body` (ladrilho SVG de 320 px, nós e ligações fixos) |
+| **Animada** | com o `neural-bg.js` rodando | `<canvas class="neural-bg">` fixo na janela, `z-index: -1`, `pointer-events: none`, `aria-hidden`. O `<html>` ganha `.neural-bg-active` e o ladrilho estático sai |
+
+Regras da rede animada (`static/js/neural-bg.js`, canvas 2D, **sem Three.js**):
+
+- **Discreta:** nós e linhas muito transparentes; a navbar, o card, os flashes e o rodapé têm fundo sólido por cima, então a leitura não muda. Os nós são um pouco mais visíveis que as linhas.
+- **Cor do tema:** `--color-accent` × `--network-strength` (1 no claro, 0,85 no escuro). Troca ao vivo com o seletor de tema e com o modo do sistema.
+- **Malha contínua, sem aglomerar:** distribuição em grade com um nó sorteado por célula; a opacidade da linha é `1 − (d/máx)²` (as ligações médias continuam visíveis, as longas somem).
+- **Movimento lento:** 4–11 px/s, rebatendo nas bordas. **Ponteiro** (só mouse): os nós perto do cursor ganham uma linha bem fraca até ele.
+- **Movimento reduzido:** um quadro parado (desenhado, sem animar).
+- **Desempenho:** nós proporcionais à área, pixel ratio até 1,5, linhas desenhadas em 8 faixas de opacidade (8 `stroke()` por quadro), pausa com a aba oculta. Medido no PR 3: 60 fps em 1440 × 900 e em 375 × 812, também com a CPU 4× mais lenta e digitando, sem tarefas longas.
+
+Ajustes no topo do `neural-bg.js` (valores aprovados no PR 3):
+
+| Constante | Valor | Efeito |
+|---|---|---|
+| `AREA_PER_NODE` | `7000` px² | densidade (menor = mais nós): 1440 × 900 → 180 nós; 375 × 812 → 43 |
+| `MIN_NODES` / `MAX_NODES` | `24` / `180` | limites da quantidade |
+| `LINK_FACTOR` | `1.5` | distância máxima de ligação = 1,5 × o lado da célula de cada nó (≈ 126 px) |
+| `LINK_MIN` / `LINK_MAX` | `100` / `150` px | limites da distância |
+| `NODE_ALPHA` / `LINE_ALPHA` | `0.42` / `0.16` | opacidade máxima (antes do `--network-strength`) |
+| `SPEED_MIN` / `SPEED_MAX` | `4` / `11` px/s | velocidade dos nós |
+
+Para a landing: o `neural-bg.js` pode ser reaproveitado como camada de fundo ou fallback da cena 3D (ver [features/04](features/04-landing-page.md), decisão 7 do rebrand).
