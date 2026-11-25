@@ -74,7 +74,8 @@ def inject_ai_mode():
 def index():
     if 'user_id' in session:
         return redirect(url_for('dashboard'))
-    return redirect(url_for('login'))
+    # Visitante sem sessão: landing page (docs/features/04-landing-page.md, §5.1)
+    return render_template('landing.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
