@@ -140,6 +140,15 @@
      com a cor do texto secundário escrita dentro (uma por tema). */
   --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475A71' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
+  /* Fundo de rede do login e do cadastro (PR 3): nós e ligações em azul-acinzentado
+     claro, repetido em ladrilho de 320 px. Decorativo e discreto (não é texto):
+     a cor vem escrita no SVG, como na seta do <select>, uma por tema. */
+  /* Rede neural animada do login e do cadastro (neural-bg.js): a cor é o
+     --color-accent; este número multiplica a opacidade dos nós e das linhas.
+     No escuro é menor, porque o ciano sobre o marinho chama mais atenção. */
+  --network-strength: 1;
+  --pattern-network: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='%23C1CCDA' stroke='%23C1CCDA' stroke-width='1' stroke-opacity='0.6'%3E%3Cpath fill='none' d='M24 40L118 18M118 18L210 72M210 72L296 30M24 40L70 140M118 18L70 140M210 72L170 170M70 140L170 170M170 170L262 150M210 72L262 150M296 30L262 150M70 140L30 250M30 250L128 262M170 170L128 262M128 262L226 240M170 170L226 240M262 150L226 240M226 240L300 292M262 150L300 292'/%3E%3Ccircle cx='24' cy='40' r='2.5'/%3E%3Ccircle cx='118' cy='18' r='2.5'/%3E%3Ccircle cx='210' cy='72' r='2.5'/%3E%3Ccircle cx='296' cy='30' r='2.5'/%3E%3Ccircle cx='70' cy='140' r='2.5'/%3E%3Ccircle cx='170' cy='170' r='2.5'/%3E%3Ccircle cx='262' cy='150' r='2.5'/%3E%3Ccircle cx='30' cy='250' r='2.5'/%3E%3Ccircle cx='128' cy='262' r='2.5'/%3E%3Ccircle cx='226' cy='240' r='2.5'/%3E%3Ccircle cx='300' cy='292' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+
   /* ---------- 3. Tipografia ---------- */
 
   --font-sans: "Atkinson Hyperlegible Next", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif,
@@ -311,6 +320,9 @@
 
     --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8BDD5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
 
+    --network-strength: 0.85;
+    --pattern-network: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='%231C3F66' stroke='%231C3F66' stroke-width='1' stroke-opacity='0.9'%3E%3Cpath fill='none' d='M24 40L118 18M118 18L210 72M210 72L296 30M24 40L70 140M118 18L70 140M210 72L170 170M70 140L170 170M170 170L262 150M210 72L262 150M296 30L262 150M70 140L30 250M30 250L128 262M170 170L128 262M128 262L226 240M170 170L226 240M262 150L226 240M226 240L300 292M262 150L300 292'/%3E%3Ccircle cx='24' cy='40' r='2.5'/%3E%3Ccircle cx='118' cy='18' r='2.5'/%3E%3Ccircle cx='210' cy='72' r='2.5'/%3E%3Ccircle cx='296' cy='30' r='2.5'/%3E%3Ccircle cx='70' cy='140' r='2.5'/%3E%3Ccircle cx='170' cy='170' r='2.5'/%3E%3Ccircle cx='262' cy='150' r='2.5'/%3E%3Ccircle cx='30' cy='250' r='2.5'/%3E%3Ccircle cx='128' cy='262' r='2.5'/%3E%3Ccircle cx='226' cy='240' r='2.5'/%3E%3Ccircle cx='300' cy='292' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+
     --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
   }
 }
@@ -367,6 +379,9 @@
   --color-code-text:      #E8F1FB;  /* 17,2 */
 
   --icon-select-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23A8BDD5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m7 10 5 5 5-5'/%3E%3C/svg%3E");
+
+  --network-strength: 0.85;
+  --pattern-network: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg fill='%231C3F66' stroke='%231C3F66' stroke-width='1' stroke-opacity='0.9'%3E%3Cpath fill='none' d='M24 40L118 18M118 18L210 72M210 72L296 30M24 40L70 140M118 18L70 140M210 72L170 170M70 140L170 170M170 170L262 150M210 72L262 150M296 30L262 150M70 140L30 250M30 250L128 262M170 170L128 262M128 262L226 240M170 170L226 240M262 150L226 240M226 240L300 292M262 150L300 292'/%3E%3Ccircle cx='24' cy='40' r='2.5'/%3E%3Ccircle cx='118' cy='18' r='2.5'/%3E%3Ccircle cx='210' cy='72' r='2.5'/%3E%3Ccircle cx='296' cy='30' r='2.5'/%3E%3Ccircle cx='70' cy='140' r='2.5'/%3E%3Ccircle cx='170' cy='170' r='2.5'/%3E%3Ccircle cx='262' cy='150' r='2.5'/%3E%3Ccircle cx='30' cy='250' r='2.5'/%3E%3Ccircle cx='128' cy='262' r='2.5'/%3E%3Ccircle cx='226' cy='240' r='2.5'/%3E%3Ccircle cx='300' cy='292' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
 
   --shadow-floating: 0 12px 32px -12px rgb(0 0 0 / 0.6), 0 2px 6px rgb(0 0 0 / 0.35);
 }

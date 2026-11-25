@@ -1769,15 +1769,73 @@ h3.card-title { font-size: var(--text-base); }
 }
 
 /* --------------------------------------------------------------------------
-   Autenticação (login e cadastro)
+   Autenticação (login e cadastro, PR 3)
+   O mesmo layout nas duas páginas: card centralizado sobre o fundo de rede.
+   A partir de 768 px, a marca do logo aparece acima do card; abaixo disso,
+   só o formulário (a marca já está na navbar).
+   O cérebro em 3D é exclusivo da landing (PR 4): aqui não há ilustração.
    -------------------------------------------------------------------------- */
 
+/* Medidas compartilhadas pela .auth-page e pelos flashes (que ficam fora dela,
+   no base.html), para os dois se alinharem */
+body:has(.auth-page) {
+  --auth-card-w: 28rem;
+}
+
 .auth-page {
-  max-width: 28rem;
+  max-width: var(--auth-card-w);
+  width: 100%;
   margin: var(--space-2) auto var(--space-8);
 }
 
-.auth-card { padding: var(--space-6); }
+/* Fundo de rede (decorativo). Sem JS, ou sem canvas: o ladrilho estático do
+   tokens.css. Com o neural-bg.js rodando, o <html> ganha .neural-bg-active,
+   o ladrilho sai e fica só a rede animada no <canvas class="neural-bg">. */
+body:has(.auth-page) {
+  display: flex;
+  flex-direction: column;
+  background-image: var(--pattern-network);
+  background-size: 20rem 20rem;
+  background-position: center var(--nav-height);
+}
+.neural-bg-active body:has(.auth-page) { background-image: none; }
+
+/* Atrás de tudo (z-index -1 no contexto raiz: acima só do fundo da página),
+   preso à janela, sem receber clique. A navbar, o card, os flashes e o
+   rodapé têm fundo sólido e ficam por cima. */
+.neural-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* O conteúdo ocupa a altura que sobra e o card fica no meio dela: o rodapé
+   encosta no fim da tela e o fundo de rede não aparece embaixo dele */
+body:has(.auth-page) > .flash-container { width: 100%; }
+body:has(.auth-page) > main {
+  flex: 1 0 auto;
+  display: grid;
+  align-content: center;
+  width: 100%;
+}
+body:has(.auth-page) .site-footer { background-color: var(--color-bg); }
+
+/* Flash: na largura do card */
+body:has(.auth-page) .flash-container {
+  max-width: calc(var(--auth-card-w) + 2 * var(--gutter));
+}
+
+.auth-logo { display: none; }
+
+/* Card: a "borda luminosa" da referência é a borda no acento suave (sem glow
+   nem gradiente: docs/06 §8). Azul-claro no claro, azul-petróleo no escuro. */
+.auth-card {
+  padding: var(--space-6) var(--space-5);
+  border-color: var(--color-accent-soft-border);
+}
 
 .auth-header { margin-bottom: var(--space-6); }
 
@@ -1795,13 +1853,101 @@ h3.card-title { font-size: var(--text-base); }
   padding-top: var(--space-5);
   font-size: var(--text-ui);
   color: var(--color-text-secondary);
+  text-align: center;
   border-top: 1px solid var(--color-border);
 }
-.auth-footer a { font-weight: var(--weight-semibold); }
+.auth-footer a {
+  font-weight: var(--weight-semibold);
+  /* alvo de toque de 44 px de altura sem mudar o tamanho do texto */
+  display: inline-block;
+  padding-block: calc((var(--touch-min) - 1lh) / 2);
+  margin-block: calc((var(--touch-min) - 1lh) / -2);
+}
+
+/* Marca acima do card: o símbolo do logo num quadrado, como o favicon */
+.auth-logo {
+  justify-content: center;
+  margin-bottom: var(--space-6);
+}
+.auth-logo .brand-mark {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: var(--space-3);
+  stroke-width: 1.25;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-accent-soft-border);
+  border-radius: var(--radius-lg);
+}
 
 @media (min-width: 640px) {
   .auth-page { margin-top: var(--space-10); }
   .auth-card { padding: var(--space-8); }
+}
+
+@media (min-width: 768px) {
+  .auth-logo { display: flex; }
+}
+
+/* Campo com ícone à esquerda (decorativo) e, nos de senha, o botão do olho à direita */
+.input-with-icon { position: relative; }
+
+.input-with-icon > .input-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--space-3);
+  translate: 0 -50%;
+  color: var(--color-text-subtle);
+  pointer-events: none;
+}
+.input-with-icon > .form-control {
+  padding-left: calc(var(--space-3) + var(--icon-md) + var(--space-2));
+}
+/* Com o olho visível (só com o auth.js), o texto não passa por baixo dele */
+.input-with-icon:has(> .password-toggle:not([hidden])) > .form-control {
+  padding-right: var(--touch-min);
+}
+/* O Edge desenha o próprio olho em campos de senha: some quando o nosso aparece */
+.input-with-icon:has(> .password-toggle:not([hidden])) > .form-control::-ms-reveal { display: none; }
+
+.password-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--touch-min);
+  height: 100%;
+  min-height: var(--touch-min);
+  padding: 0;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.password-toggle[hidden] { display: none; }
+/* Anel por dentro, para não encostar na borda do campo */
+.password-toggle:focus-visible { outline-offset: -4px; }
+.password-toggle .password-toggle-hide,
+.password-toggle[aria-pressed="true"] .password-toggle-show { display: none; }
+.password-toggle[aria-pressed="true"] .password-toggle-hide { display: inline-block; }
+
+@media (hover: hover) {
+  .password-toggle:hover { color: var(--color-text); }
+}
+
+/* Preenchimento automático (agora mais frequente, com os autocomplete): o fundo
+   amarelo/azul do navegador vira a superfície do tema, com o texto do tema. */
+.form-control:-webkit-autofill,
+.form-control:-webkit-autofill:hover,
+.form-control:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text);
+  caret-color: var(--color-accent);
+  -webkit-box-shadow: 0 0 0 100rem var(--color-surface) inset;
+  box-shadow: 0 0 0 100rem var(--color-surface) inset;
 }
 
 /* --------------------------------------------------------------------------
