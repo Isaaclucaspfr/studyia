@@ -158,10 +158,12 @@ Status: ✅ confirmado pela leitura do código · ⚠️ não confirmado (depend
 - **Impacto:** o "💾 N mensagens salvas no banco" fica desatualizado até recarregar a página.
 - **Por que não é só visual:** exige JS.
 
-### B10. CDNs sem versão fixa e script morto ✅
+### B10. CDNs sem versão fixa e script morto ✅ (Lucide resolvido; `marked` aberto)
 - **Onde:** `base.html:87` (`marked` sem versão), `base.html:13` (`lucide@latest`) e `:89-93` (`lucide.createIcons()`, sem nenhum `data-lucide` no projeto). Nenhum dos dois tem SRI (`integrity`).
 - **Impacto:** uma nova versão major do `marked` pode mudar a API ou a saída e quebrar o chat sem nenhum commit nosso. O Lucide é baixado à toa. Numa apresentação offline, o Markdown não renderiza (⚠️ não confirmado).
 - **Visto na [feature 02](features/02-tema-claro-escuro-dispositivo.md) (23/11/2026):** o Lucide continua no `<head>` (hoje `base.html:33`, chamada em `:147-151`) como script **síncrono**, sem `defer`. Ele bloqueia a primeira pintura até o `unpkg.com` responder. Não afeta o anti-flash do tema, porque o script inline do tema roda antes, mas atrasa a página inteira. Continua pendente: remover junto com a revisão das CDNs (categoria B).
+- **Lucide resolvido no PR 4 (landing, branch `feat/landing-page`, 24/11/2026):** o `<script src="https://unpkg.com/lucide@latest">` do `<head>` e o `lucide.createIcons()` do fim do `<body>` saíram do `base.html`. Conferido antes com `grep -rn "lucide\|data-lucide"` (templates, JS, CSS e Python): nenhum `data-lucide` no projeto; os ícones são o sprite SVG do `base.html`. Eram **489 KB** (o `@latest` resolvia para `lucide@1.79.0/dist/umd/lucide.min.js`) baixados de forma síncrona em **todas** as páginas: no Lighthouse da landing (celular), só bloquear o Lucide levava o Desempenho de ~80 para ~88.
+- **Continua aberto:** o `marked` sem versão fixa e sem SRI (`https://cdn.jsdelivr.net/npm/marked/marked.min.js`, no fim do `<body>`). Proposta: o mesmo padrão `static/vendor/<lib>/<versão>/` que a landing inaugurou com o GSAP (ver `static/vendor/README.md`).
 - **Por que não é só visual:** é dependência de runtime usada pelo JS.
 
 ### B11. Duplicações ✅

@@ -9,9 +9,9 @@
 > - [01 — Remover "Configurar IA"](../features/01-remover-configurar-ia.md): resolve o **§2** (chave em texto puro) e o **§9** (banner de demo baseado só na chave do banco), e toca o **§7** (aviso no log quando falta `GEMINI_API_KEY`).
 > - [03 — Conteúdo dentro do plano](../features/03-conteudo-do-plano.md): grava `is_simulated` por conteúdo (**§8**), segue o **§15** (sem emojis) e o **§14** (sem "Dia N") no prompt novo, depende do **§11** (JSON do plano sem validação) e acrescenta 2 rotas POST ao **§12** (CSRF). Equipe de backend lidera.
 > - [02 — Tema claro/escuro/dispositivo](../features/02-tema-claro-escuro-dispositivo.md): não toca o backend. **Possibilidade futura:** salvar a preferência de tema no banco, registrada no **§19**. Na revisão apareceu o **§18** (formato dos percentuais), que já existia antes.
-> - [04 — Landing page](../features/04-landing-page.md): mudança **pequena** na rota `/` (`index`, `app.py:53-57`). Sem sessão, ela passa a renderizar `landing.html` em vez de redirecionar ao login (só a linha `:57` muda) e ganha 2 testes novos; nenhum teste existente acessa a `/`. Precisa do ok da equipe de backend no PR da landing. **Possibilidade futura:** cache longo para `static/vendor/` (caminhos versionados) no lugar do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy.
+> - [04 — Landing page](../features/04-landing-page.md): mudança **pequena** na rota `/` (`index`, `app.py:53-57`). Sem sessão, ela passa a renderizar `landing.html` em vez de redirecionar ao login (só a linha `:57` muda) e ganha 2 testes novos; nenhum teste existente acessa a `/`. Precisa do ok da equipe de backend no PR da landing. **Possibilidade futura:** cache longo para `static/vendor/` (caminhos versionados) no lugar do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy (detalhado no **§21**).
 
-Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado) · [16](#16-gemini-citado-como-fonte-mesmo-no-modo-demonstração) · [17](#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500) · [18](#18-percentuais-sempre-com-uma-casa-decimal-100) · [19](#19-sugestão-futura-preferência-de-tema-salva-no-banco) · [20](#20-sugestão-futura-idempotência-nas-rotas-de-ia)
+Índice: [1](#1-pergunta-do-chat-duplicada-no-prompt) · [2](#2-chave-do-gemini-gravada-em-texto-puro) · [3](#3-secret_key-com-valor-padrão-no-código) · [4](#4-logout-via-get) · [5](#5-int-sem-tratamento-no-create_plan) · [6](#6-nomes-dos-modelos-gemini-a-confirmar) · [7](#7-fallback-silencioso-só-com-print) · [8](#8-is_simulated-descartado-ou-não-persistido) · [9](#9-banner-de-demo-considera-só-a-chave-do-banco) · [10](#10-upload-acima-de-10-mb-devolve-413-cru) · [11](#11-json-da-ia-sem-validação) · [12](#12-ausência-de-csrf) · [13](#13-dependências-sem-versão-fixada) · [14](#14-dia-n-repetido-no-título-do-dia-do-plano) · [15](#15-emojis-no-conteúdo-gerado) · [16](#16-gemini-citado-como-fonte-mesmo-no-modo-demonstração) · [17](#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500) · [18](#18-percentuais-sempre-com-uma-casa-decimal-100) · [19](#19-sugestão-futura-preferência-de-tema-salva-no-banco) · [20](#20-sugestão-futura-idempotência-nas-rotas-de-ia) · [21](#21-sem-compressão-gzip-e-sem-cache-para-os-estáticos)
 
 ---
 
@@ -159,6 +159,17 @@
 - **O que acontece:** ✅ o clique duplo (B4) foi bloqueado **no navegador** pelo `static/js/forms.js` (branch `fix/robustez-envio-e-sessao`). O servidor continua aceitando dois POSTs iguais: duas abas, F5 depois do envio ou um cliente sem o JS ainda criam registros duplicados.
 - **Impacto na tela:** nenhum no uso normal. É defesa em profundidade.
 - **Sugestão (opcional, futuro):** um token por envio (campo oculto gerado no GET e consumido no POST) ou uma checagem de duplicata recente (mesmo usuário, mesmo tópico e mesmos dados em poucos segundos). Toca todas as rotas de IA e os templates dos forms; PR próprio.
+
+---
+
+### 21. Sem compressão (gzip) e sem cache para os estáticos
+- **Onde:** `app.py:27` (`SEND_FILE_MAX_AGE_DEFAULT = 0`) e o deploy (`Procfile`: `gunicorn app:app`, sem proxy na frente)
+- **O que acontece:** ✅ o Flask serve CSS, JS e fontes **sem compressão** e com `max-age=0`: o navegador revalida cada arquivo a cada visita (uma ida e volta por arquivo, resposta `304` se não mudou). Medido na landing ([features/04](../features/04-landing-page.md), 24/11/2026): 334 KB locais na primeira carga; o Lighthouse estima **194 KB de economia só com gzip** (o `style.css` cai de 72 KB para ~15 KB, o `gsap.min.js` de 73 KB para ~28 KB).
+- **Impacto na tela:** a primeira pintura demora mais em rede móvel (pesa no Desempenho do Lighthouse da landing). Nada quebra.
+- **Sugestão (opcional):**
+  1. **gzip/brotli no deploy:** no proxy da hospedagem, ou no Flask com `flask-compress` (dependência nova: entra no item 13).
+  2. **Cache longo só para `static/vendor/`:** os caminhos têm a versão (`static/vendor/gsap/3.15.1/...`), então o arquivo de uma URL nunca muda e pode ter `Cache-Control: public, max-age=31536000, immutable`. O resto dos estáticos já usa `?v=` no template e também poderia ter cache longo; manter o `max-age=0` só no desenvolvimento.
+- Registrado no PR 4 (landing), a pedido do Renzo. Não alterado.
 
 ---
 
