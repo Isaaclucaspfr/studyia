@@ -169,6 +169,7 @@
 - **Sugestão (opcional):**
   1. **gzip/brotli no deploy:** no proxy da hospedagem, ou no Flask com `flask-compress` (dependência nova: entra no item 13).
   2. **Cache longo só para `static/vendor/`:** os caminhos têm a versão (`static/vendor/gsap/3.15.1/...`), então o arquivo de uma URL nunca muda e pode ter `Cache-Control: public, max-age=31536000, immutable`. O resto dos estáticos já usa `?v=` no template e também poderia ter cache longo; manter o `max-age=0` só no desenvolvimento.
+- **Pesa mais depois da Fase 2 da landing (25/11/2026):** no desktop, a cena 3D baixa mais ≈ 1,08 MB sem compressão, revalidados a cada visita. Medido com `gzip -9`: `three.module.js` 383 → 87 KB, `three.core.js` 412 → 103 KB, `brain-v2.glb` 235 → 145 KB, `landing-scene.js` 51 → 15 KB (≈ 360 KB no total com gzip). Todos em caminhos versionados (`static/vendor/three/0.187.0/`, `static/vendor/models/brain/brain-v2.glb`), então o item 2 da sugestão vale para eles sem risco. No celular a cena não é baixada.
 - Registrado no PR 4 (landing), a pedido do Renzo. Não alterado.
 
 ---

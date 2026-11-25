@@ -94,9 +94,9 @@ Estas decisões vieram com o [rebrand azul](../06-padroes-visuais.md#8-identidad
 7. ✅ **O cérebro é EXCLUSIVO da landing** (decisão do PR 3, 24/11/2026): o cérebro em 3D, com movimento e com as redes neurais em movimento ao redor (decisão 3), só aparece na landing. **Login e cadastro não têm ilustração:** só o fundo de rede neural em canvas 2D (`static/js/neural-bg.js`, sem Three.js), padrão visual no [06 §9](../06-padroes-visuais.md#9-telas-de-autenticação-login-e-cadastro).
    - **Reaproveitável na landing:** o `neural-bg.js` cria o próprio `<canvas class="neural-bg">` em tela cheia, atrás da página, e não depende de nada do login. A landing pode carregá-lo pelo `scripts_extra` como **camada de fundo** atrás da cena 3D ou como **fallback** onde a cena não é baixada (celular, sem WebGL, movimento reduzido: §5.6, §5.7). Precisa do CSS `.neural-bg` / `.neural-bg-active` (hoje no bloco de autenticação do `style.css`; se a landing usar, mover para um bloco comum).
 
-### ✅ Implementação da Fase 1 (25/11/2026)
+### ✅ Implementação (Fases 1 e 2, 24–25/11/2026)
 
-A Fase 1 (rota, template, CSS, Inter, cérebro em SVG, GSAP) foi implementada e aprovada. As decisões tomadas na implementação (textos finais, "sempre escura" com `data-theme-lock`, hero em tela cheia, "Como funciona" com prints reais, remoção do Lucide etc.) estão no [§12](#12-registro-da-implementação) e **valem sobre as seções 5 a 9** onde forem diferentes. A Fase 2 (cérebro em 3D) está no "Contexto para retomar" do §12.
+As duas fases foram implementadas e aprovadas pelo Renzo: a **Fase 1** (rota, template, CSS, Inter, cérebro em SVG, GSAP) e a **Fase 2** (o cérebro em 3D com Three.js, a partir de um modelo real). As decisões tomadas na implementação (textos finais, "sempre escura" com `data-theme-lock`, hero em tela cheia, "Como funciona" com prints reais, remoção do Lucide, o modelo "Brain" em CC BY 4.0, a rede densa com a anatomia, a entrada sem SVG no desktop etc.) estão no [§12](#12-registro-da-implementação) e **valem sobre as seções 5 a 9** onde forem diferentes.
 
 ## 5. Proposta técnica
 
@@ -328,14 +328,17 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 
 **Um PR único**, do **frontend (Renzo)**. É o passo 5 da [ordem](README.md#ordem-de-implementação--decidido), em paralelo à [03](03-conteudo-do-plano.md).
 
+**Status (25/11/2026): ✅ concluída — aguardando revisão** (PR aberto, branch `feat/landing-page`, base `main`). O que entrou, por parte (detalhes no [§12](#12-registro-da-implementação)):
+
 | Parte | Escopo | Observação |
 |---|---|---|
-| ⚠️ **Rota `/` (`app.py:57`) + 2 testes** | **C (pequeno)** | **destacada na descrição do PR para a revisão da equipe de backend.** É a única linha de Python do PR. Em commit separado, para a equipe revisar e aprovar isolado |
-| Blocos novos e link da marca no `base.html` | A/B | blocos vazios: as outras telas não mudam |
-| `landing.html` + `landing.css` | A | só tokens |
-| `static/vendor/` (GSAP, Three.js, README) | — | versões e licenças de §5.3 |
-| `landing.js` (cena, animações, pausas, tema) | B (JS novo) | aprovado ao decidir a funcionalidade |
-| Docs 02, 03, 04, 05, 06 | — | |
+| ⚠️ **Rota `/` (`app.py`, só a função `index`) + 2 testes** | **C (pequeno)** | **destacada na descrição do PR para a revisão da equipe de backend.** É o único Python do PR, em commit separado (Fase 1) |
+| Blocos novos e link da marca no `base.html` | A/B | 5 blocos **vazios por padrão** (`html_attrs`, `head_extra`, `theme_switch`, `nav_extra`, `footer_extra`): as outras telas não mudam |
+| `landing.html` + `landing.css` | A | só tokens; o `head_extra` traz o importmap e o script "vai ter 3D?" (Fase 2) |
+| `static/vendor/` (GSAP, Inter, Three.js + addon, modelo do cérebro, README) | — | versão no caminho (ou no nome, no modelo); origem, licença e SHA-256 no `static/vendor/README.md` e no `static/vendor/models/brain/README.md` |
+| `landing.js` (animações, decisão e montagem da cena) e `landing-scene.js` (a cena 3D) | B (JS novo, só da landing) | aprovado ao decidir a funcionalidade |
+| `static/img/landing/` | A | os prints do app em "Como funciona" (Fase 1) |
+| Docs 04 (contratos), 05, 06, handoff e este | — | |
 
 **Depende de:** passo 2 ([01](01-remover-configurar-ia.md)) e passo 3 ([02](02-tema-claro-escuro-dispositivo.md)) na `main`: a landing precisa do seletor de tema fora da condição de sessão, do script anti-FOUC e dos tokens escuros. **Não depende** da 03; o único cruzamento é o texto do passo 2 (§5.4).
 
@@ -344,15 +347,18 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 ## 11. Em aberto / futuro
 
 - **Futuro (✅ decisão 6):** vendorizar também a fonte (Atkinson Hyperlegible Next em `static/vendor/fonts/`), para a apresentação offline ficar idêntica. Mexe no `<head>` do `base.html` e vale para o app inteiro, então entra com o PR do [B10](../05-achados-frontend.md), não neste.
-- **Futuro (backend):** cache longo para `static/vendor/` (caminhos versionados), em vez do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy. Fica registrado no [handoff](../handoff/backend-pendencias.md).
+- **Futuro (backend):** cache longo para `static/vendor/` (caminhos versionados), em vez do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy. Pesa mais depois da Fase 2: no desktop, a cena baixa ≈ 1,08 MB sem compressão (≈ 360 KB com gzip), revalidados a cada visita. Registrado no [handoff §21](../handoff/backend-pendencias.md#21-sem-compressão-gzip-e-sem-cache-para-os-estáticos).
 - **Futuro:** trocar o texto do passo 2 para "Plano com conteúdo" quando o 4b da 03 entrar (§5.4).
 - **Futuro:** se a cena ficar pesada demais mesmo no desktop, uma versão só com GSAP + SVG animado mantém a ideia sem o Three.js. Isso exigiria rever a decisão do grupo, então só com novo ok.
+- **⚠️ Não confirmado (Fase 2):** Safari, Firefox e aparelho físico (celular e tablet reais). Testado no Chromium (Playwright, GPU Intel integrada) e com o Lighthouse. Pedido na descrição do PR para quem revisar.
 
 ## 12. Registro da implementação
 
+**Status: ✅ concluída — aguardando revisão** (Fases 1 e 2 aprovadas pelo Renzo em 25/11/2026; PR aberto na branch `feat/landing-page`, base `main`).
+
 ### Fase 1: estrutura, conteúdo, rota e GSAP (24–25/11/2026, branch `feat/landing-page`)
 
-✅ **Aprovada pelo Renzo em 25/11/2026**, testada no navegador. A **Fase 2** (o cérebro em 3D com Three.js) vem depois, numa sessão nova (ver "Contexto para retomar", no fim). A descrição do PR fica para o fim da Fase 2.
+✅ **Aprovada pelo Renzo em 25/11/2026**, testada no navegador. A Fase 2 (o cérebro em 3D) está logo abaixo.
 
 #### O que entrou
 
@@ -418,18 +424,89 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 - O `landing.js` é um script comum com `defer`, não um módulo: a Fase 2 decide como carregar o Three.js (ver abaixo).
 - Ordem das seções: "Como funciona" antes dos benefícios (o §5.4 tinha o contrário).
 
-### Contexto para retomar (Fase 2: o cérebro em 3D)
+### Fase 2: o cérebro em 3D (25/11/2026, branch `feat/landing-page`)
 
-**Estado:** a Fase 1 está pronta e aprovada em `feat/landing-page` (commits do Renzo). Nada da Fase 2 foi começado.
+✅ **Aprovada pelo Renzo em 25/11/2026**, testada no navegador, depois de 4 rodadas de ajuste (cérebro procedural → modelo real → rede densa e entrada sem SVG → tamanho e tempo). Nenhum Python novo nesta fase.
 
-**O que fazer:**
+#### O que entrou
 
-1. **Three.js 0.187.0** em `static/vendor/three/0.187.0/`: `three.module.js` e `three.core.js` minificados (jsDelivr), **mantendo os nomes** (o módulo importa `./three.core.js`). Registrar origem, data, licença (MIT) e SHA no `static/vendor/README.md`. Reconferir a regra das 2 semanas no dia.
-2. **Carregar sob demanda** (§5.6, decisão 2): só depois do `load` (ou num `requestIdleCallback`) e só se `min-width: 768px`, `pointer: fine`, sem `prefers-reduced-motion` e com WebGL (`webgl2 || webgl`). Caminho sugerido: um módulo novo (ex.: `static/js/landing-3d.js`, `type="module"`, com `importmap` para `three`) chamado pelo `landing.js`, ou o `landing.js` virando módulo. Sem WebGL, ou se o `import()` falhar, fica o SVG, sem erro no console.
-3. **Cena = a mesma composição do SVG** (decisão 3 do rebrand): o cérebro do logo em rede neural, com nós e ligações, a base em anéis holográfica e os **6 satélites** (`book`, `cap`, `bulb`, `chart-up`, `layers`, `laptop`) numa órbita inclinada, com os de trás passando atrás do cérebro. Referência das coordenadas no SVG (`landing.html`, `viewBox 0 0 640 600`): cérebro centrado em (320, 236), contorno = o `.brand-mark` escalado 18,5×; órbita com centro (320, 262), raios 290 × 84, inclinada −8°; satélites a −28°, 22°, 78°, 132°, 182° e 228° da elipse; base em (320, 512). O SVG foi gerado por um script fora do repositório (rede com 47 nós, 81 ligações e 7 nós "acesos"); para o 3D, vale gerar os nós de novo dentro do contorno.
-4. **Encaixe sem salto**: o `<canvas aria-hidden="true">` entra **dentro do `.landing-visual`** (já tem `aspect-ratio: 640 / 600`), por cima do SVG. O SVG continua no HTML como pôster e fallback; quando a cena estiver pronta, o SVG some (sem mudar o tamanho do contêiner: CLS 0). O laço GSAP do SVG (satélites flutuando, nós pulsando) deve **parar** quando o 3D assumir.
-5. **Desempenho e acessibilidade**: as regras de §5.6 e §5.7 valem como estão (DPR ≤ 1,5, `IntersectionObserver` + `visibilitychange` para pausar, `dispose()` no `pagehide`, interação máxima de ~3° com `pointer: fine`, nada passando de ~1 s na entrada). A landing é sempre escura: ler as cores dos tokens uma vez (`--color-accent`, `--color-primary`, `--color-accent-soft-border`), sem observar troca de tema. Brilho é permitido na cena (exceção do docs/06 §8), sem bloom pesado.
-6. **Meta**: manter o Lighthouse no celular ≥ 90 (no celular o Three.js nem baixa) e conferir no desktop que o 3D não mexe no LCP (o título) nem gera tarefas longas.
-7. **No fim da Fase 2**: Lighthouse, screenshots em `../studyia-screenshots/landing/fase2/`, atualizar este §12, o `static/vendor/README.md` e os docs 03, 04 (contrato `three.core.js`) e 06; depois, a **descrição do PR** (com a rota `/` destacada para o backend).
+| Parte | Arquivos | Observação |
+|---|---|---|
+| Three.js 0.187.0 | `static/vendor/three/0.187.0/three.module.js`, `three.core.js`, `LICENSE`, `addons/math/MeshSurfaceSampler.js` | minificados pelo jsDelivr a partir do pacote npm, **nomes sem `.min`** (o módulo importa `./three.core.js` pelo nome); MIT; SHA-256 no `static/vendor/README.md` |
+| Modelo do cérebro | `static/vendor/models/brain/brain-v2.glb` (235 KB) + `README.md` | "Brain", de **farhad.Guli** (Sketchfab), **CC BY 4.0**. Otimizado fora do projeto: só a casca externa (18.609 triângulos), simplificado por parte, normais para fora, a parte do cérebro em cada vértice (`_PART`). Original (1,25 MB) e `fonte.txt` **fora do repositório**, em `~/Documents/projects/studyia-assets/brain/`. Alterações listadas no README da pasta |
+| Cena | `static/js/landing-scene.js` (novo, módulo ES, `?v=landing_scene_v6`) | a rede neural, a máscara de profundidade, os impulsos, a base holográfica, a órbita, os 6 satélites, as pausas e o `dispose()`. Parâmetros no topo do arquivo |
+| Orquestração | `static/js/landing.js` (`?v=landing_v8`) | importa a cena e baixa o modelo sob demanda; deixa de entrada; rede de segurança; troca de faixa (janela estreita/larga), `pagehide`/`pageshow` |
+| Template | `templates/landing.html` | `head_extra`: importmap (`three`, `three/addons/`) e o script "vai ter 3D?"; `data-scene-src` e `data-model-src` no `.landing-visual`; o crédito do modelo no `footer_extra` |
+| `base.html` | bloco `{% block footer_extra %}` | **vazio por padrão**, dentro do `<footer>`, depois do texto do RNF06 |
+| CSS | `static/css/landing.css` (`?v=landing_v11`) | `.landing-scene` (canvas absoluto, sangra 8%), `.scene-3d`, `.is-3d`, `.is-fallback`, `.landing-credit`; título e apoio entram em 0,5 s |
 
-**Como testar (sem mexer no banco do Renzo):** subir uma instância própria com `DATABASE_PATH` descartável em `/tmp` e numa porta livre; o Flask sem debug guarda o template em cache, então reiniciar depois de mexer no `landing.html`. Os prints de `static/img/landing/` só precisam ser refeitos se as telas do app mudarem (roteiro: conta nova em banco descartável, tema escuro, assunto "Fotossíntese", plano Iniciante / 30 min / 5 dias, seminário; viewport 720 px, 2x, recorte 4:3; conversão com `sharp` para AVIF/WebP 720 e 1120 + JPEG).
+#### Decisões aprovadas (25/11/2026)
+
+1. **Modelo real, não procedural.** A forma gerada por código (dois elipsoides) lia como "duas bolhas"; o cérebro vem do modelo "Brain" (farhad.Guli, CC BY 4.0). A malha **não aparece**: serve de molde (os nós são sorteados na superfície com o `MeshSurfaceSampler`) e de máscara.
+2. **Crédito do CC BY** no rodapé da landing, pelo bloco novo `footer_extra` do `base.html`: "Modelo 3D do cérebro: “Brain” por farhad.Guli (Sketchfab), licença CC BY 4.0", com link para a página do modelo e para a licença. Aparece sempre na landing (também no celular, onde o modelo não desce); nunca nas outras telas.
+3. **Rede densa que desenha a anatomia:** até 3.400 nós (só a metade de frente aparece) e ≈ 6.000 ligações curtas seguindo a superfície. As **fissuras ficam abertas**: superfícies que se olham (as duas margens de um sulco, os dois hemisférios) não se ligam, o temporal só se liga a si e ao occipital (fissura lateral) e o cerebelo só a si. **Cerebelo** mais denso, com ligações quase horizontais (as folhas); **tronco** com ligações verticais, descendo até o feixe. O **contorno** brilha um pouco mais que o miolo. 70 impulsos.
+4. **Máscara de profundidade:** a malha entra só no buffer de profundidade (`colorWrite: false`): esconde a rede do lado de trás, os satélites e a metade da órbita que passam atrás do cérebro. Sem casca, sem cor, sem malha sólida visível.
+5. **Leitor mínimo do `.glb`** (`parseBrainGLB`, ≈ 50 linhas) no lugar do `GLTFLoader` (≈ 160 KB): só aceita o formato que nós geramos (1 malha, `POSITION` float32, `_PART` uint8, índices); qualquer outra coisa falha em silêncio e o SVG fica.
+6. **Rotação:** 360° contínuos no eixo vertical, **20 s por volta** (`ROTATION_PERIOD`), com o eixo inclinado **14°** (`BRAIN_PITCH_DEG`: a câmera vê um pouco de cima, e de frente aparecem os dois hemisférios e a fissura). Inclinação de até **5°** seguindo o mouse, sem quique. (A oscilação no três quartos foi montada e comparada em vídeo, e descartada.)
+7. **Entrada sem o SVG no desktop capaz:** um script no `<head>` decide antes da primeira pintura (≥ 768 px, `pointer: fine`, sem movimento reduzido, WebGL 2 acelerado), marca `<html class="scene-3d">` e adianta os downloads (`modulepreload` + preload do modelo). O CSS esconde o SVG (espaço reservado, CLS 0). O cérebro surge com fade + escala de 0,55 s **logo depois do título e do apoio** (deixa: 70% da animação do apoio), ou assim que a cena ficar pronta. Ordem: título → apoio → CTAs → cérebro.
+8. **Rede de segurança de 3,5 s:** se a cena falhar ou não ficar pronta até 3,5 s da navegação, o SVG entra com fade (`.is-fallback`) e a cena **não entra mais** naquela visita (sem troca tardia). Celular, sem WebGL, movimento reduzido e sem JS: o SVG, como na Fase 1.
+9. **Tamanho:** `BRAIN_SCALE` **2,7** (o cérebro ocupa a maior parte da coluna); base, feixe e halo derivam dele; **órbita 2,72**, o maior raio em que os satélites não são cortados pela borda direita da coluna (a `.landing` corta o que passa dela a partir de 1024 px).
+10. **Satélites:** sprites do Three com textura desenhada num canvas 2D a partir dos ícones do sprite do `base.html`; linha fraca até o cérebro com um impulso que vai para dentro.
+11. **`neural-bg.js` sem mudança:** ele já pausa com a aba oculta (60 → 0 desenhos/s, medido) e no `pagehide`; o canvas é fixo e cobre a janela, então nunca fica "fora da tela".
+12. **Montagem em etapas:** a cena é montada assim que os arquivos chegam, em etapas curtas (o navegador recebe a vez entre elas) e com os shaders compilados em paralelo quando a GPU tem `KHR_parallel_shader_compile`: nenhuma tarefa longa durante a entrada.
+
+#### Verificação (Playwright e Lighthouse, banco descartável, Chromium com GPU Intel integrada)
+
+| Medida | Resultado |
+|---|---|
+| FPS no desktop (1440 px, mouse mexendo) | **60** estáveis (p95 16,8 ms); **23 draw calls** por quadro |
+| Entrada (5 rodadas, desde a navegação) | 1ª pintura 0,28–0,32 s · CTAs completos 0,74–0,80 s · **cérebro: começa 0,67–0,73 s, termina 1,24–1,31 s** · nenhuma tarefa longa |
+| LCP no desktop com 3D | continua o título, 0,25–0,34 s; FCP ≈ +20 ms (o teste de WebGL no `<head>`) |
+| CPU da thread principal (parada no hero) | ≈ 11% com a cena e o fundo de rede; a cena custa o mesmo que o laço do SVG que ela substitui; o fundo de rede, ≈ 3 pontos |
+| Pausas | fora da tela e com a aba oculta: 0 draw calls; volta sozinha |
+| Memória | 12 idas e voltas de rolagem: heap JS 6,33 → 6,36 MB, sempre 1 canvas (sem vazamento) |
+| Peso só no desktop com 3D | ≈ 1,08 MB sem compressão (Three.js 795 KB, modelo 235 KB, cena 51 KB, sampler 3 KB); ≈ 360 KB com gzip |
+| Celular, tablet com toque, movimento reduzido, sem WebGL | SVG; **0 arquivos** de 3D baixados; console limpo |
+| Offline (só `127.0.0.1`) | a cena carrega do vendor |
+| Rede de segurança | modelo atrasado 6 s → SVG com fade aos 3,5 s; modelo com erro → SVG na hora |
+| Sem corte, sem rolagem horizontal | 375, 768, 1024, 1280 e 1440 px (inclusive com o satélite no ponto mais à direita da órbita) |
+| Lighthouse no celular | **Desempenho 89–91** (a Fase 1 dá 89–91 na mesma máquina, medido lado a lado), **Acessibilidade 100**, Boas práticas 100, **CLS 0** |
+| Lighthouse no desktop | Desempenho 98–100, Acessibilidade 100, CLS 0 (o Chrome headless do Lighthouse não informa `pointer: fine`, então ele não pega o caminho 3D: o custo da cena está nas linhas acima) |
+| Regressão | 13 testes passando; cadastro → app → logout → login; tema salvo fora da landing intacto |
+
+Screenshots e vídeos: `../studyia-screenshots/landing/fase2/` (versões anteriores), `modelo-real/`, `ajustes/` (rede densa: `cena-frente.png`, `cena-tres-quartos.png`, `cena-lado.png`, `volta-completa.webm`) e `ajustes-2/` (versão final: `hero-*.png`, `entrada.webm`).
+
+#### Critérios de aceite (§9) no fim
+
+| Critério | Situação |
+|---|---|
+| Sem sessão vê a landing (200); logado → dashboard (302); CTAs e marca; `login_required` e logout | ✅ |
+| Sem internet: a landing abre e a cena roda | ✅ (só a fonte do corpo cai no fallback) |
+| Sem WebGL: ilustração estática, sem erro no console; movimento reduzido e celular sem baixar o Three.js | ✅ |
+| Cena com o cérebro e os 6 satélites | ✅ (3D no desktop; SVG no resto) |
+| Sem JS, sem rolagem horizontal, AA, 44 px, Lighthouse no celular (≥ 90 / ≥ 95 / CLS 0) | ✅ (Desempenho na faixa 89–91, igual à da Fase 1 medida no mesmo dia: oscilação do Lighthouse) |
+| Orçamento de peso (§5.6) | ⚠️ desviado (ver abaixo), aprovado |
+| GSAP e Three.js só no `landing.html` | ✅ (`grep -rn "vendor/" templates/` acha também o preload da fonte do wordmark no `base.html`, esperado) |
+| Docs no mesmo PR | ✅ |
+
+#### Desvios do plano original (aprovados)
+
+- **Tamanho dos JS:** `landing.js` 19,8 KB e `landing-scene.js` 51,9 KB (muito comentário, sem minificar; 6 KB e 15 KB com gzip), acima do teto de 15 KB do §5.6. A cena só é baixada no desktop capaz.
+- **Módulo separado** (`landing-scene.js`), e o `landing.js` continua script comum com `defer` (usa `import()` dinâmico).
+- **Só WebGL 2** (o Three.js deixou de suportar WebGL 1 na r163) e só com aceleração (`failIfMajorPerformanceCaveat`).
+- **FOV de 20°** (pouca perspectiva: nada sai do quadro).
+- **Importmap no `<head>`** (no `head_extra`), não no fim do `<body>`: o navegador rejeita um importmap que chega depois de um `modulepreload`.
+- **Script inline novo no `head_extra`** ("vai ter 3D?" + preloads), além do anti-flash do `base.html`.
+- **Bloco novo `footer_extra`** no `base.html` (o 5º bloco opcional), para o crédito do modelo.
+- **Modelo 3D** (não previsto no §5.5, que previa "sem texturas" e uma cena gerada): 235 KB a mais no desktop, em CC BY 4.0.
+- **A troca SVG → 3D** deixou de ser "a mesma pose": no desktop capaz o SVG nem aparece; no caminho raro (janela que começou estreita e alargou), o crossfade troca o logo de frente pelo cérebro de lado.
+
+#### Pendências
+
+- ⚠️ **Não confirmado:** Safari, Firefox e aparelho físico. O WebKit do cache do Playwright não abriu e o Firefox não está instalado na máquina de teste. Pedido na descrição do PR.
+- **Backend (opcional):** gzip e cache longo para `static/vendor/` ([handoff §21](../handoff/backend-pendencias.md#21-sem-compressão-gzip-e-sem-cache-para-os-estáticos)).
+- **Futuro:** o texto do passo 2 vira "Plano com conteúdo" quando o 4b da [03](03-conteudo-do-plano.md) entrar.
+
+#### Como refazer o modelo (fora do projeto, sem dependência no repositório)
+
+A partir do original em `~/Documents/projects/studyia-assets/brain/brain.glb`, com gltf-transform 4, meshoptimizer, three@0.187.0 e three-mesh-bvh num diretório temporário: separar as partes pelo nome do nó pai (`frontal`, `pariet`, `temp`, `occipit`, `cereb`, `stem`; fora `corpus`, `pitua`, as arestas e a câmera), soldar e simplificar cada uma (erro 0,002; proporções 0,55 / 0,32 no cerebelo / 0,6 no tronco), juntar com o id da parte por vértice, manter só as faces que enxergam o lado de fora (raios em cone pelos dois lados, com BVH) virando-as para fora, centrar e normalizar (comprimento = 2) e gravar com `POSITION` float32, `_PART` uint8 e índices uint16. Salvar com **nome novo** (`brain-v3.glb`) e atualizar o `data-model-src` e o preload do `landing.html`.

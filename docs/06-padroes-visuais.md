@@ -291,6 +291,7 @@ O tema claro é a mesma família em versão clara: neutros levemente azulados, t
 ### Regras
 
 - O **gradiente é exclusivo do `.btn-primary`**. Nada de gradiente em card, fundo, texto ou borda; nada de brilho/glow em lugar nenhum.
+  - **Única exceção: a cena do cérebro da landing** ([§10](#10-landing-page)), no SVG e no 3D: brilho em volta dos nós, halo azul atrás do cérebro, feixe e anéis holográficos. Fica dentro do `.landing-visual` (decorativo, `aria-hidden`), nunca em texto, botão, card ou fundo, e nunca atrás do texto do hero.
 - O botão primário e a bolha do usuário **não mudam com o tema** (`--color-primary*`, `--gradient-primary*` só no `:root`, fora dos blocos 4a/4b). O resto do acento muda: azul no claro, ciano no escuro.
 - O `.btn-primary` usa `background-origin: border-box`, para o gradiente cobrir a borda transparente do `.btn`, e o desabilitado zera o `background-image`.
 - O hover e o pressionado do primário trocam o gradiente sem transição (gradiente não interpola). A escala de pressão (.98) continua.
@@ -352,7 +353,7 @@ Para a landing: o `neural-bg.js` pode ser reaproveitado como camada de fundo ou 
 
 ## 10. Landing page
 
-Entrou no PR 4 (`feat/landing-page`, Fase 1, 25/11/2026). Decisões e medições: [features/04 §12](features/04-landing-page.md#12-registro-da-implementação). Contratos: [04 §7.8](04-contratos-frontend.md#78-landing-page). Estilos em `static/css/landing.css`, carregado só na landing.
+Entrou no PR 4 (`feat/landing-page`, Fases 1 e 2, 25/11/2026). Decisões e medições: [features/04 §12](features/04-landing-page.md#12-registro-da-implementação). Contratos: [04 §7.8](04-contratos-frontend.md#78-landing-page). Estilos em `static/css/landing.css`, carregado só na landing.
 
 ### Identidade
 
@@ -367,7 +368,8 @@ Entrou no PR 4 (`feat/landing-page`, Fase 1, 25/11/2026). Decisões e medições
 |---|---|
 | Navbar | fundo igual ao da página (`--color-bg`) + borda; "Entrar" (fantasma) e "Começar agora" (primário, a partir de 640 px), ambos com 44 px |
 | Hero | a primeira tela inteira (`100svh` menos a navbar), conteúdo centralizado na altura. Desktop: texto (1,15fr) e cérebro (1fr) lado a lado; celular: cérebro abaixo dos CTAs, até 17rem, aparecendo na dobra. CTAs de 48 px. "Role para explorar" discreto, alinhado ao texto, no pé |
-| Cérebro (SVG) | o contorno do `.brand-mark` escalado, rede de nós e ligações no acento, nós "acesos" com brilho, base em anéis com feixe, 6 satélites numa órbita inclinada (os de trás atrás do cérebro). Contêiner com `aspect-ratio: 640 / 600` (o 3D da Fase 2 entra no mesmo espaço) |
+| Cérebro (SVG) | o contorno do `.brand-mark` escalado, rede de nós e ligações no acento, nós "acesos" com brilho, base em anéis com feixe, 6 satélites numa órbita inclinada (os de trás atrás do cérebro). Contêiner com `aspect-ratio: 640 / 600`. É o **fallback** da cena 3D (celular, sem WebGL, movimento reduzido, sem JS, ou se a cena falhar/atrasar) |
+| Cérebro (3D, desktop) | a cena em Three.js no mesmo contêiner (padrão abaixo, em "Cena 3D") |
 | Como funciona | texto e print do app alternados a partir de 1024 px (5fr / 7fr, invertendo no passo do meio); número do passo grande em `--color-border-input` (4,7:1); print 4:3 numa moldura de superfície com borda e `--radius-lg` |
 | Benefícios | painel na superfície (`--radius-lg`), título e introdução à esquerda, lista 2 × 2 com ícones de linha de 28 px no acento |
 | Chamada final | título à esquerda e os 2 CTAs à direita, a partir de 768 px |
@@ -375,8 +377,31 @@ Entrou no PR 4 (`feat/landing-page`, Fase 1, 25/11/2026). Decisões e medições
 
 ### Movimento
 
-- **Entrada do hero:** o título e o apoio sobem com CSS (`landing-rise`, 0,9 s, `--ease-out`, a partir de 1% de opacidade, para contar no LCP); CTAs, cérebro e o "role para explorar" entram com GSAP (`expo.out`, 0,9 s, cascata de 90 ms). Depois, os satélites flutuam ±5 px e os nós acesos pulsam, com o laço pausado fora da tela.
+- **Entrada do hero:** o título e o apoio sobem com CSS (`landing-rise`, **0,5 s**, `--ease-out`, a partir de 1% de opacidade, para contar no LCP); CTAs e o "role para explorar" entram com GSAP logo depois (`expo.out`, 0,6 s, cascata de 60 ms). Ordem: título → apoio → CTAs → cérebro.
+  - **No desktop capaz (3D):** o SVG não aparece; o cérebro 3D surge com fade + escala (0,94 → 1, 0,55 s, `--ease-out`) quando o apoio está a 70% da entrada (≈ 0,7 s da navegação; termina ≈ 1,3 s), ou assim que a cena ficar pronta. Se não ficar pronta em 3,5 s, o SVG entra com fade (0,8 s).
+  - **No resto (SVG):** o cérebro SVG entra com GSAP; depois, os satélites flutuam ±5 px e os nós acesos pulsam, com o laço pausado fora da tela.
 - **Seções:** sobem 28 px com opacidade ao entrar na tela (0,8 s, cascata de 80 ms); nos passos, o texto chega do lado dele e o print sobe logo depois.
 - **"Role para explorar":** a opacidade acompanha a rolagem (1 → 0 até 20% da altura do hero, sem atraso) e volta ao subir; invisível, não recebe clique nem Tab. A seta oscila 4 px a cada 2,4 s.
-- **Movimento reduzido:** nada anima; o "role para explorar" some de uma vez no mesmo ponto. **Sem JS:** tudo visível e parado.
+- **Movimento reduzido:** nada anima e a cena 3D não é baixada (fica o SVG parado); o "role para explorar" some de uma vez no mesmo ponto. **Sem JS:** tudo visível e parado, com o SVG.
+
+### Cena 3D (Fase 2)
+
+`static/js/landing-scene.js` (Three.js 0.187.0 do vendor). Decisões e medições no [features/04 §12](features/04-landing-page.md#12-registro-da-implementação).
+
+| Elemento | Padrão |
+|---|---|
+| Quando aparece | só no desktop capaz: ≥ 768 px, `pointer: fine`, sem movimento reduzido, WebGL 2 com aceleração. No resto, o SVG (e nada de 3D é baixado) |
+| Cérebro | o modelo "Brain" (farhad.Guli, CC BY 4.0) usado **só como forma**: nenhuma malha, casca ou superfície visível. Rede neural de até 3.400 nós e ≈ 6.000 ligações curtas seguindo a superfície, no `--color-accent`; o contorno um pouco mais brilhante que o miolo |
+| Anatomia | as fissuras ficam abertas (entre os hemisférios, a lateral do temporal, a do cerebelo); cerebelo mais denso, com linhas quase horizontais; tronco com linhas verticais descendo até o feixe |
+| Profundidade | a malha só no buffer de profundidade: o lado de trás da rede, os satélites e a metade da órbita que passam atrás do cérebro ficam escondidos; o que está mais longe também fica mais apagado |
+| Impulsos | 70 "cometas" curtos no `--color-accent-active`, de nó em nó; acendem o nó ao chegar (brilho que decai) |
+| Movimento | 360° contínuos, 20 s por volta, eixo inclinado 14° (vista um pouco de cima); inclinação de até 5° seguindo o mouse, com aproximação suave (sem quique); a base "respira" (3,6 s) e solta uma onda a cada 4,8 s; os satélites orbitam devagar (≈ 90 s por volta) |
+| Base holográfica | 4 anéis (contínuos e tracejados), chão com brilho radial e feixe até o tronco, no acento; halo `--color-primary` atrás do cérebro |
+| Satélites | os 6 ícones do sprite (livro, formatura, lâmpada, gráfico, camadas, notebook) num círculo de superfície com borda `--color-accent-soft-border`; uma linha fraca até o cérebro com um impulso que vai para dentro |
+| Escala | `BRAIN_SCALE` 2,7 (no quadro de 6,4 × 6 unidades do `viewBox` 640 × 600); órbita 2,72 (o maior raio sem corte na borda da coluna) |
+| Brilho | permitido aqui (exceção do [§8](#8-identidade-azul-rebrand)): halo próprio dos pontos no shader, sem pós-processamento (bloom) |
+| Cores | lidas dos tokens no início (a landing é sempre escura): `--color-accent`, `--color-accent-active`, `--color-primary`, `--color-accent-soft-border`, `--color-surface`. Nenhum `#hex` |
+| Desempenho | pixel ratio ≤ 1,5; 23 draw calls; pausa fora da tela e com a aba oculta; `dispose()` no `pagehide` |
+| Acessibilidade | o canvas é `aria-hidden`, sem ponteiro nem foco; nenhum conteúdo depende dele |
+| Crédito | no rodapé da landing (`.landing-credit`, `--text-xs`, `--color-text-subtle`, links sublinhados) |
 
