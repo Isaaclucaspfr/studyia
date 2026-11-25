@@ -8,23 +8,25 @@
 
 ## 7.1 Herança Jinja e estrutura do `base.html`
 
-- [ ] **Os 7 templates fazem `{% extends "base.html" %}`** e preenchem só dois blocos:
+- [ ] **Os 8 templates fazem `{% extends "base.html" %}`** (o 8º é o `landing.html`, PR 4) e preenchem os dois blocos obrigatórios:
   - `{% block title %}` (`base.html:6`): o texto do `<title>`.
   - `{% block content %}` (`base.html:77`): o conteúdo dentro de `<main class="container">`.
-  - Renomear ou remover esses blocos quebra todas as páginas. **Não existe** bloco `head`/`scripts`/`styles`. Criar um novo é permitido, desde que os dois atuais continuem.
+  - Renomear ou remover esses blocos quebra todas as páginas. Criar um novo é permitido, desde que os dois atuais continuem.
+  - **Blocos opcionais, vazios por padrão** (só a landing preenche, exceto o `scripts_extra`): `{% block html_attrs %}` (atributos no `<html>`), `{% block head_extra %}` (no `<head>`, depois do CSS), `{% block theme_switch %}` (o padrão **é o seletor de tema**: a landing o deixa vazio), `{% block nav_extra %}` (na `.nav-actions`, entre o seletor e a `.nav-user`) e `{% block scripts_extra %}` (ver abaixo). As outras telas não mexem neles.
 - [ ] **Ordem dos scripts no fim do `<body>`** (`base.html:87-88`): primeiro `marked`, depois `app.js`. O `app.js` usa `window.marked` no `DOMContentLoaded` (`app.js:37`, `:111`). Não mova o `app.js` para o `<head>` sem `defer` e não inverta a ordem.
 - [ ] **Flashes** (`base.html:63-73`): o loop precisa continuar gerando `class="alert alert-{{ category }}"`. O backend usa exatamente as categorias **`success`, `danger`, `warning` e `info`** (`flash(..., "<categoria>")` em todo o `app.py`). Se renomear as classes do CSS, mantenha esses 4 sufixos ou faça o mapeamento no template.
 - [ ] **Condição de sessão:** o nome do usuário e o "Sair" só existem com `{% if session.get('user_id') %}` (dentro da `.nav-user`). Mantenha a condição. O **seletor de tema** fica **fora** dela, na `.nav-actions`, e aparece com e sem login (decisão da [feature 02](features/02-tema-claro-escuro-dispositivo.md); a [landing](features/04-landing-page.md) depende disso). (O botão "Configurar IA" e o modal da chave saíram na [feature 01](features/01-remover-configurar-ia.md).)
-- [ ] **Tema: script inline anti-flash** (feature 02): fica no `<head>` do `base.html`, **antes de qualquer `<link>` de CSS**. Ele lê a chave `studyia-theme` do `localStorage` e põe `data-theme` e a classe `js` no `<html>` antes da primeira pintura. Movido para depois do CSS, para um arquivo ou com `defer`, o tema errado pisca ao carregar. O `static/js/theme.js` entra logo depois do CSS, com `defer`, e **não depende do `app.js`** (nem o `app.js` dele): a ordem `marked` → `app.js` no fim do `<body>` não muda.
+- [ ] **Tema: script inline anti-flash** (feature 02): fica no `<head>` do `base.html`, **antes de qualquer `<link>` de CSS**. Ele lê a chave `studyia-theme` do `localStorage` e põe `data-theme` e a classe `js` no `<html>` antes da primeira pintura. **Tema travado (landing, PR 4):** se o `<html>` já vier do servidor com `data-theme-lock`, o script **não lê** a escolha salva (o `data-theme` do servidor vale) e só põe a classe `js`. Movido para depois do CSS, para um arquivo ou com `defer`, o tema errado pisca ao carregar. O `static/js/theme.js` entra logo depois do CSS, com `defer`, e **não depende do `app.js`** (nem o `app.js` dele): a ordem `marked` → `app.js` no fim do `<body>` não muda.
 - [ ] **Tema: contrato do navegador** (feature 02), lido pelo CSS e pelo `theme.js`:
   - `data-theme` no `<html>`: `light`, `dark` ou **ausente** (= Dispositivo, segue o sistema);
+  - `data-theme-lock` no `<html>` (PR 4): tema fixo vindo do servidor; hoje só a landing (`data-theme="dark" data-theme-lock`, pelo bloco `html_attrs`). Página travada nunca escreve a chave `studyia-theme`;
   - chave `studyia-theme` no `localStorage`: `light`, `dark` ou `system`;
   - classe `js` no `<html>`: sem ela o seletor fica escondido;
   - IDs do seletor usados pelo `theme.js`: `#themeToggle` (com `popovertarget="themeMenu"`), `#themeMenu` (`[popover]`), `#themeCurrent`, `#themeSystemHint` e os radios `name="studyia-theme"` com `value` `light`/`dark`/`system`. Os radios **não** estão num `<form>`: nada vai ao servidor.
 - [ ] **Carregamento dos forms: `static/js/forms.js`** (B4, branch `fix/robustez-envio-e-sessao`): entra no `<head>` logo depois do `theme.js`, com `defer`, e **não depende do `app.js` nem do `theme.js`** (nem eles dele). A ordem `marked` → `app.js` no fim do `<body>` não muda. Ver [7.6](#76-estado-de-carregamento-data-loading-text).
-- [ ] **Bloco `{% block scripts_extra %}`** (PR 3, `base.html`, logo depois do `<script>` do `app.js`): **vazio por padrão**; serve para scripts de uma página só. Fica **depois** do `app.js`, então a ordem `marked` → `app.js` não muda. Hoje só o login e o cadastro o preenchem (`auth.js` e `neural-bg.js`, ver [7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)). A [landing](features/04-landing-page.md) vai usá-lo também.
+- [ ] **Bloco `{% block scripts_extra %}`** (PR 3, `base.html`, logo depois do `<script>` do `app.js`): **vazio por padrão**; serve para scripts de uma página só. Fica **depois** do `app.js`, então a ordem `marked` → `app.js` não muda. Preenchido pelo login e pelo cadastro (`auth.js` e `neural-bg.js`, ver [7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)) e pela [landing](features/04-landing-page.md) (`neural-bg.js`, GSAP do vendor e `landing.js`, ver [7.8](#78-landing-page)).
 - [ ] **`ai_demo_mode`** (variável global, `context_processor` em `app.py`): `True` quando não há `GEMINI_API_KEY` no ambiente. Controla o banner "Modo demonstração" do `dashboard.html`. Está disponível em **todos** os templates.
-- [ ] **Link da marca** (`base.html:19`): vai para `dashboard` se houver sessão, senão para `login`.
+- [ ] **Link da marca** (`base.html:92`): vai para `dashboard` se houver sessão, senão para `index` (a landing). Mudou no PR 4: antes, sem sessão, ia para o `login`.
 - [ ] **Nomes de endpoint em `url_for`** são os nomes das funções Python do `app.py`. Um erro de digitação gera `BuildError` e **derruba a página inteira**:
 
   `index`, `register`, `login`, `logout`, `dashboard`, `new_subject`, `export_topic`, `upload_file`, `delete_topic`, `view_topic`, `send_message`¹, `create_plan`, `view_plan`, `toggle_task`¹, `create_seminar`, `view_seminar`, `submit_seminar`, `static`.
@@ -131,6 +133,7 @@ O teste faz `assertIn` em textos do HTML ou do flash. **Se o redesign mudar este
 | `"não consta"` | resposta do fallback (`ai_service.py:155`) | `test_app.py:94` |
 | `"Progresso Geral de Execu"` | `plan_view.html:35` ("Progresso Geral de Execução:") | `test_app.py:105` |
 | `"avaliado com sucesso"` | flash do `app.py:754`, renderizado por `base.html` | `test_app.py:133` |
+| `"Transforme qualquer tema em"` + `href="/register"` e `href="/login"` | `landing.html` (`<h1>` e CTAs) | `LandingTestCase` (PR 4) |
 
 O teste também envia diretamente os `name`s de formulário (`test_app.py:25-31`, `:36-39`, `:78-81`, `:97-103`, `:127-131`) e as chaves JSON `message`, `task_key`, `reply` e `progress_percent`. Esses nomes são duplamente contrato.
 
@@ -188,6 +191,23 @@ Entrou no PR 3 (branch `feat/login-cadastro`). Tudo aqui é **só interface**: n
 
 ---
 
+## 7.8 Landing page
+
+Entrou no PR 4 (branch `feat/landing-page`, Fase 1). Padrão visual no [06 §10](06-padroes-visuais.md#10-landing-page); decisões no [features/04 §12](features/04-landing-page.md#12-registro-da-implementação).
+
+| O quê | Contrato |
+|---|---|
+| Rota | `GET /` (`index`): sem sessão → `landing.html` (200); com sessão → redirect para `dashboard`. `login_required` e logout continuam mandando para o `login` |
+| Tema | `<html data-theme="dark" data-theme-lock>` pelo bloco `html_attrs`; bloco `theme_switch` vazio (sem seletor; o `theme.js` não acha o `#themeToggle` e não faz nada) |
+| Arquivos só da landing | `static/css/landing.css` (pelo `head_extra`), `static/js/landing.js`, `static/vendor/gsap/3.15.1/*` e `static/vendor/fonts/inter-display-latin*.woff2`. **Nunca** no `base.html`: as outras telas não pagam esse peso |
+| Vendor (contrato novo) | `static/vendor/<lib>/<versão>/`: a versão vai no caminho; trocar de versão = pasta nova + atualizar o template. Origem, licença e SHA em `static/vendor/README.md`. Não editar nem reminificar os `.min.js` do GSAP (o aviso de copyright tem que ficar) |
+| Atributos lidos pelo `landing.js` | `data-hero` (entrada do hero), `data-hero-visual` (o contêiner do cérebro), `data-hero-hint` (o wrapper do "role para explorar", que some ao rolar), `data-reveal` (revelação por seção), `data-step-text`/`data-step-shot` (passos) |
+| Sem JS | tudo visível. Só o que tem `data-hero`/`data-hero-visual` começa invisível, e só com a classe `js` + sem movimento reduzido, com a trava de 1,6 s no CSS |
+| Prints do app | `static/img/landing/passo-{1,2,3}-*`: `<picture>` com AVIF e WebP (720w e 1120w) + JPEG 1120, `width="1120" height="840"`, `loading="lazy"`, `alt` descritivo. Se a tela do app mudar, refazer o print (roteiro no features/04 §12) |
+| Âncora | `#como-funciona` (a seção dos passos), alvo do "role para explorar" |
+
+---
+
 ## Antes de mexer em um template, confirme:
 
 1. [ ] O template continua com `{% extends "base.html" %}` e o conteúdo está dentro de `{% block content %}`.
@@ -203,6 +223,7 @@ Entrou no PR 3 (branch `feat/login-cadastro`). Tudo aqui é **só interface**: n
 11. [ ] Se mexeu no `<head>` ou na navbar do `base.html`: o script inline do tema continua **antes** dos `<link>` de CSS, e o seletor de tema continua **fora** do `{% if session.get('user_id') %}`.
 12. [ ] Todo botão de envio de form POST que chama a IA tem `data-loading-text` ([7.6](#76-estado-de-carregamento-data-loading-text)), e o `#chatForm` continua com um único `button[type="submit"]` e o `#chatStatus` vazio.
 13. [ ] No login e no cadastro: cada `.password-toggle` continua com `hidden`, `aria-controls` apontando para o `id` do campo de senha, `aria-label="Mostrar senha"` fixo e `aria-pressed="false"`; os `autocomplete` de [7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede) continuam; o `scripts_extra` carrega o `auth.js` e o `neural-bg.js`.
+14. [ ] Na landing: o `html_attrs` continua com `data-theme="dark" data-theme-lock`, o `theme_switch` vazio e um único `<h1>`; os atributos de [7.8](#78-landing-page) continuam nos mesmos elementos; GSAP e `landing.js` só no `scripts_extra` do `landing.html`.
 
 ---
 
@@ -210,6 +231,7 @@ Entrou no PR 3 (branch `feat/login-cadastro`). Tudo aqui é **só interface**: n
 
 | Data | Mudança | Origem |
 |---|---|---|
+| 2026-11-25 | **Alterados:** a rota `GET /` (`index`) renderiza o `landing.html` sem sessão (antes: redirect para o `login`); com sessão, continua indo para o `dashboard`. O **link da marca** sem sessão vai para `index` (antes: `login`). O script anti-flash respeita `data-theme-lock` no `<html>`. Os templates passam a ser **8** (o `landing.html` estende o `base.html`). **Adicionados:** os blocos vazios `html_attrs`, `head_extra`, `theme_switch` (padrão = o seletor) e `nav_extra` no `base.html` (7.1); o `templates/landing.html`, o `static/css/landing.css`, o `static/js/landing.js`, o `static/vendor/` (GSAP 3.15.1 + ScrollTrigger, Inter Display) e o `static/img/landing/` ([7.8](#78-landing-page)); os ícones `chip`, `layers`, `network`, `trophy`, `cap`, `bulb`, `chart-up`, `laptop` e `arrow-down` no sprite; o texto testado "Transforme qualquer tema em" (7.5). **Removidos:** o Lucide (`<script src="https://unpkg.com/lucide@latest">` e `lucide.createIcons()`), sem nenhum `data-lucide` no projeto ([B10](05-achados-frontend.md)). **Sem mudança:** `title`/`content`, ordem `marked` → `app.js`, condição de sessão da navbar, `login_required`, logout. Cache: `tokens.css` e `style.css` em `?v=landing_v1`; `landing.css` em `?v=landing_v7`; `landing.js` em `?v=landing_v3`. **Backend:** só a função `index` do `app.py` (+ 2 testes). | PR 4, branch `feat/landing-page` ([features/04](features/04-landing-page.md) §12) |
 | 2026-11-24 | **Adicionados:** o bloco vazio `{% block scripts_extra %}` no `base.html`, depois do `app.js` (7.1); o `static/js/auth.js` (olho da senha) e o `static/js/neural-bg.js` (fundo de rede animada), carregados só no login e no cadastro por esse bloco, independentes dos outros scripts; o botão `.password-toggle` nos 3 campos de senha, com `hidden`, `aria-controls`, `aria-label` fixo e `aria-pressed` ([7.7](#77-login-e-cadastro-olho-da-senha-e-fundo-de-rede)); os `autocomplete` dos dois forms (7.3); `data-loading-text` no login ("Entrando…") e no cadastro ("Criando conta…") (7.6); o `<canvas class="neural-bg">` e a classe `neural-bg-active` no `<html>`, criados pelo JS; os tokens `--pattern-network` e `--network-strength`; os ícones `#i-eye`, `#i-eye-off`, `#i-mail` e `#i-at` no sprite. **Alterado:** textos do cadastro (título "Criar conta no StudyIA", botão "Criar conta"). **Sem mudança:** `name`, `action`, `method` e `url_for` dos dois forms; o link da marca sem sessão continua indo para o `login`; nenhum texto da tabela 7.5. Cache: `tokens.css` e `style.css` em `?v=auth_v1`; `auth.js` em `?v=auth_v1`, `neural-bg.js` em `?v=auth_v2`. | PR 3, branch `feat/login-cadastro` ([features/04](features/04-landing-page.md), decisões 6 e 7 do rebrand) |
 | 2026-11-24 | **Adicionados:** o `static/js/forms.js` (`defer`, no `<head>` depois do `theme.js`, independente do `app.js` e do `theme.js`); o atributo `data-loading-text` nos 9 botões de envio dos forms POST de IA ([7.6](#76-estado-de-carregamento-data-loading-text)); os estados `aria-busy` no form e `aria-disabled` no botão durante o envio; o ID `#formsStatus` (criado pelo JS); o `<p id="chatStatus" role="status">` no `#chatForm`; as classes `.btn-spinner` e a regra `form[aria-busy="true"] .btn[aria-disabled="true"]` no CSS. **Alterado:** o envio do chat no `app.js` (guarda `isSending`, botão travado e rótulo "Respondendo…" até a resposta, de volta no `finally`); o `app.js` passa a usar o `button[type="submit"]` do `#chatForm`. **Sem mudança:** payload, URL e resposta do `fetch`, estrutura da bolha, `name`/`action`/`method` dos forms. Cache: `style.css` e `app.js` em `?v=robustez_v1`. **Backend:** o `login_required` agora trata a sessão órfã (redirect + flash `info`); as rotas JSON mantêm o redirect. | branch `fix/robustez-envio-e-sessao` (B4 + [handoff §17](handoff/backend-pendencias.md#17-sessão-de-um-usuário-que-não-existe-mais-no-banco-gera-erro-500)) |
 | 2026-11-23 | **Adicionados:** o seletor de tema na navbar, **fora** da condição de sessão (`.nav-actions` › `.theme-switch`); o script inline anti-flash no `<head>`, antes do CSS; o `static/js/theme.js` (`defer`, independente do `app.js`); o contrato `data-theme` no `<html>` (`light`/`dark`/ausente), a chave `studyia-theme` no `localStorage` (`light`/`dark`/`system`), a classe `js` no `<html>` e os IDs `#themeToggle`, `#themeMenu`, `#themeCurrent` e `#themeSystemHint`. **Alterado:** a cor que o `app.js` escreve em `#label_<task_key>` (`#94a3b8` → `var(--color-text-subtle)`); o ID e o mecanismo não mudaram. **Nenhum contrato existente removido.** | [feature 02](features/02-tema-claro-escuro-dispositivo.md) |

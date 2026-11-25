@@ -6,6 +6,8 @@
 
 Todos os 7 templates de página fazem `{% extends "base.html" %}` e preenchem **apenas** `{% block title %}` e `{% block content %}`.
 
+> **Atualização (PR 4, landing, 2026-11-25):** são **8** templates. O `landing.html` (rota `index`, só sem sessão) estende o `base.html` e preenche também os blocos opcionais `html_attrs`, `head_extra`, `theme_switch` (vazio) e `nav_extra`; login e cadastro usam o `scripts_extra` (PR 3). Partes: hero em tela cheia (título, apoio, CTAs, cérebro em SVG estático com 6 satélites, "role para explorar"), "Como funciona" com 3 prints do app (`static/img/landing/`), 4 benefícios e chamada final. Contratos: [04 §7.8](04-contratos-frontend.md#78-landing-page). O `base.html` não carrega mais o Lucide.
+
 | Template | O que mostra | Variáveis do backend | Rota |
 |---|---|---|---|
 | `base.html` | `<head>` (CSS, fontes, Lucide); navbar (`:18-35`) com marca, nome e "Sair" (o "Configurar IA" e o modal da chave saíram na feature 01); flashes (`:63-73`); `<main class="container">` (`:76-78`); rodapé de transparência RNF06 (`:81-84`); scripts (`:87-93`) | `session.user_id`, `session.name`, `get_flashed_messages(with_categories=true)`; `url_for`: `dashboard`, `login`, `logout`, `static`; `ai_demo_mode` (global) | — |
@@ -30,6 +32,20 @@ Todos os 7 templates de página fazem `{% extends "base.html" %}` e preenchem **
 > | `favicon.svg` | a marca |
 >
 > `?v=` atual: `tokens.css` e `style.css` em `tema_v3`; `app.js` e `theme.js` em `tema_v1`. Padrões e tokens: [06-padroes-visuais.md](06-padroes-visuais.md) (§7, "Temas").
+>
+> **Atualização (PR 3 e PR 4, 2026-11-24/25).** Entraram também:
+>
+> | Arquivo | O que é |
+> |---|---|
+> | `js/forms.js` | carregamento e anti-clique-duplo dos forms POST (B4) |
+> | `js/auth.js` | olho de mostrar senha (login e cadastro) |
+> | `js/neural-bg.js` | fundo de rede neural animada em canvas 2D (login, cadastro e landing); o CSS `.neural-bg` fica num bloco comum do `style.css` |
+> | `css/landing.css` | estilos da landing (só nela, pelo `head_extra`) |
+> | `js/landing.js` | animações da landing com GSAP (entrada do hero, revelação das seções, "role para explorar"); independente dos outros scripts |
+> | `vendor/` | terceiros servidos localmente, com a versão no caminho: `gsap/3.15.1/` (GSAP + ScrollTrigger, só na landing), `fonts/` (Inter Wordmark do logo e Inter Display da landing). Origem, licença e SHA: `vendor/README.md` |
+> | `img/landing/` | 3 prints do app (AVIF/WebP 720 e 1120 + JPEG) para o "Como funciona" |
+>
+> `?v=` atual: `tokens.css` e `style.css` em `landing_v1`; `landing.css` em `landing_v7`; `landing.js` em `landing_v3`; `app.js` e `forms.js` em `robustez_v1`; `auth.js` em `auth_v1`; `neural-bg.js` em `auth_v2`; `theme.js` em `tema_v1`.
 
 Na época, só existiam dois arquivos.
 
@@ -95,7 +111,7 @@ Existem **só duas**. Todo o resto do app usa forms HTML com POST e redirect.
 | Recurso | Onde | Versão | Uso real |
 |---|---|---|---|
 | Google Fonts: Inter **e** Plus Jakarta Sans | `base.html:9-11` | — | Só **Inter** é usada (`style.css:68-69`). Plus Jakarta Sans é baixada à toa |
-| Lucide (ícones) | `base.html:13` + `lucide.createIcons()` em `:89-93` | `lucide@latest` (**sem versão fixa**) | **Nenhum** elemento usa `data-lucide`: código morto |
+| ~~Lucide (ícones)~~ | ~~`base.html:13` + `lucide.createIcons()` em `:89-93`~~ | ~~`lucide@latest`~~ | **Removido no PR 4** (landing, 2026-11-25): nenhum elemento usava `data-lucide` |
 | marked (Markdown) | `base.html:87` | `cdn.jsdelivr.net/npm/marked/marked.min.js` (**sem versão**, pega a última) | Usado pelo `app.js:37`, `:112` |
 | `style.css`, `app.js` | `base.html:7`, `:88` | `?v=chakra_modern_ui_2026` (string fixa) | Cache-busting **manual**: precisa mudar a string a cada deploy para forçar o recarregamento. Em desenvolvimento, `SEND_FILE_MAX_AGE_DEFAULT=0` (`app.py:27`) já evita o cache |
 

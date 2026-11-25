@@ -94,6 +94,10 @@ Estas decisões vieram com o [rebrand azul](../06-padroes-visuais.md#8-identidad
 7. ✅ **O cérebro é EXCLUSIVO da landing** (decisão do PR 3, 24/11/2026): o cérebro em 3D, com movimento e com as redes neurais em movimento ao redor (decisão 3), só aparece na landing. **Login e cadastro não têm ilustração:** só o fundo de rede neural em canvas 2D (`static/js/neural-bg.js`, sem Three.js), padrão visual no [06 §9](../06-padroes-visuais.md#9-telas-de-autenticação-login-e-cadastro).
    - **Reaproveitável na landing:** o `neural-bg.js` cria o próprio `<canvas class="neural-bg">` em tela cheia, atrás da página, e não depende de nada do login. A landing pode carregá-lo pelo `scripts_extra` como **camada de fundo** atrás da cena 3D ou como **fallback** onde a cena não é baixada (celular, sem WebGL, movimento reduzido: §5.6, §5.7). Precisa do CSS `.neural-bg` / `.neural-bg-active` (hoje no bloco de autenticação do `style.css`; se a landing usar, mover para um bloco comum).
 
+### ✅ Implementação da Fase 1 (25/11/2026)
+
+A Fase 1 (rota, template, CSS, Inter, cérebro em SVG, GSAP) foi implementada e aprovada. As decisões tomadas na implementação (textos finais, "sempre escura" com `data-theme-lock`, hero em tela cheia, "Como funciona" com prints reais, remoção do Lucide etc.) estão no [§12](#12-registro-da-implementação) e **valem sobre as seções 5 a 9** onde forem diferentes. A Fase 2 (cérebro em 3D) está no "Contexto para retomar" do §12.
+
 ## 5. Proposta técnica
 
 > 💡 **Proposta — validar com a equipe**, exceto o que o §4 marca como ✅ aprovado pelo Renzo. Mantém o stack (Flask + Jinja + CSS puro + JS puro, sem build step). GSAP e Three.js entram como arquivos estáticos versionados, não como CDN.
@@ -343,3 +347,89 @@ Prioridade em conflito, como na sprint 01: contratos > acessibilidade visual > t
 - **Futuro (backend):** cache longo para `static/vendor/` (caminhos versionados), em vez do `SEND_FILE_MAX_AGE_DEFAULT = 0` global (`app.py:27`), e compressão gzip no deploy. Fica registrado no [handoff](../handoff/backend-pendencias.md).
 - **Futuro:** trocar o texto do passo 2 para "Plano com conteúdo" quando o 4b da 03 entrar (§5.4).
 - **Futuro:** se a cena ficar pesada demais mesmo no desktop, uma versão só com GSAP + SVG animado mantém a ideia sem o Three.js. Isso exigiria rever a decisão do grupo, então só com novo ok.
+
+## 12. Registro da implementação
+
+### Fase 1: estrutura, conteúdo, rota e GSAP (24–25/11/2026, branch `feat/landing-page`)
+
+✅ **Aprovada pelo Renzo em 25/11/2026**, testada no navegador. A **Fase 2** (o cérebro em 3D com Three.js) vem depois, numa sessão nova (ver "Contexto para retomar", no fim). A descrição do PR fica para o fim da Fase 2.
+
+#### O que entrou
+
+| Parte | Arquivos | Observação |
+|---|---|---|
+| Rota `/` | `app.py` (só a função `index`, `:74-78`) | sem sessão → `render_template('landing.html')`; com sessão → redirect para o `dashboard`. `login_required` e logout sem mudança. **Única mudança de Python**, para a revisão da equipe de backend |
+| Testes | `test_app.py` (`LandingTestCase`, 2 testes) | anônimo em `/` → 200 com "Transforme qualquer tema em" e os links `/register` e `/login`; logado → 302 para `/dashboard`. Total: 13 testes passando |
+| `base.html` | blocos, anti-flash, marca, sprite, CDN | 4 blocos novos **vazios por padrão**: `html_attrs` (no `<html>`), `head_extra` (depois do CSS), `theme_switch` (o padrão é o próprio seletor de tema) e `nav_extra` (na `.nav-actions`). O anti-flash pula o `localStorage` quando o `<html>` tem `data-theme-lock`. Link da marca sem sessão → `index`. Ícones novos no sprite: `chip`, `layers`, `network`, `trophy` (benefícios), `cap`, `bulb`, `chart-up`, `laptop` (satélites), `arrow-down` ("role para explorar"). **Lucide removido** (o `<script>` e o `createIcons()`). `tokens.css`/`style.css` em `?v=landing_v1` |
+| `templates/landing.html` | novo | estende o `base.html`; hero, "Como funciona", benefícios, chamada final; o rodapé RNF06 vem do `base.html` |
+| `static/css/landing.css` | novo (`?v=landing_v7`) | só tokens semânticos, nenhum `#hex`, nenhum `style=""`; carregado só pelo `head_extra` da landing |
+| `static/js/landing.js` | novo (`?v=landing_v3`), script comum com `defer` | animações com GSAP; independente do `app.js`, `theme.js`, `forms.js` e `neural-bg.js` |
+| `static/vendor/` | `gsap/3.15.1/` (`gsap.min.js` + `ScrollTrigger.min.js`), `fonts/inter-display-latin*.woff2`, `README.md` | origem, licença e SHA-256 no README. GSAP e Inter só no `landing.html` |
+| `static/img/landing/` | 3 prints × (AVIF e WebP em 720 e 1120 + JPEG 1120) | 516 KB no repositório; na página, `loading="lazy"` e `width`/`height` |
+| `style.css` | `.neural-bg` | saiu do bloco de autenticação para um bloco comum (login, cadastro e landing) |
+
+#### Decisões aprovadas (24–25/11/2026)
+
+1. **Textos** (sentence case, sem emoji):
+   - Título: "Transforme qualquer tema em *aprendizagem estruturada*" (a frase do login; a ênfase em itálico no acento). Substituiu "Estude qualquer assunto com IA" no ajuste de 25/11.
+   - Apoio: "Escolha um tema ou envie seu material. O StudyIA explica, monta um plano de estudos com tarefas e testa o que você aprendeu num mini seminário."
+   - CTAs: **"Começar agora"** (`register`) e **"Entrar"** (`login`), no hero, na chamada final e na navbar (o "Começar agora" da navbar só a partir de 640 px). Substituem "Criar conta" / "Já tenho conta" do §5.4.
+   - "Como funciona": "Do assunto ao seminário, *em três passos*"; passos "Escolha o assunto", "Plano de estudos com tarefas" (decisão 5) e "Mini seminário com nota", com textos ligados aos prints (Fotossíntese, prova de Biologia, 30 min/dia, 5 sessões).
+   - Benefícios: "Feito para aprender, *não só para ler*" e os 4 títulos da decisão 4 do rebrand, com os textos de apoio da Fase 1.
+   - Chamada final: "Comece pelo assunto da *próxima prova*." + os 2 CTAs.
+2. **Sempre escura** com `data-theme="dark" data-theme-lock` no `<html>` (bloco `html_attrs`), entregue pelo servidor: funciona sem JS, o anti-flash não lê a escolha salva e a landing nunca escreve a chave `studyia-theme`. O bloco `theme_switch` fica vazio na landing, então o seletor nem existe no DOM e o `theme.js` sai na primeira linha (sem botão).
+3. **`neural-bg.js` como fundo da página inteira**, com `--network-strength: 0.6` (no login é 0,85 no escuro), definido em `:root[data-theme-lock]` no `landing.css`.
+4. **Hero em tela cheia** (`min-height: 100svh` menos a navbar), conteúdo centralizado na altura: título, apoio e CTAs à esquerda e o cérebro à direita no desktop; no celular, o cérebro abaixo dos CTAs (375 × 667: os CTAs terminam a 439 px, o cérebro aparece na dobra).
+   - **"Role para explorar"** no pé do hero: link real para `#como-funciona`. Some aos poucos ao rolar, como no site da Rosso: o wrapper `[data-hero-hint]` vai de opacidade 1 (rolagem 0) a 0 (20% da altura do hero) com ScrollTrigger `scrub: true` (sem atraso) e `autoAlpha` (invisível = `visibility: hidden`, sem clique nem Tab); volta ao subir. Com movimento reduzido, some de uma vez no mesmo ponto; sem JS, fica visível.
+5. **"Como funciona" com o produto real**: um print do StudyIA por passo (o card "Pesquisar assunto geral" preenchido com "Fotossíntese"; o plano com 36,4% e as tarefas da sessão 1 marcadas; o resultado do seminário com 83,3%), em layout alternado (texto | print, invertendo no passo 2) a partir de 1024 px, empilhado abaixo disso, com o número do passo grande e discreto (`--color-border-input`, 4,7:1).
+   - Gerados do app real, no tema escuro, a 2x, num banco descartável e numa porta própria, em modo demonstração. ⚠️ **O conteúdo da IA nos prints é exemplo escrito à mão** no mesmo formato JSON que a IA devolve (`ai_service.py`), não uma resposta do Gemini. Para refazer com respostas reais, basta repetir com a chave.
+6. **Benefícios no formato original da Fase 1**: painel na superfície, título e introdução à esquerda e a lista 2 × 2 com ícones de linha à direita. As 2 alternativas "editoriais" do ajuste de 25/11 foram montadas, comparadas e **descartadas** (markup, CSS e as imagens do chat removidos).
+7. **Lucide removido do `base.html`** ([B10](../05-achados-frontend.md)): nenhum `data-lucide` no projeto; eram 489 KB síncronos em todas as páginas. O `marked` sem versão continua aberto.
+8. **Peso de 334 KB** locais na primeira carga (sem as imagens, que são `lazy`), acima do teto de 300 KB do §5.6, que não contava o ScrollTrigger (44 KB) nem a Inter (48 KB). Aceito.
+9. **Entrada do hero**: título e apoio entram com uma animação **só de CSS** (`landing-rise`, a partir de 1% de opacidade, só com `.js` e sem movimento reduzido), na primeira pintura. É o que deixa o LCP no título (o Chrome ignora no LCP o que pinta com opacidade 0). CTAs, cérebro e o "role para explorar" entram com o GSAP; até o GSAP rodar, ficam invisíveis (só com `.js` + sem movimento reduzido), com a trava de 1,6 s no CSS.
+10. **Inter dos títulos**: corte Display (`opsz` 32), variável 400–600, subconjunto latino + português, 23,8 + 25,6 KB (normal + itálico), família `"Inter"` com fallback de métricas ajustadas (CLS 0). Como foi gerada: `static/vendor/README.md`.
+11. **GSAP + ScrollTrigger** (o §5.3 sugeria só o core): o ScrollTrigger cuida da revelação das seções, da pausa do laço do cérebro fora da tela e do "role para explorar".
+
+#### Verificação (medida com Playwright e Lighthouse, banco descartável)
+
+- **Lighthouse no celular** (aba anônima, app local): **Desempenho 91** (3 rodadas, todas 91), **Acessibilidade 100**, **Boas práticas 100**, **CLS 0**, LCP 3,2 s. Histórico: 80 com o Lucide → 86 sem ele → 91 com o título e o apoio em CSS. O que ainda pesa é o CSS sem compressão (ver [handoff §21](../handoff/backend-pendencias.md#21-sem-compressão-gzip-e-sem-cache-para-os-estáticos)).
+- **Tema**: com "Claro" salvo, a landing fica escura e o login continua claro; a chave salva não muda. Com o sistema claro e nada salvo, também escura.
+- **Offline** (só `127.0.0.1`): GSAP, ScrollTrigger e Inter carregam do vendor; nenhum erro do app.
+- **Sem JS** e **movimento reduzido**: nada escondido, nada deslocado. **Sem rolagem horizontal** em 375, 390, 768 e 1440. Todos os alvos ≥ 44 px, foco visível em todos.
+- Screenshots: `../studyia-screenshots/landing/fase1/`, `fase1-ajustes/`, `fase1-ajustes/beneficios-restaurado/` e `fase1-ajustes/role-para-explorar/`.
+
+#### Critérios de aceite (§9) depois da Fase 1
+
+| Critério | Situação |
+|---|---|
+| Sem sessão vê a landing (200); logado → dashboard (302); CTAs e marca; `login_required` e logout | ✅ (testes + navegador) |
+| Sem internet, sem JS, movimento reduzido, sem rolagem horizontal, AA, 44 px, Lighthouse, passo 2, peso, sem `#hex`/`style=""`, testes | ✅ |
+| Sempre escura e sem seletor; 4 benefícios; títulos em Inter | ✅ |
+| Cena com o cérebro e os 6 satélites | ✅ no SVG estático; **3D na Fase 2** |
+| Sem WebGL: ilustração estática sem erro; celular e movimento reduzido sem baixar o Three.js | **Fase 2** (hoje o Three.js não existe, então a ilustração estática é sempre a que aparece) |
+| GSAP e Three.js só no `landing.html` (`grep -rn "vendor/" templates/`) | ✅ GSAP. O `grep` também acha o `base.html`, mas é o preload do `inter-wordmark-600.woff2` (rebrand), esperado |
+| Docs 02, 03, 04, 05 e 06 no mesmo PR | ✅ |
+
+#### Desvios do plano original
+
+- Linhas citadas no §2 mudaram: a rota `/` está hoje em `app.py:73-78` e o link da marca em `base.html:92`.
+- Em vez de 3 blocos novos, entraram **4** (`html_attrs`, `head_extra`, `theme_switch`, `nav_extra`); o `scripts_extra` já vinha do PR 3.
+- A Inter foi vendorizada já (a decisão 6 do §4 foi substituída pela decisão 5 do rebrand). A Atkinson do corpo continua no Google Fonts: offline, o corpo cai no fallback.
+- O `landing.js` é um script comum com `defer`, não um módulo: a Fase 2 decide como carregar o Three.js (ver abaixo).
+- Ordem das seções: "Como funciona" antes dos benefícios (o §5.4 tinha o contrário).
+
+### Contexto para retomar (Fase 2: o cérebro em 3D)
+
+**Estado:** a Fase 1 está pronta e aprovada em `feat/landing-page` (commits do Renzo). Nada da Fase 2 foi começado.
+
+**O que fazer:**
+
+1. **Three.js 0.187.0** em `static/vendor/three/0.187.0/`: `three.module.js` e `three.core.js` minificados (jsDelivr), **mantendo os nomes** (o módulo importa `./three.core.js`). Registrar origem, data, licença (MIT) e SHA no `static/vendor/README.md`. Reconferir a regra das 2 semanas no dia.
+2. **Carregar sob demanda** (§5.6, decisão 2): só depois do `load` (ou num `requestIdleCallback`) e só se `min-width: 768px`, `pointer: fine`, sem `prefers-reduced-motion` e com WebGL (`webgl2 || webgl`). Caminho sugerido: um módulo novo (ex.: `static/js/landing-3d.js`, `type="module"`, com `importmap` para `three`) chamado pelo `landing.js`, ou o `landing.js` virando módulo. Sem WebGL, ou se o `import()` falhar, fica o SVG, sem erro no console.
+3. **Cena = a mesma composição do SVG** (decisão 3 do rebrand): o cérebro do logo em rede neural, com nós e ligações, a base em anéis holográfica e os **6 satélites** (`book`, `cap`, `bulb`, `chart-up`, `layers`, `laptop`) numa órbita inclinada, com os de trás passando atrás do cérebro. Referência das coordenadas no SVG (`landing.html`, `viewBox 0 0 640 600`): cérebro centrado em (320, 236), contorno = o `.brand-mark` escalado 18,5×; órbita com centro (320, 262), raios 290 × 84, inclinada −8°; satélites a −28°, 22°, 78°, 132°, 182° e 228° da elipse; base em (320, 512). O SVG foi gerado por um script fora do repositório (rede com 47 nós, 81 ligações e 7 nós "acesos"); para o 3D, vale gerar os nós de novo dentro do contorno.
+4. **Encaixe sem salto**: o `<canvas aria-hidden="true">` entra **dentro do `.landing-visual`** (já tem `aspect-ratio: 640 / 600`), por cima do SVG. O SVG continua no HTML como pôster e fallback; quando a cena estiver pronta, o SVG some (sem mudar o tamanho do contêiner: CLS 0). O laço GSAP do SVG (satélites flutuando, nós pulsando) deve **parar** quando o 3D assumir.
+5. **Desempenho e acessibilidade**: as regras de §5.6 e §5.7 valem como estão (DPR ≤ 1,5, `IntersectionObserver` + `visibilitychange` para pausar, `dispose()` no `pagehide`, interação máxima de ~3° com `pointer: fine`, nada passando de ~1 s na entrada). A landing é sempre escura: ler as cores dos tokens uma vez (`--color-accent`, `--color-primary`, `--color-accent-soft-border`), sem observar troca de tema. Brilho é permitido na cena (exceção do docs/06 §8), sem bloom pesado.
+6. **Meta**: manter o Lighthouse no celular ≥ 90 (no celular o Three.js nem baixa) e conferir no desktop que o 3D não mexe no LCP (o título) nem gera tarefas longas.
+7. **No fim da Fase 2**: Lighthouse, screenshots em `../studyia-screenshots/landing/fase2/`, atualizar este §12, o `static/vendor/README.md` e os docs 03, 04 (contrato `three.core.js`) e 06; depois, a **descrição do PR** (com a rota `/` destacada para o backend).
+
+**Como testar (sem mexer no banco do Renzo):** subir uma instância própria com `DATABASE_PATH` descartável em `/tmp` e numa porta livre; o Flask sem debug guarda o template em cache, então reiniciar depois de mexer no `landing.html`. Os prints de `static/img/landing/` só precisam ser refeitos se as telas do app mudarem (roteiro: conta nova em banco descartável, tema escuro, assunto "Fotossíntese", plano Iniciante / 30 min / 5 dias, seminário; viewport 720 px, 2x, recorte 4:3; conversão com `sharp` para AVIF/WebP 720 e 1120 + JPEG).

@@ -349,3 +349,34 @@ Ajustes no topo do `neural-bg.js` (valores aprovados no PR 3):
 | `SPEED_MIN` / `SPEED_MAX` | `4` / `11` px/s | velocidade dos nós |
 
 Para a landing: o `neural-bg.js` pode ser reaproveitado como camada de fundo ou fallback da cena 3D (ver [features/04](features/04-landing-page.md), decisão 7 do rebrand).
+
+## 10. Landing page
+
+Entrou no PR 4 (`feat/landing-page`, Fase 1, 25/11/2026). Decisões e medições: [features/04 §12](features/04-landing-page.md#12-registro-da-implementação). Contratos: [04 §7.8](04-contratos-frontend.md#78-landing-page). Estilos em `static/css/landing.css`, carregado só na landing.
+
+### Identidade
+
+- **Sempre escura** (tokens do bloco 4b, `data-theme="dark" data-theme-lock`), sem seletor de tema.
+- **Títulos em Inter Display** 500, tracking −0,04em, entrelinha 0,95 (h1) / 1 (h2), com a **ênfase em itálico no acento** (`.landing-em`, ciano 10,3:1). O corpo continua na Atkinson Hyperlegible Next.
+- Escala: h1 40 → 76 px, h2 30 → 52 px, títulos de item 20–30 px, apoio 17 → 20 px (`clamp`, tokens `--landing-*`).
+- Só tokens semânticos, nenhum `#hex`. O **brilho é exclusivo da cena do cérebro** (a exceção do §8 para o "tecnológico"); texto e botões sem glow.
+
+### Composição
+
+| Parte | Padrão |
+|---|---|
+| Navbar | fundo igual ao da página (`--color-bg`) + borda; "Entrar" (fantasma) e "Começar agora" (primário, a partir de 640 px), ambos com 44 px |
+| Hero | a primeira tela inteira (`100svh` menos a navbar), conteúdo centralizado na altura. Desktop: texto (1,15fr) e cérebro (1fr) lado a lado; celular: cérebro abaixo dos CTAs, até 17rem, aparecendo na dobra. CTAs de 48 px. "Role para explorar" discreto, alinhado ao texto, no pé |
+| Cérebro (SVG) | o contorno do `.brand-mark` escalado, rede de nós e ligações no acento, nós "acesos" com brilho, base em anéis com feixe, 6 satélites numa órbita inclinada (os de trás atrás do cérebro). Contêiner com `aspect-ratio: 640 / 600` (o 3D da Fase 2 entra no mesmo espaço) |
+| Como funciona | texto e print do app alternados a partir de 1024 px (5fr / 7fr, invertendo no passo do meio); número do passo grande em `--color-border-input` (4,7:1); print 4:3 numa moldura de superfície com borda e `--radius-lg` |
+| Benefícios | painel na superfície (`--radius-lg`), título e introdução à esquerda, lista 2 × 2 com ícones de linha de 28 px no acento |
+| Chamada final | título à esquerda e os 2 CTAs à direita, a partir de 768 px |
+| Fundo | o `neural-bg.js` em toda a página, com `--network-strength: 0.6` |
+
+### Movimento
+
+- **Entrada do hero:** o título e o apoio sobem com CSS (`landing-rise`, 0,9 s, `--ease-out`, a partir de 1% de opacidade, para contar no LCP); CTAs, cérebro e o "role para explorar" entram com GSAP (`expo.out`, 0,9 s, cascata de 90 ms). Depois, os satélites flutuam ±5 px e os nós acesos pulsam, com o laço pausado fora da tela.
+- **Seções:** sobem 28 px com opacidade ao entrar na tela (0,8 s, cascata de 80 ms); nos passos, o texto chega do lado dele e o print sobe logo depois.
+- **"Role para explorar":** a opacidade acompanha a rolagem (1 → 0 até 20% da altura do hero, sem atraso) e volta ao subir; invisível, não recebe clique nem Tab. A seta oscila 4 px a cada 2,4 s.
+- **Movimento reduzido:** nada anima; o "role para explorar" some de uma vez no mesmo ponto. **Sem JS:** tudo visível e parado.
+
