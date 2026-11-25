@@ -1769,6 +1769,22 @@ h3.card-title { font-size: var(--text-base); }
 }
 
 /* --------------------------------------------------------------------------
+   Fundo de rede neural animada (neural-bg.js): login, cadastro e landing.
+   O canvas é criado pelo JS. Atrás de tudo (z-index -1 no contexto raiz:
+   acima só do fundo da página), preso à janela, sem receber clique. A navbar,
+   os cards, os flashes e o rodapé têm fundo sólido e ficam por cima.
+   -------------------------------------------------------------------------- */
+
+.neural-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* --------------------------------------------------------------------------
    Autenticação (login e cadastro, PR 3)
    O mesmo layout nas duas páginas: card centralizado sobre o fundo de rede.
    A partir de 768 px, a marca do logo aparece acima do card; abaixo disso,
@@ -1799,18 +1815,6 @@ body:has(.auth-page) {
   background-position: center var(--nav-height);
 }
 .neural-bg-active body:has(.auth-page) { background-image: none; }
-
-/* Atrás de tudo (z-index -1 no contexto raiz: acima só do fundo da página),
-   preso à janela, sem receber clique. A navbar, o card, os flashes e o
-   rodapé têm fundo sólido e ficam por cima. */
-.neural-bg {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
 
 /* O conteúdo ocupa a altura que sobra e o card fica no meio dela: o rodapé
    encosta no fim da tela e o fundo de rede não aparece embaixo dele */
