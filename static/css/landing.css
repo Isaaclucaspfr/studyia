@@ -1,0 +1,559 @@
+/* ==========================================================================
+   StudyIA — Landing page (features/04, PR 4)
+   Carregado SÓ no landing.html (bloco head_extra), depois do tokens.css e do
+   style.css. As outras telas não baixam este arquivo.
+
+   - Sempre escura: o <html> da landing vem com data-theme="dark" (bloco 4b do
+     tokens.css) e data-theme-lock (o anti-flash não troca pela escolha salva).
+   - Só tokens semânticos; nenhum #hex. O brilho (glow) do cérebro é a exceção
+     do docs/06 §8 prevista para a cena "tecnológica" da landing; o texto fica
+     sem brilho e com contraste AA.
+   - Mobile-first: 375 → 640 → 768 → 1024 → 1280. Sem 100vw (rolagem lateral).
+   - Nada começa escondido sem JS. Com JS e sem movimento reduzido, só o hero
+     começa invisível (o GSAP faz a entrada), com uma trava de segurança: se o
+     JS falhar, ele aparece sozinho em 1,6 s.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Fonte dos títulos: Inter Display, variável 400–600, latim + português
+   (static/vendor/fonts/, licença OFL). Nome "Inter": não colide com o
+   "Inter Wordmark" do logo. Fallback com as métricas ajustadas, para a troca
+   de fonte não empurrar o layout (CLS).
+   -------------------------------------------------------------------------- */
+
+@font-face {
+  font-family: "Inter";
+  src: url("../vendor/fonts/inter-display-latin.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../vendor/fonts/inter-display-latin-italic.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter Fallback";
+  src: local("Arial"), local("Liberation Sans"), local("Helvetica");
+  size-adjust: 104%;
+  ascent-override: 93%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+
+/* --------------------------------------------------------------------------
+   Tokens da landing (só valem aqui)
+   -------------------------------------------------------------------------- */
+
+:root[data-theme-lock] {
+  /* A rede do fundo (neural-bg.js lê do <html>) mais discreta que no login:
+     aqui ela fica atrás de texto, sem card por cima */
+  --network-strength: 0.6;
+}
+
+.landing {
+  --font-display: "Inter", "Inter Fallback", var(--font-sans);
+  --tracking-display: -0.04em;
+
+  /* Escala da landing: título do hero, título de seção, título de item, texto */
+  --landing-h1: clamp(2.5rem, 1.2rem + 4.4vw, 4.75rem);    /* 40 → 76 px */
+  --landing-h2: clamp(1.875rem, 1.2rem + 2.8vw, 3.25rem);  /* 30 → 52 px */
+  --landing-h3: 1.25rem;                                    /* 20 px */
+  --landing-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.25rem);/* 17 → 20 px */
+
+  --section-gap: clamp(5rem, 3rem + 7vw, 9rem);
+
+  /* O que a animação desloca para os lados antes de entrar (x do GSAP) não
+     gera rolagem horizontal. clip (e não hidden) mantém o position: sticky */
+  overflow-x: clip;
+}
+
+/* --------------------------------------------------------------------------
+   Moldura: navbar, main e rodapé só nesta página
+   -------------------------------------------------------------------------- */
+
+/* A navbar some no fundo (mesma cor da página); a borda separa ao rolar */
+body:has(.landing) .navbar { background-color: var(--color-bg); }
+
+/* O hero encosta na navbar: o espaço de cima é dele (tela cheia) */
+body:has(.landing) > main { padding-top: 0; }
+
+/* Âncora "role para explorar": a navbar fixa não cobre o título da seção */
+.landing [id] { scroll-margin-top: calc(var(--nav-height) + var(--space-6)); }
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing) { scroll-behavior: smooth; }
+}
+
+/* O rodapé RNF06 com fundo sólido: a rede animada não passa por trás do texto */
+body:has(.landing) .site-footer {
+  margin-top: 0;
+  background-color: var(--color-bg);
+}
+
+.landing-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Alvos de 44 px também no desktop (o .btn-sm padrão tem 36 px a partir de 768 px) */
+.landing-nav .btn,
+.landing .btn { min-height: var(--touch-min); }
+
+/* "Começar agora" na navbar só a partir de 640 px; no celular ele está no hero */
+.landing-nav-cta { display: none; }
+
+@media (min-width: 640px) {
+  .landing-nav-cta { display: inline-flex; }
+}
+
+/* --------------------------------------------------------------------------
+   Tipografia
+   -------------------------------------------------------------------------- */
+
+.landing-title,
+.landing-h2,
+.step-title,
+.benefit-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.landing-title {
+  font-size: var(--landing-h1);
+  line-height: 0.95;
+  letter-spacing: var(--tracking-display);
+}
+
+.landing-h2 {
+  font-size: var(--landing-h2);
+  line-height: 1;
+  letter-spacing: var(--tracking-display);
+  max-width: 20ch;
+}
+
+/* Ênfase: itálico no acento (ciano), nunca com brilho */
+.landing-em {
+  font-style: italic;
+  color: var(--color-accent);
+  /* o itálico da Inter avança um pouco à direita: não encosta na palavra seguinte */
+  padding-inline-end: 0.04em;
+}
+
+.landing-lead {
+  max-width: 34rem;
+  font-size: var(--landing-lead);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* --------------------------------------------------------------------------
+   Botões da landing: um pouco maiores que os do app
+   -------------------------------------------------------------------------- */
+
+.landing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.landing-actions .btn {
+  min-height: 3rem;              /* 48 px */
+  padding-inline: var(--space-6);
+  font-size: var(--text-base);
+}
+
+/* Secundário transparente sobre o fundo escuro (a rede aparece por trás) */
+.landing-actions .btn-secondary { background-color: transparent; }
+
+@media (hover: hover) {
+  .landing-actions .btn-primary .icon {
+    transition: transform var(--duration-base) var(--ease-out);
+  }
+  .landing-actions .btn-primary:hover .icon { transform: translateX(3px); }
+}
+
+/* --------------------------------------------------------------------------
+   1. Hero: a primeira tela inteira (menos a navbar), em qualquer aparelho
+   -------------------------------------------------------------------------- */
+
+.landing-hero {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--nav-height));
+  min-height: calc(100svh - var(--nav-height));
+  padding-block: var(--space-6) var(--space-4);
+}
+
+/* Conteúdo centralizado na altura que sobra; o indicador fica no pé */
+.landing-hero-main {
+  flex: 1 0 auto;
+  display: grid;
+  align-content: center;
+  gap: var(--space-8);
+}
+
+.landing-hero-text {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.landing-hero-text .landing-actions { margin-top: var(--space-2); }
+
+/* O contêiner da ilustração tem proporção fixa: a cena 3D (Fase 2) entra no
+   mesmo espaço, sem salto de layout (CLS = 0). No celular, menor e abaixo
+   dos CTAs: aparece na dobra sem empurrar os botões para fora da tela */
+.landing-visual {
+  position: relative;
+  width: 100%;
+  max-width: 17rem;
+  aspect-ratio: 640 / 600;
+  margin-inline: auto;
+}
+
+.landing-visual > .brain {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+@media (min-width: 640px) {
+  .landing-visual { max-width: 26rem; }
+}
+
+@media (min-width: 1024px) {
+  .landing-hero { padding-block: var(--space-8) var(--space-6); }
+  .landing-hero-main {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-10);
+  }
+  .landing-visual { max-width: none; }
+}
+
+/* "Role para explorar": discreto, alinhado ao texto (não centralizado).
+   O wrapper [data-hero-hint] é quem some ao rolar (landing.js, opacidade
+   ligada à rolagem); o link dentro dele faz a entrada com o resto do hero */
+.landing-scroll-wrap {
+  align-self: flex-start;
+  margin-top: var(--space-6);
+}
+
+.landing-scroll {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--touch-min);
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+@media (hover: hover) {
+  .landing-scroll:hover { color: var(--color-text); }
+}
+
+@keyframes landing-scroll-nudge {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(4px); }
+}
+
+/* Só sem movimento reduzido (a regra global do style.css também zera) */
+@media (prefers-reduced-motion: no-preference) {
+  .landing-scroll-icon { animation: landing-scroll-nudge 2.4s var(--ease-in-out) infinite; }
+}
+
+/* --------------------------------------------------------------------------
+   Cérebro (SVG estático; fallback definitivo da cena 3D)
+   Cores só por token: acento (ciano), primário (azul), borda do acento.
+   -------------------------------------------------------------------------- */
+
+.brain-stop-glow  { stop-color: var(--color-accent); stop-opacity: 0.32; }
+.brain-stop-beam  { stop-color: var(--color-accent); stop-opacity: 0.16; }
+.brain-stop-halo  { stop-color: var(--color-primary); stop-opacity: 0.3; }
+.brain-stop-clear { stop-color: var(--color-accent); stop-opacity: 0; }
+
+.brain-floor { fill: url(#brainFloor); }
+.brain-beam  { fill: url(#brainBeam); }
+.brain-halo  { fill: url(#brainHalo); }
+
+.brain-ring {
+  fill: none;
+  stroke: var(--color-accent);
+  vector-effect: non-scaling-stroke;
+}
+.brain-ring--outer { stroke-opacity: 0.28; stroke-width: 1; }
+.brain-ring--ticks { stroke-opacity: 0.55; stroke-width: 2; stroke-dasharray: 2 9; }
+.brain-ring--mid   { stroke-opacity: 0.5;  stroke-width: 1.25; }
+.brain-ring--inner { stroke-opacity: 0.9;  stroke-width: 2; filter: url(#brainGlow); }
+
+/* Órbita: tracejada; a metade da frente passa na frente do cérebro */
+.brain-orbit {
+  fill: none;
+  stroke: var(--color-accent-soft-border);
+  stroke-width: 1.25;
+  stroke-dasharray: 3 7;
+  vector-effect: non-scaling-stroke;
+}
+.brain-orbit--front { stroke: var(--color-accent); stroke-opacity: 0.45; }
+
+/* O preenchimento esconde o que passa por trás (órbita e satélites de trás) */
+.brain-fill {
+  fill: var(--color-bg);
+  fill-opacity: 0.88;
+  stroke: none;
+}
+
+.brain-links {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-opacity: 0.38;
+  stroke-width: 1;
+  stroke-linecap: round;
+}
+
+.brain-outline,
+.brain-fissure {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* O contorno fica dentro do grupo escalado (×18,5): o desfoque do filtro escala
+   junto e vira o halo largo em volta do cérebro. Na fissura não: ali ele vira uma faixa */
+.brain-outline { filter: url(#brainGlow); }
+.brain-fissure { stroke-opacity: 0.5; stroke-width: 1.5; stroke-dasharray: 2 6; }
+
+.brain-nodes { fill: var(--color-accent); fill-opacity: 0.85; }
+.brain-hot   { fill: var(--color-accent-active); filter: url(#brainGlow); }
+
+/* Satélites: os 6 conceitos (livro, formatura, lâmpada, gráfico, camadas, notebook) */
+.brain-sat circle {
+  fill: var(--color-surface);
+  stroke: var(--color-accent-soft-border);
+  stroke-width: 1.25;
+}
+.brain-sat use {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.brain-sat--back { opacity: 0.55; }
+
+/* --------------------------------------------------------------------------
+   Seções
+   -------------------------------------------------------------------------- */
+
+.landing-section { margin-top: var(--section-gap); }
+
+.landing-section > .landing-h2 { margin-bottom: var(--space-12); }
+
+/* ---------- 2. Como funciona: texto e print alternados ---------- */
+
+.steps {
+  display: grid;
+  gap: var(--space-16);
+  list-style: none;
+}
+
+.step {
+  display: grid;
+  gap: var(--space-6);
+  align-items: center;
+}
+
+.step-text {
+  display: grid;
+  gap: var(--space-3);
+  align-content: center;
+}
+
+/* Número grande e discreto (a <ol> já diz a ordem ao leitor de tela).
+   --color-border-input: 4,7:1 no fundo, AA de texto grande */
+.step-num {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 2rem + 5vw, 6.5rem);
+  font-weight: 500;
+  line-height: 0.85;
+  letter-spacing: var(--tracking-display);
+  color: var(--color-border-input);
+  margin-bottom: var(--space-2);
+}
+
+.step-title {
+  font-size: clamp(1.375rem, 1.1rem + 1vw, 1.875rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.step-text p {
+  max-width: 30rem;
+  font-size: var(--landing-lead);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+/* Print do app: proporção 4:3 (width/height no <img>), moldura no tom da superfície */
+.step-shot {
+  overflow: hidden;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.step-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.step-shot { max-width: 40rem; }
+
+@media (min-width: 1024px) {
+  .steps { gap: var(--space-16); }
+  .step {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-12);
+  }
+  .step-shot { max-width: none; }
+  /* Alterna: no passo do meio o print vai para a esquerda */
+  .step:nth-child(even) { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .step:nth-child(even) .step-text { order: 2; }
+}
+
+/* ---------- 3. Benefícios: painel com 2 colunas (título | lista 2 × 2) ---------- */
+
+.landing-benefits {
+  display: grid;
+  gap: var(--space-10);
+  padding: var(--space-8) var(--space-5);
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+}
+
+.benefits-intro {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+}
+
+.benefits-intro p {
+  max-width: 30rem;
+  font-size: var(--landing-lead);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.benefits {
+  display: grid;
+  gap: var(--space-8);
+  list-style: none;
+}
+
+.benefit {
+  display: grid;
+  align-content: start;      /* as linhas não esticam: o texto fica logo abaixo do título */
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--space-4);
+  row-gap: var(--space-2);
+}
+
+.benefit-icon {
+  grid-row: span 2;
+  width: 1.75rem;
+  height: 1.75rem;
+  stroke-width: 1.3;      /* 28 px → 1,5 px */
+  color: var(--color-accent);
+}
+
+.benefit-title {
+  font-size: var(--landing-h3);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+}
+
+.benefit p { color: var(--color-text-secondary); }
+
+@media (min-width: 640px) {
+  .landing-benefits { padding: var(--space-12) var(--space-10); }
+  .benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-8);
+    row-gap: var(--space-10);
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-benefits {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: var(--space-12);
+    padding: var(--space-16) var(--space-12);
+  }
+}
+
+/* ---------- 4. Chamada final: curta, alinhada à esquerda ---------- */
+
+.landing-final {
+  display: grid;
+  gap: var(--space-6);
+  margin-bottom: var(--section-gap);
+}
+
+.landing-section > .landing-final-title {
+  max-width: 18ch;
+  margin-bottom: 0;
+}
+
+@media (min-width: 768px) {
+  .landing-final {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: var(--space-10);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Entrada do hero (landing.js / GSAP)
+   Só com JS (.js no <html>, do anti-flash) e sem movimento reduzido. O GSAP
+   escreve a opacidade inline e vence esta regra; se ele não rodar, a
+   animação de 0 s com atraso de 1,6 s mostra tudo (trava de segurança).
+   O título e o apoio são a exceção: entram com uma animação só de CSS (abaixo).
+   As seções de baixo NÃO começam escondidas no CSS: o GSAP as esconde ao
+   iniciar, fora da tela, e sem JS elas simplesmente aparecem.
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .landing [data-hero],
+  .js .landing [data-hero-visual] {
+    opacity: 0;
+    animation: landing-failsafe 0s 1.6s forwards;
+  }
+
+  /* O título entra só com CSS, já na primeira pintura (sem esperar o JS):
+     são os maiores elementos da tela (LCP). CTAs, cérebro e o "role para
+     explorar" vêm com o GSAP, logo depois */
+  .js .landing-title { animation: landing-rise 0.9s var(--ease-out) both; }
+  .js .landing-lead  { animation: landing-rise 0.9s var(--ease-out) 0.09s both; }
+}
+
+@keyframes landing-failsafe {
+  to { opacity: 1; }
+}
+
+/* Começa em 1% (não 0): o Chrome ignora no LCP o que aparece na primeira
+   pintura com opacidade 0. Visualmente é igual a sair do zero */
+@keyframes landing-rise {
+  from { opacity: 0.01; transform: translateY(24px); }
+}
