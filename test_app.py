@@ -321,5 +321,40 @@ class SessaoOrfaTestCase(unittest.TestCase):
         self.assertIn(b"Painel de Estudos", res.data)
 
 
+class LandingTestCase(unittest.TestCase):
+    """Landing page (docs/features/04-landing-page.md, §5.1): a rota / mostra a
+    landing a quem não tem sessão e manda quem está logado para o dashboard."""
+
+    def setUp(self):
+        app.config['TESTING'] = True
+        self.client = app.test_client()
+        database.init_db()
+
+        conn = database.get_db_connection()
+        conn.execute("DELETE FROM users WHERE username = 'alunolanding'")
+        conn.commit()
+        conn.close()
+
+    def test_visitante_sem_sessao_ve_a_landing(self):
+        res = self.client.get('/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('Transforme qualquer tema em'.encode('utf-8'), res.data)
+        # Os dois caminhos da landing: cadastro e login
+        self.assertIn(b'href="/register"', res.data)
+        self.assertIn(b'href="/login"', res.data)
+
+    def test_logado_vai_para_o_dashboard(self):
+        self.client.post('/register', data={
+            'name': 'Aluno Landing',
+            'username': 'alunolanding',
+            'email': f'landing_{time.time_ns()}@teste.com',
+            'password': 'senha123teste',
+            'confirm_password': 'senha123teste'
+        })
+        res = self.client.get('/')
+        self.assertEqual(res.status_code, 302)
+        self.assertTrue(res.headers['Location'].endswith('/dashboard'))
+
+
 if __name__ == '__main__':
     unittest.main()
